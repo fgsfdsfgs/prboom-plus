@@ -428,7 +428,7 @@ static const char* gld_HiRes_GetInternalName(GLTexture *gltexture)
   switch (gltexture->textype)
   {
   case GLDT_TEXTURE:
-    texname_p = textures[gltexture->index]->name;
+    texname_p = r_textures[gltexture->index]->name;
     break;
   case GLDT_FLAT:
   case GLDT_PATCH:
@@ -665,7 +665,7 @@ static int gld_HiRes_GetExternalName(GLTexture *gltexture, char *img_path, char 
   case GLDT_TEXTURE:
     {
       int i;
-      texture_t *texture = textures[gltexture->index];
+      texture_t *texture = r_textures[gltexture->index];
 
       if (!gl_hires_override_pwads)
       {

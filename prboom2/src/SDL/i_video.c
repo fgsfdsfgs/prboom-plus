@@ -129,10 +129,14 @@ SDL_Rect dst_rect = { 0, 0, 0, 0 };
 
 #ifdef __vita__
 static GLuint sw_texture;
+#define DEFAULT_SCREEN_W 960
+#define DEFAULT_SCREEN_H 544
 #else
 SDL_Texture *sdl_texture;
 SDL_Texture *sdl_texture_upscaled;
 SDL_GLContext sdl_glcontext;
+#define DEFAULT_SCREEN_W 640
+#define DEFAULT_SCREEN_H 480
 #endif
 
 ////////////////////////////////////////////////////////////////////////////
@@ -374,6 +378,40 @@ while (SDL_PollEvent(Event))
     D_PostEvent(&event);
     mwheeldowntic = 0;
   }
+}
+
+//
+// Wrappers around SDL resolution getting functions
+//
+
+static int I_GetNumDisplayModes(const int disp)
+{
+#ifdef __vita__
+  return 4;
+#else
+  return SDL_GetNumDisplayModes(disp);
+#endif
+}
+
+static int I_GetDisplayMode(const int disp, const int mode, SDL_DisplayMode *out)
+{
+#ifdef __vita__
+  static const SDL_DisplayMode modes[4] =
+  {
+    { SDL_PIXELFORMAT_BGRA8888, 480, 272, 60, NULL },
+    { SDL_PIXELFORMAT_BGRA8888, 640, 368, 60, NULL },
+    { SDL_PIXELFORMAT_BGRA8888, 720, 408, 60, NULL },
+    { SDL_PIXELFORMAT_BGRA8888, 960, 544, 60, NULL },
+  };
+  if (mode >= 0 && mode < sizeof(modes) / sizeof(*modes))
+  {
+    *out = modes[mode];
+    return 0;
+  }
+  return -1;
+#else
+  return SDL_GetDisplayMode(disp, mode, out);
+#endif
 }
 
 //
@@ -688,8 +726,8 @@ void I_GetScreenResolution(void)
 {
   int width, height;
 
-  desired_screenwidth = 640;
-  desired_screenheight = 480;
+  desired_screenwidth = DEFAULT_SCREEN_W;
+  desired_screenheight = DEFAULT_SCREEN_H;
 
   if (screen_resolution)
   {
@@ -727,7 +765,7 @@ static void I_FillScreenResolutionsList(void)
   // Don't call SDL_ListModes if SDL has not been initialized
   count = 0;
   if (!nodrawers)
-    count = SDL_GetNumDisplayModes(display_index);
+    count = I_GetNumDisplayModes(display_index);
 
   list_size = 0;
   current_resolution_index = -1;
@@ -740,7 +778,7 @@ static void I_FillScreenResolutionsList(void)
     {
       int in_list = false;
 
-      SDL_GetDisplayMode(display_index, i, &mode);
+      I_GetDisplayMode(display_index, i, &mode);
 
       doom_snprintf(mode_name, sizeof(mode_name), "%dx%d", mode.w, mode.h);
 
@@ -815,14 +853,14 @@ static void I_ClosestResolution (int *width, int *height)
   if (!SDL_WasInit(SDL_INIT_VIDEO))
     return;
 
-  count = SDL_GetNumDisplayModes(display_index);
+  count = I_GetNumDisplayModes(display_index);
 
   if (count > 0)
   {
     for(i=0; i<count; ++i)
     {
       SDL_DisplayMode mode;
-      SDL_GetDisplayMode(display_index, i, &mode);
+      I_GetDisplayMode(display_index, i, &mode);
 
       twidth = mode.w;
       theight = mode.h;
@@ -978,6 +1016,10 @@ void I_InitScreenResolution(void)
       if (myargv[p+1])
         desired_screenheight = atoi(myargv[p+1]);
 
+#ifdef __vita__
+    use_fullscreen = 1;
+#endif
+
     if ((p = M_CheckParm("-fullscreen")))
       use_fullscreen = 1;
 
@@ -994,12 +1036,6 @@ void I_InitScreenResolution(void)
 
     if ((p = M_CheckParm("-nowindow")))
       desired_fullscreen = 1;
-
-#ifdef __vita__
-    desired_fullscreen = use_fullscreen = 1;
-    desired_screenwidth = 960;
-    desired_screenheight = 544;
-#endif
 
     // e6y
     // change the screen size for the current session only
@@ -1300,22 +1336,23 @@ void I_UpdateVideoMode(void)
       init_flags);
 
     screen = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, V_GetNumPixelBits(), 0, 0, 0, 0);
-    buffer = SDL_CreateRGBSurface(0, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 32, 0, 0, 0, 0);
-    SDL_FillRect(buffer, NULL, 0);
-
     if(screen == NULL) {
       I_Error("Couldn't set %dx%d video mode [%s]", REAL_SCREENWIDTH, REAL_SCREENHEIGHT, SDL_GetError());
     }
 
 #ifdef __vita__
-    vglInitExtended(0x800000, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 0x1000000, SCE_GXM_MULTISAMPLE_NONE);
+    buffer = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, 32, 0, 0, 0, 0);
+    SDL_FillRect(buffer, NULL, 0);
+
+    // in software mode always init 960x544, we'll figure the other stuff out later
+    vglInitExtended(0x800000, DEFAULT_SCREEN_W, DEFAULT_SCREEN_H, 0x1000000, SCE_GXM_MULTISAMPLE_NONE);
     vglWaitVblankStart(render_vsync && !novsync);
 
     // we're gonna be drawing fullscreen quads, so set normal orthographic projection
     glClearColor(0, 0, 0, 0);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 0, -1, 1);
+    glOrtho(0, DEFAULT_SCREEN_W, DEFAULT_SCREEN_H, 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -1328,8 +1365,11 @@ void I_UpdateVideoMode(void)
     glBindTexture(GL_TEXTURE_2D, sw_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, SCREENWIDTH, SCREENHEIGHT, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen->pixels);
 #else
+    buffer = SDL_CreateRGBSurface(0, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 32, 0, 0, 0, 0);
+    SDL_FillRect(buffer, NULL, 0);
+
     flags = SDL_RENDERER_TARGETTEXTURE;
 
     if (render_vsync && !novsync)
@@ -1457,6 +1497,11 @@ void I_UpdateVideoMode(void)
   src_rect.h = SCREENHEIGHT;
   dst_rect.w = REAL_SCREENWIDTH;
   dst_rect.h = REAL_SCREENHEIGHT;
+#ifdef __vita__
+  // center the dest quad vertically and horizontally
+  dst_rect.x = (DEFAULT_SCREEN_W - REAL_SCREENWIDTH) / 2;
+  dst_rect.y = (DEFAULT_SCREEN_H - REAL_SCREENHEIGHT) / 2;
+#endif
 }
 
 static void ActivateMouse(void)

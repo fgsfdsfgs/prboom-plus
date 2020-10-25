@@ -90,8 +90,8 @@ int firstcolormaplump, lastcolormaplump;      // killough 4/17/98
 
 int       firstflat, lastflat, numflats;
 int       firstspritelump, lastspritelump, numspritelumps;
-int       numtextures;
-texture_t **textures; // proff - 04/05/2000 removed static for OpenGL
+int       r_numtextures;
+texture_t **r_textures; // proff - 04/05/2000 removed static for OpenGL
 fixed_t   *textureheight; //needed for texture pegging (and TFE fix - killough)
 int       *flattranslation;             // for global animation
 int       *texturetranslation;
@@ -187,15 +187,15 @@ static void R_InitTextures (void)
       numtextures2 = 0;
       maxoff2 = 0;
     }
-  numtextures = numtextures1 + numtextures2;
+  r_numtextures = numtextures1 + numtextures2;
 
   // killough 4/9/98: make column offsets 32-bit;
   // clean up malloc-ing to use sizeof
 
-  textures = Z_Malloc(numtextures*sizeof*textures, PU_STATIC, 0);
-  textureheight = Z_Malloc(numtextures*sizeof*textureheight, PU_STATIC, 0);
+  r_textures = Z_Malloc(r_numtextures*sizeof*r_textures, PU_STATIC, 0);
+  textureheight = Z_Malloc(r_numtextures*sizeof*textureheight, PU_STATIC, 0);
 
-  for (i=0 ; i<numtextures ; i++, directory++)
+  for (i=0 ; i<r_numtextures ; i++, directory++)
     {
       if (i == numtextures1)
         {
@@ -212,7 +212,7 @@ static void R_InitTextures (void)
 
       mtexture = (const maptexture_t *) ( (const byte *)maptex + offset);
 
-      texture = textures[i] =
+      texture = r_textures[i] =
         Z_Malloc(sizeof(texture_t) +
                  sizeof(texpatch_t)*(LittleShort(mtexture->patchcount)-1),
                  PU_STATIC, 0);
@@ -300,7 +300,7 @@ static void R_InitTextures (void)
   if (devparm) // cph - If in development mode, generate now so all errors are found at once
   {
     R_InitPatches(); //e6y
-    for (i=0 ; i<numtextures ; i++)
+    for (i=0 ; i<r_numtextures ; i++)
     {
       // proff - This is for the new renderer now
       R_CacheTextureCompositePatchNum(i);
@@ -316,19 +316,19 @@ static void R_InitTextures (void)
   // clean up malloc-ing to use sizeof
 
   texturetranslation =
-    Z_Malloc((numtextures+1)*sizeof*texturetranslation, PU_STATIC, 0);
+    Z_Malloc((r_numtextures+1)*sizeof*texturetranslation, PU_STATIC, 0);
 
-  for (i=0 ; i<numtextures ; i++)
+  for (i=0 ; i<r_numtextures ; i++)
     texturetranslation[i] = i;
 
   // killough 1/31/98: Initialize texture hash table
-  for (i = 0; i<numtextures; i++)
-    textures[i]->index = -1;
+  for (i = 0; i<r_numtextures; i++)
+    r_textures[i]->index = -1;
   while (--i >= 0)
     {
-      int j = W_LumpNameHash(textures[i]->name) % (unsigned) numtextures;
-      textures[i]->next = textures[j]->index;   // Prepend to chain
-      textures[j]->index = i;
+      int j = W_LumpNameHash(r_textures[i]->name) % (unsigned) r_numtextures;
+      r_textures[i]->next = r_textures[j]->index;   // Prepend to chain
+      r_textures[j]->index = i;
     }
 }
 
@@ -589,9 +589,9 @@ int PUREFUNC R_CheckTextureNumForName(const char *name)
   int i = NO_TEXTURE;
   if (*name != '-')     // "NoTexture" marker.
     {
-      i = textures[W_LumpNameHash(name) % (unsigned) numtextures]->index;
-      while (i >= 0 && strncasecmp(textures[i]->name,name,8))
-        i = textures[i]->next;
+      i = r_textures[W_LumpNameHash(name) % (unsigned) r_numtextures]->index;
+      while (i >= 0 && strncasecmp(r_textures[i]->name,name,8))
+        i = r_textures[i]->next;
     }
   return i;
 }
@@ -653,7 +653,7 @@ void R_PrecacheLevel(void)
 
   {
     int size = numflats > numsprites  ? numflats : numsprites;
-    hitlist = malloc(numtextures > size ? numtextures : size);
+    hitlist = malloc(r_numtextures > size ? r_numtextures : size);
   }
 
   // Precache flats.
@@ -669,7 +669,7 @@ void R_PrecacheLevel(void)
 
   // Precache textures.
 
-  memset(hitlist, 0, numtextures);
+  memset(hitlist, 0, r_numtextures);
 
   for (i = numsides; --i >= 0;)
     hitlist[sides[i].bottomtexture] =
@@ -685,10 +685,10 @@ void R_PrecacheLevel(void)
 
   hitlist[skytexture] = 1;
 
-  for (i = numtextures; --i >= 0; )
+  for (i = r_numtextures; --i >= 0; )
     if (hitlist[i])
       {
-        texture_t *texture = textures[i];
+        texture_t *texture = r_textures[i];
         int j = texture->patchcount;
         while (--j >= 0)
           precache_lump(texture->patches[j].patch);

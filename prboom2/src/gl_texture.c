@@ -259,7 +259,7 @@ static GLTexture *gld_AddNewGLTexItem(int num, int count, GLTexture ***items)
 
 static GLTexture *gld_AddNewGLTexture(int texture_num)
 {
-  return gld_AddNewGLTexItem(texture_num, numtextures, &gld_GLTextures);
+  return gld_AddNewGLTexItem(texture_num, r_numtextures, &gld_GLTextures);
 }
 
 static GLTexture *gld_AddNewGLPatchTexture(int lump)
@@ -572,8 +572,8 @@ GLTexture *gld_RegisterTexture(int texture_num, dboolean mipmap, dboolean force)
   {
     texture_t *texture=NULL;
 
-    if ((texture_num>=0) || (texture_num<numtextures))
-      texture=textures[texture_num];
+    if ((texture_num>=0) || (texture_num<r_numtextures))
+      texture=r_textures[texture_num];
     if (!texture)
       return NULL;
     gltexture->textype=GLDT_BROKEN;
@@ -1310,7 +1310,7 @@ static void gld_CleanTexItems(int count, GLTexture ***items)
 
 void gld_FlushTextures(void)
 {
-  gld_CleanTexItems(numtextures, &gld_GLTextures);
+  gld_CleanTexItems(r_numtextures, &gld_GLTextures);
   gld_CleanTexItems(numlumps, &gld_GLPatchTextures);
   gld_CleanTexItems(numlumps, &gld_GLStaticPatchTextures);
 
@@ -1372,7 +1372,7 @@ void gld_Precache(void)
 
   {
     size_t size = numflats > numsprites  ? numflats : numsprites;
-    hitlist = Z_Malloc((size_t)numtextures > size ? (size_t)numtextures : size,PU_LEVEL,0);
+    hitlist = Z_Malloc((size_t)r_numtextures > size ? (size_t)r_numtextures : size,PU_LEVEL,0);
   }
 
   // Precache flats.
@@ -1419,7 +1419,7 @@ void gld_Precache(void)
 
   // Precache textures.
 
-  memset(hitlist, 0, numtextures);
+  memset(hitlist, 0, r_numtextures);
 
   for (i = numsides; --i >= 0;)
   {
@@ -1503,9 +1503,9 @@ void gld_Precache(void)
     }
   }
 
-  CalcHitsCount(hitlist, numtextures, &hit, &hitcount);
+  CalcHitsCount(hitlist, r_numtextures, &hit, &hitcount);
 
-  for (i = numtextures; --i >= 0; )
+  for (i = r_numtextures; --i >= 0; )
     if (hitlist[i])
     {
       gld_ProgressUpdate("Loading Textures...", ++hit, hitcount);
@@ -1588,7 +1588,7 @@ void gld_Precache(void)
 void gld_CleanMemory(void)
 {
   gld_CleanVertexData();
-  gld_CleanTexItems(numtextures, &gld_GLTextures);
+  gld_CleanTexItems(r_numtextures, &gld_GLTextures);
   gld_CleanTexItems(numlumps, &gld_GLPatchTextures);
   gld_CleanDisplayLists();
   gl_preprocessed = false;

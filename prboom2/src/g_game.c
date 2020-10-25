@@ -309,7 +309,7 @@ static int   dclicks2;
 // joystick values are repeated
 static int   joyxmove;
 static int   joyymove;
-static dboolean joyarray[9];
+static dboolean joyarray[33];
 static dboolean *joybuttons = &joyarray[1];    // allow [-1]
 
 // Game events info
@@ -1001,15 +1001,14 @@ dboolean G_Responder (event_t* ev)
       return true;    // eat events
 
     case ev_joystick:
-      joybuttons[0] = ev->data1 & 1;
-      joybuttons[1] = ev->data1 & 2;
-      joybuttons[2] = ev->data1 & 4;
-      joybuttons[3] = ev->data1 & 8;
-      joybuttons[4] = ev->data1 & 16;
-      joybuttons[5] = ev->data1 & 32;
-      joybuttons[6] = ev->data1 & 64;
-      joybuttons[7] = ev->data1 & 128;
-      joyxmove = ev->data2;
+      joybuttons[0]  = ev->data1 & 1;
+      joybuttons[1]  = ev->data1 & 2;
+      joybuttons[2]  = ev->data1 & 4;
+      joybuttons[3]  = ev->data1 & 8;
+      joybuttons[4]  = ev->data1 & 16;
+      joybuttons[5]  = ev->data1 & 32;
+      joybuttons[6]  = ev->data1 & 64;
+      joybuttons[7]  = ev->data1 & 128;
       joyymove = ev->data3;
       return true;    // eat events
 

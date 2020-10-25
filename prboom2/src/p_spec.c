@@ -109,7 +109,7 @@ void MarkAnimatedTextures(void)
 #ifdef GL_DOOM
   anim_t* anim;
 
-  anim_textures = calloc(numtextures, sizeof(TAnimItemParam));
+  anim_textures = calloc(r_numtextures, sizeof(TAnimItemParam));
   anim_flats = calloc(numflats, sizeof(TAnimItemParam));
 
   for (anim = anims ; anim < lastanim ; anim++)

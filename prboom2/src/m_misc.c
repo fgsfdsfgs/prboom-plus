@@ -688,21 +688,21 @@ default_t defaults[] =
   {"Joystick settings",{NULL},{0},UL,UL,def_none,ss_none},
   {"use_joystick",{&usejoystick},{1},0,2,
    def_int,ss_none}, // number of joystick to use (0 for none)
-  {"joy_left",{&joyleft},{0},  UL,UL,def_int,ss_none},
-  {"joy_right",{&joyright},{0},UL,UL,def_int,ss_none},
-  {"joy_up",  {&joyup},  {0},  UL,UL,def_int,ss_none},
-  {"joy_down",{&joydown},{0},  UL,UL,def_int,ss_none},
-  {"joyb_fire",{&joybfire},{0},0,UL,
+  {"joy_left",{&joyleft},{7},  UL,UL,def_int,ss_none},
+  {"joy_right",{&joyright},{9},UL,UL,def_int,ss_none},
+  {"joy_up",  {&joyup},  {8},  UL,UL,def_int,ss_none},
+  {"joy_down",{&joydown},{6},  UL,UL,def_int,ss_none},
+  {"joyb_fire",{&joybfire},{2},0,UL,
    def_int,ss_keys}, // joystick button number to use for fire
-  {"joyb_strafe",{&joybstrafe},{1},0,UL,
+  {"joyb_strafe",{&joybstrafe},{0},0,UL,
    def_int,ss_keys}, // joystick button number to use for strafing
   {"joyb_strafeleft",{&joybstrafeleft},{4},0,UL,
    def_int,ss_keys}, // joystick button number to use for strafe left
   {"joyb_straferight",{&joybstraferight},{5},0,UL,
    def_int,ss_keys}, // joystick button number to use for strafe right
-  {"joyb_speed",{&joybspeed},{2},0,UL,
+  {"joyb_speed",{&joybspeed},{3},0,UL,
    def_int,ss_keys}, // joystick button number to use for running
-  {"joyb_use",{&joybuse},{3},0,UL,
+  {"joyb_use",{&joybuse},{1},0,UL,
    def_int,ss_keys}, // joystick button number to use for use/open
 
   {"Chat macros",{NULL},{0},UL,UL,def_none,ss_none},
