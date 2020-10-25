@@ -55,6 +55,10 @@
 #include <SDL_syswm.h>
 #endif
 
+#ifdef __vita__
+#include <vitaGL/source/vitaGL.h>
+#endif
+
 #include "m_argv.h"
 #include "doomstat.h"
 #include "doomdef.h"
@@ -119,12 +123,17 @@ SDL_Surface *surface;
 SDL_Surface *buffer;
 SDL_Window *sdl_window;
 SDL_Renderer *sdl_renderer;
-SDL_Texture *sdl_texture;
-SDL_Texture *sdl_texture_upscaled;
-SDL_GLContext sdl_glcontext;
 unsigned int windowid = 0;
 SDL_Rect src_rect = { 0, 0, 0, 0 };
 SDL_Rect dst_rect = { 0, 0, 0, 0 };
+
+#ifdef __vita__
+static GLuint sw_texture;
+#else
+SDL_Texture *sdl_texture;
+SDL_Texture *sdl_texture_upscaled;
+SDL_GLContext sdl_glcontext;
+#endif
 
 ////////////////////////////////////////////////////////////////////////////
 // Input code
@@ -567,6 +576,26 @@ void I_FinishUpdate (void)
   // 32-bit RGBA buffer that we can load into the texture.
   SDL_LowerBlit(screen, &src_rect, buffer, &src_rect);
 
+#ifdef __vita__
+  // Update the intermediate texture with the contents of the RGBA buffer.
+  glBindTexture(GL_TEXTURE_2D, sw_texture);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, src_rect.x, src_rect.y, src_rect.w, src_rect.h, GL_BGRA, GL_UNSIGNED_BYTE, buffer->pixels);
+
+  // Make sure the pillarboxes are kept clear each frame.
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  // Draw our buffer to screen, possibly upscaling it.
+  glBegin(GL_QUADS);
+    glTexCoord2i(0, 0);
+    glVertex3f(dst_rect.x, dst_rect.y, 0);
+    glTexCoord2i(1, 0);
+    glVertex3f(dst_rect.x + dst_rect.w, dst_rect.y, 0);
+    glTexCoord2i(1, 1);
+    glVertex3f(dst_rect.x + dst_rect.w, dst_rect.y + dst_rect.h, 0);
+    glTexCoord2i(0, 1);
+    glVertex3f(dst_rect.x, dst_rect.y + dst_rect.h, 0);
+  glEnd();
+#else
   // Update the intermediate texture with the contents of the RGBA buffer.
   SDL_UpdateTexture(sdl_texture, &src_rect, buffer->pixels, buffer->pitch);
 
@@ -591,6 +620,7 @@ void I_FinishUpdate (void)
 
   // Draw!
   SDL_RenderPresent(sdl_renderer);
+#endif
 }
 
 //
@@ -965,6 +995,12 @@ void I_InitScreenResolution(void)
     if ((p = M_CheckParm("-nowindow")))
       desired_fullscreen = 1;
 
+#ifdef __vita__
+    desired_fullscreen = use_fullscreen = 1;
+    desired_screenwidth = 960;
+    desired_screenheight = 544;
+#endif
+
     // e6y
     // change the screen size for the current session only
     // syntax: -geom WidthxHeight[w|f]
@@ -1148,12 +1184,22 @@ void I_UpdateVideoMode(void)
 
     I_InitScreenResolution();
 
+#ifdef __vita__
+    if (sw_texture)
+    {
+      glDeleteTextures(1, &sw_texture);
+      sw_texture = 0;
+    }
+    vglEnd();
+#else
     SDL_GL_DeleteContext(sdl_glcontext);
-    SDL_FreeSurface(screen);
-    SDL_FreeSurface(buffer);
     SDL_DestroyTexture(sdl_texture);
     SDL_DestroyTexture(sdl_texture_upscaled);
     SDL_DestroyRenderer(sdl_renderer);
+#endif
+
+    SDL_FreeSurface(screen);
+    SDL_FreeSurface(buffer);
     SDL_DestroyWindow(sdl_window);
     
     sdl_renderer = NULL;
@@ -1187,6 +1233,34 @@ void I_UpdateVideoMode(void)
   if (V_GetMode() == VID_MODEGL)
   {
 #ifdef GL_DOOM
+#ifdef __vita__
+    gld_MultisamplingInit();
+
+    // create a fake SDL window for events and shit
+    sdl_window = SDL_CreateWindow(
+      PACKAGE_NAME " " PACKAGE_VERSION,
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      REAL_SCREENWIDTH, REAL_SCREENHEIGHT,
+      0);
+
+    //e6y: anti-aliasing
+    const enum SceGxmMultisampleMode gxm_ms =
+      render_multisampling <= 1 ? SCE_GXM_MULTISAMPLE_NONE :
+      render_multisampling == 2 ? SCE_GXM_MULTISAMPLE_2X :
+                                  SCE_GXM_MULTISAMPLE_4X;
+    vglInitExtended(0x800000, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 0x1000000, gxm_ms);
+    vglWaitVblankStart(render_vsync && !novsync);
+
+    glClearColor(0, 0, 0, 0);
+
+    // clear matrices possibly stuck there from previous usage of sw modes
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    gld_CheckHardwareGamma();
+#else
     SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 0 );
     SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 0 );
     SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 0 );
@@ -1213,38 +1287,66 @@ void I_UpdateVideoMode(void)
 
     gld_CheckHardwareGamma();
 #endif
+#endif
   }
   else
   {
-    int flags = SDL_RENDERER_TARGETTEXTURE;
-
-    if (render_vsync && !novsync)
-      flags |= SDL_RENDERER_PRESENTVSYNC;
+    int flags;
 
     sdl_window = SDL_CreateWindow(
       PACKAGE_NAME " " PACKAGE_VERSION,
       SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
       REAL_SCREENWIDTH, REAL_SCREENHEIGHT,
       init_flags);
-    sdl_renderer = SDL_CreateRenderer(sdl_window, -1, flags);
-
-    SDL_RenderSetLogicalSize(sdl_renderer, REAL_SCREENWIDTH, REAL_SCREENHEIGHT);
 
     screen = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, V_GetNumPixelBits(), 0, 0, 0, 0);
     buffer = SDL_CreateRGBSurface(0, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 32, 0, 0, 0, 0);
     SDL_FillRect(buffer, NULL, 0);
 
+    if(screen == NULL) {
+      I_Error("Couldn't set %dx%d video mode [%s]", REAL_SCREENWIDTH, REAL_SCREENHEIGHT, SDL_GetError());
+    }
+
+#ifdef __vita__
+    vglInitExtended(0x800000, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 0x1000000, SCE_GXM_MULTISAMPLE_NONE);
+    vglWaitVblankStart(render_vsync && !novsync);
+
+    // we're gonna be drawing fullscreen quads, so set normal orthographic projection
+    glClearColor(0, 0, 0, 0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 0, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    // don't need depth, texture is always used
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+
+    // generate frame texture and fill it with black (have to do it so vitaGL would allocate it)
+    glGenTextures(1, &sw_texture);
+    glBindTexture(GL_TEXTURE_2D, sw_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 0, GL_BGRA, GL_UNSIGNED_BYTE, buffer->pixels);
+#else
+    flags = SDL_RENDERER_TARGETTEXTURE;
+
+    if (render_vsync && !novsync)
+      flags |= SDL_RENDERER_PRESENTVSYNC;
+
+    sdl_renderer = SDL_CreateRenderer(sdl_window, -1, flags);
+
+    SDL_RenderSetLogicalSize(sdl_renderer, REAL_SCREENWIDTH, REAL_SCREENHEIGHT);
+
     sdl_texture = SDL_CreateTextureFromSurface(sdl_renderer, buffer);
-    
+
     if (screen_multiply)
     {
       sdl_texture_upscaled = SDL_CreateTexture(sdl_renderer, SDL_PIXELFORMAT_ARGB8888,
         SDL_TEXTUREACCESS_TARGET, REAL_SCREENWIDTH, REAL_SCREENHEIGHT);
     }
-
-    if(screen == NULL) {
-      I_Error("Couldn't set %dx%d video mode [%s]", REAL_SCREENWIDTH, REAL_SCREENHEIGHT, SDL_GetError());
-    }
+#endif
   }
 
   if (sdl_video_window_pos)

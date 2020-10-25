@@ -68,7 +68,11 @@
 **
 */
 
-#include <SDL_opengl.h>
+#ifdef __vita__
+# include <vitaGL.h>
+#else
+# include <SDL_opengl.h>
+#endif
 #include <math.h>
 #include "v_video.h"
 #include "gl_intern.h"

@@ -42,6 +42,13 @@
 //#define USE_VBO
 
 #include <SDL.h>
+
+#ifdef __vita__
+
+#include <vitaGL/source/vitaGL.h>
+
+#else // __vita__
+
 #include <SDL_opengl.h>
 
 #if SDL_VERSION_ATLEAST(1, 3, 0)
@@ -56,6 +63,8 @@
 #include <GL/glu.h>	/* Header File For The GLU Library */
 #endif
 #endif
+
+#endif // __vita__
 
 #include "doomtype.h"
 

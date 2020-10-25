@@ -25,6 +25,13 @@ set(PACKAGE_TARNAME "prboom-plus")
 set(PACKAGE_VERSION "${PROJECT_VERSION}")
 set(PACKAGE_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
 
+# Vita things
+if(VITA)
+    include("${VITASDK}/share/vita.cmake")
+    set(VITA_TITLEID "FGS000667")
+    set(VITA_NAME "PrBoom Plus")
+endif()
+
 include(CheckSymbolExists)
 
 check_symbol_exists(stricmp "string.h" HAVE_STRICMP)
@@ -144,11 +151,29 @@ if(WITH_PORTMIDI)
     endif()
 endif()
 
+if(VITA)
+    # vitaGL is required and is present as a submodule, so make a target for it
+    set(VITAGL_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/vita/vitaGL/libvitaGL.a)
+    add_custom_target(build_vitaGL ALL 
+                   COMMAND ${CMAKE_MAKE_PROGRAM} HAVE_SBRK=1
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/vita/vitaGL
+                   COMMENT "Original vitaGL makefile target")
+    add_library(vitaGL STATIC IMPORTED)
+    set_property(TARGET vitaGL APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
+    set_target_properties(vitaGL PROPERTIES IMPORTED_LOCATION_NOCONFIG "${VITAGL_LIBRARY}")
+    add_dependencies(vitaGL build_vitaGL)
+endif()
+
 set(CMAKE_REQUIRED_INCLUDES_PREV ${CMAKE_REQUIRED_INCLUDES})
 set(CMAKE_REQUIRED_LIBRARIES_PREV ${CMAKE_REQUIRED_LIBRARIES})
 set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${SDL2_INCLUDE_DIRS})
 set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${SDL2_LIBRARIES})
-check_symbol_exists(SDL_JoystickGetAxis "SDL.h" HAVE_SDL_JOYSTICKGETAXIS)
+if(VITA)
+    # the check fails for our SDL.h for some reason
+    set(HAVE_SDL_JOYSTICKGETAXIS TRUE)
+else()
+    check_symbol_exists(SDL_JoystickGetAxis "SDL.h" HAVE_SDL_JOYSTICKGETAXIS)
+endif()
 set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_PREV})
 set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_PREV})
 
@@ -178,6 +203,10 @@ else()
         -Wpointer-arith -Wno-unused -Wno-switch -Wno-sign-compare -Wno-pointer-sign \
         -ffast-math"
     )
+    if (VITA)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mtune=cortex-a9 -mfpu=neon -mthumb -O0 -g3 -fsigned-char -fno-short-enums -flto")
+        set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -g3")
+    endif()
 endif()
 
 set(PRBOOM_OUTPUT_PATH ${CMAKE_BINARY_DIR})
@@ -185,6 +214,8 @@ set(PRBOOM_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(WAD_DATA prboom-plus.wad)
 set(WAD_DATA_PATH "${PRBOOM_OUTPUT_PATH}/${WAD_DATA}")
 
-add_subdirectory(data)
-add_subdirectory(doc)
+if(NOT CMAKE_CROSSCOMPILING)
+    add_subdirectory(data)
+    add_subdirectory(doc)
+endif()
 add_subdirectory(src)

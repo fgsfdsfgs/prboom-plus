@@ -71,6 +71,11 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
+#ifdef __vita__
+#include <vitaGL/source/vitaGL.h>
+#include <psp2/io/stat.h> 
+#include <dirent.h>
+#endif
 
 #ifndef PRBOOM_SERVER
 #include "m_argv.h"
@@ -138,6 +143,10 @@ dboolean I_StartDisplay(void)
   if (realframe)
     saved_gametic = gametic;
 
+#ifdef __vita__
+  vglStartRendering();
+#endif
+
   start_displaytime = SDL_GetTicks();
   InDisplay = true;
   return true;
@@ -145,6 +154,9 @@ dboolean I_StartDisplay(void)
 
 void I_EndDisplay(void)
 {
+#ifdef __vita__
+  vglStopRendering();
+#endif
   displaytime = SDL_GetTicks() - start_displaytime;
   InDisplay = false;
 }
@@ -388,6 +400,56 @@ const char* I_GetTempDir(void)
 #elif defined(MACOSX)
 
 /* Defined elsewhere */
+
+#elif defined(__vita__)
+
+const char *I_DoomExeDir(void)
+{
+  static char base[32];
+
+  if (!base[0])
+  {
+    const char *drives[] = { "uma0", "imc0", "ux0" };
+    const char *path = "/data/prboom";
+    unsigned int i;
+    DIR *dir;
+
+    // check if a prboom folder exists on one of the drives
+    // default to the last one (ux0)
+    for (i = 0; i < sizeof(drives) / sizeof(*drives); ++i)
+    {
+      snprintf(base, sizeof(base), "%s:%s", drives[i], path);
+      dir = opendir(base);
+      if (dir)
+      {
+        closedir(dir);
+        break;
+      }
+    }
+  }
+
+  return base;
+}
+
+const char *I_GetTempDir(void)
+{
+  static char base[48];
+
+  if (!base[0])
+  {
+    const char *basedir = I_DoomExeDir();
+    DIR *dir;
+    snprintf(base, sizeof(base), "%s/tmp", basedir);
+    dir = opendir(base);
+    // create it if it doesn't exist
+    if (!dir)
+      sceIoMkdir(base, 0755);
+    else
+      closedir(dir);
+  }
+
+  return base;
+}
 
 #else
 // cph - V.Aguilar (5/30/99) suggested return ~/.lxdoom/, creating

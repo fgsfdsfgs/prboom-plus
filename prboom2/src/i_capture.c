@@ -142,7 +142,7 @@ static int my_popen3 (pipeinfo_t *p); // 1 on success
 static void my_pclose3 (pipeinfo_t *p);
 
 
-#ifdef _WIN32
+#if defined(_WIN32)
 // direct winapi implementation
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN 1
@@ -310,6 +310,26 @@ static void my_pclose3 (pipeinfo_t *p)
   CloseHandle (puser->proc);
   CloseHandle (puser->thread);
   free (puser);
+}
+
+#elif defined(__vita__)
+// can't do shit on the vita
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+typedef struct
+{
+  int pid;
+} puser_t;
+
+static int my_popen3 (pipeinfo_t *p)
+{
+  return 0;
+}
+
+static void my_pclose3 (pipeinfo_t *p)
+{
 }
 
 #else // _WIN32

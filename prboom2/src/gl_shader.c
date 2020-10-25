@@ -39,7 +39,11 @@
 #ifdef USE_SHADERS
 
 #include <SDL.h>
-#include <SDL_opengl.h>
+#ifdef __vita__
+# include <vitaGL.h>
+#else
+# include <SDL_opengl.h>
+#endif
 #include <math.h>
 #include "doomstat.h"
 #include "v_video.h"

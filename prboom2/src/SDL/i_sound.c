@@ -72,6 +72,8 @@
 
 #include "d_main.h"
 
+#include "i_system.h"
+
 //e6y
 #include "i_pcsound.h"
 #include "e6y.h"
@@ -839,7 +841,11 @@ void I_InitMusic(void)
   }
 #ifdef HAVE_MIXER
   if (!music_tmp) {
-#ifndef _WIN32
+#if defined(__vita__)
+    char musname[128] = { 0 };
+    snprintf(musname, sizeof(musname), "%s/music.tmp", I_GetTempDir());
+    music_tmp = strdup(musname);
+#elif !defined(_WIN32)
     music_tmp = strdup("/tmp/"PACKAGE_TARNAME"-music-XXXXXX");
     {
       int fd = mkstemp(music_tmp);

@@ -34,7 +34,11 @@
 #ifndef _GL_STRUCT_H
 #define _GL_STRUCT_H
 
-#include <SDL_opengl.h>
+#ifdef __vita__
+# include <vitaGL.h>
+#else
+# include <SDL_opengl.h>
+#endif
 
 extern int nodesVersion;
 

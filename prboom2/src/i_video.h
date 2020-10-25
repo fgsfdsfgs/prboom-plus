@@ -39,7 +39,11 @@
 #endif
 
 #ifdef GL_DOOM
-#include <SDL_opengl.h>
+#ifdef __vita__
+# include <vitaGL.h>
+#else
+# include <SDL_opengl.h>
+#endif
 #endif
 
 #include "doomtype.h"

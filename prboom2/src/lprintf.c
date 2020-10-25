@@ -74,6 +74,16 @@ int lprintf(OutputLevels pri, const char *s, ...)
   doom_vsnprintf(msg,sizeof(msg),s,v);    /* print message in buffer  */
   va_end(v);
 
+#ifdef __vita__
+  FILE *fout;
+  fout = fopen("ux0:/data/prboom/log.log", "a");
+  if (fout)
+  {
+    fprintf(fout, "%s", msg);
+    fclose(fout);
+  }
+#endif
+
   if (lvl&cons_output_mask)               /* mask output as specified */
   {
 #ifdef _WIN32
@@ -105,7 +115,19 @@ void I_Error(const char *error, ...)
   doom_vsnprintf(errmsg,sizeof(errmsg),error,argptr);
   va_end(argptr);
   lprintf(LO_ERROR, "%s\n", errmsg);
-#ifdef _WIN32
+#if defined(__vita__)
+  {
+    char fname[256];
+    FILE *fout;
+    snprintf(fname, sizeof(fname), "%s/error.log", I_DoomExeDir());
+    fout = fopen(fname, "w");
+    if (fout)
+    {
+      fprintf(fout, "FATAL ERROR:\n%s\n", errmsg);
+      fclose(fout);
+    }
+  }
+#elif defined(_WIN32)
   if (!M_CheckParm ("-nodraw") && !capturing_video) {
     I_MessageBox(errmsg, PRB_MB_OK);
   }

@@ -402,7 +402,7 @@ default_t defaults[] =
 #endif
   /* 640x480 default resolution */
   {"screen_resolution",{NULL, &screen_resolution},{0,"640x480"},UL,UL,def_str,ss_none},
-  {"use_fullscreen",{&use_fullscreen},{0},0,1, /* proff 21/05/2000 */
+  {"use_fullscreen",{&use_fullscreen},{1},0,1, /* proff 21/05/2000 */
    def_bool,ss_none},
   {"render_vsync",{&render_vsync},{1},0,1,
    def_bool,ss_none},
@@ -686,7 +686,7 @@ default_t defaults[] =
    0,MAX_KEY,def_key,ss_keys}, // key to take a screenshot
 
   {"Joystick settings",{NULL},{0},UL,UL,def_none,ss_none},
-  {"use_joystick",{&usejoystick},{0},0,2,
+  {"use_joystick",{&usejoystick},{1},0,2,
    def_int,ss_none}, // number of joystick to use (0 for none)
   {"joy_left",{&joyleft},{0},  UL,UL,def_int,ss_none},
   {"joy_right",{&joyright},{0},UL,UL,def_int,ss_none},

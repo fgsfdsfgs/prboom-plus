@@ -329,7 +329,18 @@ function(AddGameExecutable TARGET SOURCES)
         target_include_directories(${TARGET} PRIVATE ${PORTMIDI_INCLUDE_DIR})
         target_link_libraries(${TARGET} PRIVATE ${PORTMIDI_LIBRARIES})
     endif()
-    add_dependencies(${TARGET} prboomwad)
+    if(NOT CMAKE_CROSSCOMPILING)
+        add_dependencies(${TARGET} prboomwad)
+    endif()
+
+    if(VITA)
+        target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../vita)
+        # HACK: this adds libraries in a severely fucked up order and our pkg-config seems to do jack shit,
+        #       so we just re-add them by hand
+        target_link_libraries(${TARGET} PRIVATE SDL2_net SDL2_image SDL2_mixer SDL2 vita2d vitaGL mathneon png jpeg mikmod mpg123 vorbisfile vorbis ogg FLAC z m c)
+        target_link_libraries(${TARGET} PRIVATE SceLibKernel_stub SceAppMgr_stub SceSysmodule_stub SceCtrl_stub SceTouch_stub SceNet_stub SceNetCtl_stub)
+        target_link_libraries(${TARGET} PRIVATE SceAppUtil_stub ScePower_stub SceCommonDialog_stub SceAudio_stub SceGxm_stub SceDisplay_stub SceHid_stub)
+    endif()
 
     if(MSVC)
         set_target_properties(${TARGET} PROPERTIES
@@ -390,10 +401,20 @@ if(OPENGL_FOUND AND OPENGL_GLU_FOUND)
     )
 endif()
 
+if(VITA)
+    # HACK: vita_create_self prepends CMAKE_CURRENT_BINARY_DIR to the source if it's a target,
+    #       which is set to src/ for some reason
+    vita_create_self(prboom-plus.self "../prboom-plus")
+    vita_create_vpk(prboom-plus.vpk ${VITA_TITLEID} prboom-plus.self NAME ${VITA_NAME})
+endif()
 
 # PrBoom-Plus server executable
 
 option(BUILD_SERVER "Build PrBoom-Plus server executable" ON)
+
+if(CMAKE_CROSSCOMPILING)
+    set(BUILD_SERVER OFF)
+endif()
 
 if(BUILD_SERVER AND SDL2_NET_FOUND)
     set(PRBOOM_PLUS_GAME_SERVER_SOURCES
