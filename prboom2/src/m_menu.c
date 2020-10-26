@@ -4559,9 +4559,13 @@ dboolean M_Responder (event_t* ev) {
   // Take care of any messages that need input
 
   if (messageToPrint) {
-    if (messageNeedsInput == true &&
-  !(ch == ' ' || ch == 'n' || ch == 'y' || ch == key_escape || ch == key_escape_alt)) // phares
-      return false;
+    if (messageNeedsInput) {
+      // fgs: allow operating Y/N messages with the menu enter/backspace keys
+      if (ch == key_menu_enter || ch == key_menu_enter_alt) ch = 'y';
+      if (ch == key_menu_backspace || ch == key_menu_backspace_alt) ch = 'n';
+      if (!(ch == ' ' || ch == 'n' || ch == 'y' || ch == key_escape || ch == key_escape_alt)) // phares
+        return false;
+    }
 
     menuactive = messageLastMenuActive;
     messageToPrint = 0;
@@ -4864,12 +4868,12 @@ dboolean M_Responder (event_t* ev) {
 
     if (default_verify)
       {
-  if (toupper(ch) == 'Y') {
+  if (toupper(ch) == 'Y' || ch == key_menu_enter || ch == key_menu_enter_alt) {
     M_ResetDefaults();
     default_verify = false;
     M_SelectDone(ptr1);
   }
-  else if (toupper(ch) == 'N') {
+  else if (toupper(ch) == 'N' || ch == key_menu_backspace || ch == key_menu_backspace_alt) {
     default_verify = false;
     M_SelectDone(ptr1);
   }
