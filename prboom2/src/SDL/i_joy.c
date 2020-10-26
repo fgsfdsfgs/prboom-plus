@@ -46,76 +46,128 @@
 #include "i_joy.h"
 #include "lprintf.h"
 
-int joyleft;
-int joyright;
-int joyup;
-int joydown;
+#define TRIGGER_DEADZONE 16384
+
+int joyaxis_moveh;
+int joyaxis_movev;
+int joyaxis_lookh;
+int joyaxis_lookv;
 
 int usejoystick;
 
-#ifdef HAVE_SDL_JOYSTICKGETAXIS
-static SDL_Joystick *joystick;
-#endif
+static SDL_GameController *joystick;
+static int joystick_num;
+
+static int prev_axis[SDL_CONTROLLER_AXIS_MAX];
 
 static void I_EndJoystick(void)
 {
   lprintf(LO_DEBUG, "I_EndJoystick : closing joystick\n");
+  if (joystick)
+  {
+    SDL_GameControllerClose(joystick);
+    joystick = NULL;
+  }
+}
+
+static inline int JoystickMove(const int axis)
+{
+  int axis_value;
+  if (axis >= 0 && axis < SDL_CONTROLLER_AXIS_MAX)
+  {
+    prev_axis[axis] = SDL_GameControllerGetAxis(joystick, axis);
+    axis_value = prev_axis[axis] / 3000;
+    if (abs(axis_value) < 7) axis_value = 0;
+    return axis_value;
+  }
+  return 0;
+}
+
+static inline int JoystickLook(const int axis)
+{
+  int axis_value, delta;
+  if (axis >= 0 && axis < SDL_CONTROLLER_AXIS_MAX)
+  {
+    axis_value = SDL_GameControllerGetAxis(joystick, axis);
+    delta = axis_value - prev_axis[axis];
+    if (delta)
+    {
+      prev_axis[axis] = axis_value;
+      return delta << 4;
+    }
+  }
+  return 0;
 }
 
 void I_PollJoystick(void)
 {
-#ifdef HAVE_SDL_JOYSTICKGETAXIS
   event_t ev;
   Sint16 axis_value;
+  int i;
 
-  if (!usejoystick || (!joystick)) return;
+  if (!usejoystick || !joystick) return;
+
+  // movement uses the old joystick system
+
   ev.type = ev_joystick;
-  ev.data1 =
-    (SDL_JoystickGetButton(joystick, 0)<<0) |
-    (SDL_JoystickGetButton(joystick, 1)<<1) |
-    (SDL_JoystickGetButton(joystick, 2)<<2) |
-    (SDL_JoystickGetButton(joystick, 3)<<3) |
-    (SDL_JoystickGetButton(joystick, 4)<<4) |
-    (SDL_JoystickGetButton(joystick, 5)<<5) |
-    (SDL_JoystickGetButton(joystick, 6)<<6) |
-    (SDL_JoystickGetButton(joystick, 7)<<7);
-  axis_value = SDL_JoystickGetAxis(joystick, 0) / 3000;
-  if (abs(axis_value)<7) axis_value=0;
-  ev.data2 = axis_value;
-  axis_value = SDL_JoystickGetAxis(joystick, 1) / 3000;
-  if (abs(axis_value)<7) axis_value=0;
-  ev.data3 = axis_value;
-
+  ev.data1 = 0;
+  ev.data2 = JoystickMove(joyaxis_moveh);
+  ev.data3 = JoystickMove(joyaxis_movev);
   D_PostEvent(&ev);
-#endif
+
+  // look translates to mouse motion
+
+  ev.type = ev_mouse;
+  ev.data1 = 0;
+  ev.data2 = JoystickLook(joyaxis_lookh);
+  ev.data3 = JoystickLook(joyaxis_lookv);
+  if (ev.data2 || ev.data3) D_PostEvent(&ev);
+
+  // triggers generate keypresses
+
+  ev.data2 = ev.data3 = 0;
+  for (i = SDL_CONTROLLER_AXIS_TRIGGERLEFT; i <= SDL_CONTROLLER_AXIS_TRIGGERRIGHT; ++i)
+  {
+    axis_value = SDL_GameControllerGetAxis(joystick, i);
+    ev.data1 = KEYD_JOY_BASE + i;
+    if (axis_value >= TRIGGER_DEADZONE && prev_axis[i] < TRIGGER_DEADZONE)
+    {
+      ev.type = ev_keydown;
+      D_PostEvent(&ev);
+    }
+    else if (axis_value < TRIGGER_DEADZONE && prev_axis[i] >= TRIGGER_DEADZONE)
+    {
+      ev.type = ev_keyup;
+      D_PostEvent(&ev);
+    }
+  }
 }
 
 void I_InitJoystick(void)
 {
-#ifdef HAVE_SDL_JOYSTICKGETAXIS
   const char* fname = "I_InitJoystick : ";
   int num_joysticks;
 
-  if (!usejoystick) return;
-  SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-  num_joysticks=SDL_NumJoysticks();
-  if (M_CheckParm("-nojoy") || (usejoystick>num_joysticks) || (usejoystick<0)) {
-    if ((usejoystick > num_joysticks) || (usejoystick < 0))
-      lprintf(LO_WARN, "%sinvalid joystick %d\n", fname, usejoystick);
-    else
-      lprintf(LO_INFO, "%suser disabled\n", fname);
+  if (!usejoystick || M_CheckParm("-nojoy")) return;
+
+  SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
+  num_joysticks = SDL_NumJoysticks();
+
+  if ((usejoystick > num_joysticks) || (usejoystick <= 0) || !SDL_IsGameController(usejoystick-1))
+  {
+    lprintf(LO_WARN, "%sinvalid joystick %d\n", fname, usejoystick);
     return;
   }
-  joystick=SDL_JoystickOpen(usejoystick-1);
+
+  joystick = SDL_GameControllerOpen(usejoystick-1);
   if (!joystick)
+  {
     lprintf(LO_ERROR, "%serror opening joystick %d\n", fname, usejoystick);
-  else {
-    atexit(I_EndJoystick);
-    lprintf(LO_INFO, "%sopened %s\n", fname, SDL_JoystickName(joystick));
-    joyup = 32767;
-    joydown = -32768;
-    joyright = 32767;
-    joyleft = -32768;
   }
-#endif
+  else
+  {
+    atexit(I_EndJoystick);
+    SDL_GameControllerEventState(SDL_ENABLE);
+    lprintf(LO_INFO, "%sopened %s\n", fname, SDL_GameControllerName(joystick));
+  }
 }

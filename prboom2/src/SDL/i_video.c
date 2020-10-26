@@ -226,19 +226,6 @@ static int I_TranslateKey(SDL_Keysym* key)
 /////////////////////////////////////////////////////////////////////////////////
 // Main input code
 
-/* cph - pulled out common button code logic */
-//e6y static 
-int I_SDLtoDoomMouseState(Uint32 buttonstate)
-{
-  return 0
-      | (buttonstate & SDL_BUTTON(1) ? 1 : 0)
-      | (buttonstate & SDL_BUTTON(2) ? 2 : 0)
-      | (buttonstate & SDL_BUTTON(3) ? 4 : 0)
-      | (buttonstate & SDL_BUTTON(6) ? 8 : 0)
-      | (buttonstate & SDL_BUTTON(7) ? 16 : 0)
-      ;
-}
-
 static void I_GetEvent(void)
 {
   event_t event;
@@ -290,48 +277,55 @@ while (SDL_PollEvent(Event))
     break;
 
   case SDL_KEYUP:
-  {
-    event.type = ev_keyup;
-    event.data1 = I_TranslateKey(&Event->key.keysym);
-    D_PostEvent(&event);
-  }
-  break;
+    {
+      event.type = ev_keyup;
+      event.data1 = I_TranslateKey(&Event->key.keysym);
+      D_PostEvent(&event);
+    }
+    break;
 
   case SDL_MOUSEBUTTONDOWN:
   case SDL_MOUSEBUTTONUP:
-  if (mouse_enabled && window_focused)
-  {
-    event.type = ev_mouse;
-    event.data1 = I_SDLtoDoomMouseState(SDL_GetMouseState(NULL, NULL));
-    event.data2 = event.data3 = 0;
+    if (mouse_enabled && window_focused)
+    {
+      event.type = Event->button.state == SDL_PRESSED ? ev_keydown : ev_keyup;
+      event.data1 = Event->button.button - 1 + KEYD_MOUSE1;
+      D_PostEvent(&event);
+    }
+    break;
+
+  case SDL_CONTROLLERBUTTONDOWN:
+  case SDL_CONTROLLERBUTTONUP:
+    event.type = Event->cbutton.state == SDL_PRESSED ? ev_keydown : ev_keyup;
+    event.data1 = Event->cbutton.button + KEYD_JOY_BASE;
     D_PostEvent(&event);
-  }
-  break;
+    break;
 
   case SDL_MOUSEWHEEL:
-  if (mouse_enabled && window_focused)
-  {
-    if (Event->wheel.y > 0)
+    if (mouse_enabled && window_focused)
     {
-      event.type = ev_keydown;
-      event.data1 = KEYD_MWHEELUP;
-      mwheeldowntic = gametic;
-      D_PostEvent(&event);
+      if (Event->wheel.y > 0)
+      {
+        event.type = ev_keydown;
+        event.data1 = KEYD_MWHEELUP;
+        mwheeldowntic = gametic;
+        D_PostEvent(&event);
+      }
+      else if (Event->wheel.y < 0)
+      {
+        event.type = ev_keydown;
+        event.data1 = KEYD_MWHEELDOWN;
+        mwheeluptic = gametic;
+        D_PostEvent(&event);
+      }
     }
-    else if (Event->wheel.y < 0)
-    {
-      event.type = ev_keydown;
-      event.data1 = KEYD_MWHEELDOWN;
-      mwheeluptic = gametic;
-      D_PostEvent(&event);
-    }
-  }
-  break;
+    break;
+
   case SDL_MOUSEMOTION:
     if (mouse_enabled && window_focused)
     {
       event.type = ev_mouse;
-      event.data1 = I_SDLtoDoomMouseState(Event->motion.state);
+      event.data1 = 0; // fgs: mouse buttons now virtual keys
       event.data2 = Event->motion.xrel << 4;
       event.data3 = -Event->motion.yrel << 4;
       D_PostEvent(&event);
@@ -384,10 +378,25 @@ while (SDL_PollEvent(Event))
 // Wrappers around SDL resolution getting functions
 //
 
+#ifdef __vita__
+static const SDL_DisplayMode vita_modes[] =
+{
+  { SDL_PIXELFORMAT_BGRA8888, 320, 200, 60, NULL },
+  { SDL_PIXELFORMAT_BGRA8888, 320, 240, 60, NULL },
+  { SDL_PIXELFORMAT_BGRA8888, 480, 272, 60, NULL },
+  { SDL_PIXELFORMAT_BGRA8888, 640, 368, 60, NULL },
+  { SDL_PIXELFORMAT_BGRA8888, 640, 400, 60, NULL },
+  { SDL_PIXELFORMAT_BGRA8888, 640, 480, 60, NULL },
+  { SDL_PIXELFORMAT_BGRA8888, 720, 408, 60, NULL },
+  { SDL_PIXELFORMAT_BGRA8888, 960, 544, 60, NULL },
+};
+static const int vita_nummodes = sizeof(vita_modes) / sizeof(*vita_modes);
+#endif
+
 static int I_GetNumDisplayModes(const int disp)
 {
 #ifdef __vita__
-  return 4;
+  return vita_nummodes;
 #else
   return SDL_GetNumDisplayModes(disp);
 #endif
@@ -396,16 +405,9 @@ static int I_GetNumDisplayModes(const int disp)
 static int I_GetDisplayMode(const int disp, const int mode, SDL_DisplayMode *out)
 {
 #ifdef __vita__
-  static const SDL_DisplayMode modes[4] =
+  if (mode >= 0 && mode < vita_nummodes)
   {
-    { SDL_PIXELFORMAT_BGRA8888, 480, 272, 60, NULL },
-    { SDL_PIXELFORMAT_BGRA8888, 640, 368, 60, NULL },
-    { SDL_PIXELFORMAT_BGRA8888, 720, 408, 60, NULL },
-    { SDL_PIXELFORMAT_BGRA8888, 960, 544, 60, NULL },
-  };
-  if (mode >= 0 && mode < sizeof(modes) / sizeof(*modes))
-  {
-    *out = modes[mode];
+    *out = vita_modes[mode];
     return 0;
   }
   return -1;
@@ -580,6 +582,7 @@ void I_FinishUpdate (void)
   }
 #endif
 
+#ifndef __vita__
   if ((screen_multiply > 1) || SDL_MUSTLOCK(screen)) {
       int h;
       byte *src;
@@ -602,6 +605,7 @@ void I_FinishUpdate (void)
 
       SDL_UnlockSurface(screen);
   }
+#endif
 
   /* Update the display buffer (flipping video pages if supported)
    * If we need to change palette, that implicitely does a flip */
@@ -982,11 +986,38 @@ void I_CalculateRes(int width, int height)
 
   // e6y: processing of screen_multiply
   {
-    int factor = ((V_GetMode() == VID_MODEGL) ? 1 : render_screen_multiply);
-    REAL_SCREENWIDTH = SCREENWIDTH * factor;
-    REAL_SCREENHEIGHT = SCREENHEIGHT * factor;
-    REAL_SCREENPITCH = SCREENPITCH * factor;
+    if (render_screen_multiply > 0)
+    {
+      // old fixed scale
+      const int factor = ((V_GetMode() == VID_MODEGL) ? 1 : render_screen_multiply);
+      REAL_SCREENWIDTH = SCREENWIDTH * factor;
+      REAL_SCREENHEIGHT = SCREENHEIGHT * factor;
+      REAL_SCREENPITCH = SCREENPITCH * factor;
+    }
+#ifdef __vita__
+    else
+    {
+      double xfactor, yfactor;
+      switch (render_screen_multiply)
+      {
+        case VID_SCALE_ASPECT:
+          xfactor = yfactor = (double)DEFAULT_SCREEN_H / (double)SCREENHEIGHT;
+          break;
+        case VID_SCALE_INT:
+          xfactor = yfactor = DEFAULT_SCREEN_H / SCREENHEIGHT;
+          break;
+        default:
+          xfactor = (double)DEFAULT_SCREEN_W / (double)SCREENWIDTH;
+          yfactor = (double)DEFAULT_SCREEN_H / (double)SCREENHEIGHT;
+          break;
+      }
+      // do a ceil here just in case
+      REAL_SCREENWIDTH = SCREENWIDTH * xfactor + 0.5;
+      REAL_SCREENHEIGHT = SCREENHEIGHT * yfactor + 0.5;
+      REAL_SCREENPITCH = SCREENPITCH * xfactor + 0.5;
+    }
   }
+#endif
 }
 
 // CPhipps -
@@ -998,7 +1029,7 @@ void I_InitScreenResolution(void)
   int i, p, w, h;
   char c, x;
   video_mode_t mode;
-  int init = (sdl_window == NULL);
+  int init = (screen == NULL);
 
   I_GetScreenResolution();
 
@@ -1148,6 +1179,26 @@ void I_InitGraphics(void)
 
   if (firsttime)
   {
+#ifdef __vita__
+    // init vitaGL once at the very start
+    // use max resolution; in software mode we'll just change the resolution of the
+    // framebuffer texture, in hardware mode there's little reason to use small res
+    const enum SceGxmMultisampleMode gxm_ms =
+      render_multisampling <= 1 ? SCE_GXM_MULTISAMPLE_NONE :
+      render_multisampling == 2 ? SCE_GXM_MULTISAMPLE_2X :
+                                  SCE_GXM_MULTISAMPLE_4X;
+    vglInitExtended(0x800000, DEFAULT_SCREEN_W, DEFAULT_SCREEN_H, 0x1000000, gxm_ms);
+    vglWaitVblankStart(GL_TRUE);
+    // create a fake SDL window for events and shit
+    sdl_window = SDL_CreateWindow(
+      PACKAGE_NAME " " PACKAGE_VERSION,
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      REAL_SCREENWIDTH, REAL_SCREENHEIGHT,
+      0);
+    if (!sdl_window)
+      I_Error("SDL window dead: %s", SDL_GetError());
+#endif
+
     firsttime = 0;
 
     atexit(I_ShutdownGraphics);
@@ -1204,7 +1255,7 @@ void I_UpdateVideoMode(void)
   const dboolean novsync = M_CheckParm("-timedemo") || \
                            M_CheckParm("-fastdemo");
 
-  if(sdl_window)
+  if(screen)
   {
     // video capturing cannot be continued with new screen settings
     I_CaptureFinish();
@@ -1226,17 +1277,16 @@ void I_UpdateVideoMode(void)
       glDeleteTextures(1, &sw_texture);
       sw_texture = 0;
     }
-    vglEnd();
 #else
     SDL_GL_DeleteContext(sdl_glcontext);
     SDL_DestroyTexture(sdl_texture);
     SDL_DestroyTexture(sdl_texture_upscaled);
     SDL_DestroyRenderer(sdl_renderer);
+    SDL_DestroyWindow(sdl_window);
 #endif
 
     SDL_FreeSurface(screen);
     SDL_FreeSurface(buffer);
-    SDL_DestroyWindow(sdl_window);
     
     sdl_renderer = NULL;
     sdl_window = NULL;
@@ -1269,24 +1319,10 @@ void I_UpdateVideoMode(void)
   if (V_GetMode() == VID_MODEGL)
   {
 #ifdef GL_DOOM
-#ifdef __vita__
+    //e6y: anti-aliasing
     gld_MultisamplingInit();
 
-    // create a fake SDL window for events and shit
-    sdl_window = SDL_CreateWindow(
-      PACKAGE_NAME " " PACKAGE_VERSION,
-      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-      REAL_SCREENWIDTH, REAL_SCREENHEIGHT,
-      0);
-
-    //e6y: anti-aliasing
-    const enum SceGxmMultisampleMode gxm_ms =
-      render_multisampling <= 1 ? SCE_GXM_MULTISAMPLE_NONE :
-      render_multisampling == 2 ? SCE_GXM_MULTISAMPLE_2X :
-                                  SCE_GXM_MULTISAMPLE_4X;
-    vglInitExtended(0x800000, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 0x1000000, gxm_ms);
-    vglWaitVblankStart(render_vsync && !novsync);
-
+#ifdef __vita__
     glClearColor(0, 0, 0, 0);
 
     // clear matrices possibly stuck there from previous usage of sw modes
@@ -1311,9 +1347,6 @@ void I_UpdateVideoMode(void)
     SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, gl_depthbuffer_bits );
     SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, 8 );
 
-    //e6y: anti-aliasing
-    gld_MultisamplingInit();
-
     sdl_window = SDL_CreateWindow(
       PACKAGE_NAME " " PACKAGE_VERSION,
       SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -1329,12 +1362,6 @@ void I_UpdateVideoMode(void)
   {
     int flags;
 
-    sdl_window = SDL_CreateWindow(
-      PACKAGE_NAME " " PACKAGE_VERSION,
-      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-      REAL_SCREENWIDTH, REAL_SCREENHEIGHT,
-      init_flags);
-
     screen = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, V_GetNumPixelBits(), 0, 0, 0, 0);
     if(screen == NULL) {
       I_Error("Couldn't set %dx%d video mode [%s]", REAL_SCREENWIDTH, REAL_SCREENHEIGHT, SDL_GetError());
@@ -1343,10 +1370,6 @@ void I_UpdateVideoMode(void)
 #ifdef __vita__
     buffer = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, 32, 0, 0, 0, 0);
     SDL_FillRect(buffer, NULL, 0);
-
-    // in software mode always init 960x544, we'll figure the other stuff out later
-    vglInitExtended(0x800000, DEFAULT_SCREEN_W, DEFAULT_SCREEN_H, 0x1000000, SCE_GXM_MULTISAMPLE_NONE);
-    vglWaitVblankStart(render_vsync && !novsync);
 
     // we're gonna be drawing fullscreen quads, so set normal orthographic projection
     glClearColor(0, 0, 0, 0);
@@ -1367,6 +1390,12 @@ void I_UpdateVideoMode(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, SCREENWIDTH, SCREENHEIGHT, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen->pixels);
 #else
+    sdl_window = SDL_CreateWindow(
+      PACKAGE_NAME " " PACKAGE_VERSION,
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      REAL_SCREENWIDTH, REAL_SCREENHEIGHT,
+      init_flags);
+
     buffer = SDL_CreateRGBSurface(0, REAL_SCREENWIDTH, REAL_SCREENHEIGHT, 32, 0, 0, 0, 0);
     SDL_FillRect(buffer, NULL, 0);
 
@@ -1421,7 +1450,11 @@ void I_UpdateVideoMode(void)
     lprintf(LO_INFO, "I_UpdateVideoMode: 0x%x, %s, %s\n", init_flags, screen && screen->pixels ? "SDL buffer" : "own buffer", screen && SDL_MUSTLOCK(screen) ? "lock-and-copy": "direct access");
 
     // Get the info needed to render to the display
+#ifdef __vita__
+    if (1)
+#else
     if (screen_multiply==1 && !SDL_MUSTLOCK(screen))
+#endif
     {
       screens[0].not_on_heap = true;
       screens[0].data = (unsigned char *) (screen->pixels);

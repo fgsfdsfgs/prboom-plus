@@ -179,6 +179,14 @@ int     key_menu_backspace;                                  //     ^
 int     key_menu_escape;                                     //     |
 int     key_menu_enter;                                      // phares 3/7/98
 int     key_menu_clear;
+int     key_menu_right_alt = KEYD_JOY_RIGHT; // TODO: put these in the config
+int     key_menu_left_alt = KEYD_JOY_LEFT;
+int     key_menu_up_alt = KEYD_JOY_UP;
+int     key_menu_down_alt = KEYD_JOY_DOWN;
+int     key_menu_backspace_alt = KEYD_JOY_B;
+int     key_menu_escape_alt = KEYD_JOY_START;
+int     key_menu_enter_alt = KEYD_JOY_A;
+int     key_menu_clear_alt = KEYD_JOY_Y;
 int     key_strafeleft;
 int     key_straferight;
 int     key_flyup;
@@ -188,6 +196,7 @@ int     key_use;
 int     key_strafe;
 int     key_speed;
 int     key_escape = KEYD_ESCAPE;                           // phares 4/13/98
+int     key_escape_alt = KEYD_JOY_START;
 int     key_savegame;                                               // phares
 int     key_loadgame;                                               //    |
 int     key_autorun;                                                //    V
@@ -224,7 +233,6 @@ int     key_gamma;
 int     key_spy;
 int     key_pause;
 int     key_setup;
-int     destination_keys[MAXPLAYERS];
 int     key_weapontoggle;
 int     key_weapon1;
 int     key_weapon2;
@@ -237,19 +245,8 @@ int     key_weapon8;                                                //    |
 int     key_weapon9;                                                // phares
 int     key_nextweapon;
 int     key_prevweapon;
-
 int     key_screenshot;             // killough 2/22/98: screenshot key
-int     mousebfire;
-int     mousebstrafe;
-int     mousebforward;
-int     mousebbackward;
-int     mousebuse;
-int     joybfire;
-int     joybstrafe;
-int     joybstrafeleft;
-int     joybstraferight;
-int     joybuse;
-int     joybspeed;
+int     destination_keys[MAXPLAYERS];
 
 #define MAXPLMOVE   (forwardmove[1])
 #define TURBOTHRESHOLD  0x32
@@ -293,9 +290,6 @@ static const struct
   { wp_bfg,          wp_bfg }
 };
 
-static int mousearray[6];
-static int *mousebuttons = &mousearray[1];    // allow [-1]
-
 // mouse values are used once
 static int   mousex;
 static int   mousey;
@@ -309,8 +303,6 @@ static int   dclicks2;
 // joystick values are repeated
 static int   joyxmove;
 static int   joyymove;
-static dboolean joyarray[33];
-static dboolean *joybuttons = &joyarray[1];    // allow [-1]
 
 // Game events info
 static buttoncode_t special_event; // Event triggered by local player, to send
@@ -445,10 +437,9 @@ void G_BuildTiccmd(ticcmd_t* cmd)
   memset(cmd,0,sizeof*cmd);
   cmd->consistancy = consistancy[consoleplayer][maketic%BACKUPTICS];
 
-  strafe = gamekeydown[key_strafe] || mousebuttons[mousebstrafe]
-    || joybuttons[joybstrafe];
+  strafe = gamekeydown[key_strafe];
   //e6y: the "RUN" key inverts the autorun state
-  speed = (gamekeydown[key_speed] || joybuttons[joybspeed] ? !autorun : autorun); // phares
+  speed = (gamekeydown[key_speed] ? !autorun : autorun); // phares
 
   forward = side = 0;
 
@@ -515,20 +506,18 @@ void G_BuildTiccmd(ticcmd_t* cmd)
     forward += forwardmove[speed];
   if (joyymove > 0)
     forward -= forwardmove[speed];
-  if (gamekeydown[key_straferight] || joybuttons[joybstraferight])
+  if (gamekeydown[key_straferight])
     side += sidemove[speed];
-  if (gamekeydown[key_strafeleft] || joybuttons[joybstrafeleft])
+  if (gamekeydown[key_strafeleft])
     side -= sidemove[speed];
 
     // buttons
   cmd->chatchar = HU_dequeueChatChar();
 
-  if (gamekeydown[key_fire] || mousebuttons[mousebfire] ||
-      joybuttons[joybfire])
+  if (gamekeydown[key_fire])
     cmd->buttons |= BT_ATTACK;
 
-  if (gamekeydown[key_use] || mousebuttons[mousebuse] ||
-      joybuttons[joybuse])
+  if (gamekeydown[key_use])
     {
       cmd->buttons |= BT_USE;
       // clear double clicks if hit use button
@@ -625,60 +614,6 @@ void G_BuildTiccmd(ticcmd_t* cmd)
       cmd->buttons |= BT_CHANGE;
       cmd->buttons |= newweapon<<BT_WEAPONSHIFT;
     }
-
-  // mouse
-  if (mousebuttons[mousebforward])
-    forward += forwardmove[speed];
-  if (mousebuttons[mousebbackward])
-    forward -= forwardmove[speed];
-
-  if (mouse_doubleclick_as_use) {//e6y
-
-  // forward double click
-  if (mousebuttons[mousebforward] != dclickstate && dclicktime > 1 )
-    {
-      dclickstate = mousebuttons[mousebforward];
-      if (dclickstate)
-        dclicks++;
-      if (dclicks == 2)
-        {
-          cmd->buttons |= BT_USE;
-          dclicks = 0;
-        }
-      else
-        dclicktime = 0;
-    }
-  else
-    if ((dclicktime += ticdup) > 20)
-      {
-        dclicks = 0;
-        dclickstate = 0;
-      }
-
-  // strafe double click
-
-  bstrafe = mousebuttons[mousebstrafe] || joybuttons[joybstrafe];
-  if (bstrafe != dclickstate2 && dclicktime2 > 1 )
-    {
-      dclickstate2 = bstrafe;
-      if (dclickstate2)
-        dclicks2++;
-      if (dclicks2 == 2)
-        {
-          cmd->buttons |= BT_USE;
-          dclicks2 = 0;
-        }
-      else
-        dclicktime2 = 0;
-    }
-  else
-    if ((dclicktime2 += ticdup) > 20)
-      {
-        dclicks2 = 0;
-        dclickstate2 = 0;
-      }
-
-  }//e6y: end if (mouse_doubleclick_as_use)
 
   forward += mousey;
   if (strafe)
@@ -847,8 +782,6 @@ static void G_DoLoadLevel (void)
   mousex = mousey = 0;
   mlooky = 0;//e6y
   special_event = 0; paused = false;
-  memset (&mousearray, 0, sizeof(mousearray));
-  memset (&joyarray, 0, sizeof(joyarray));
 
   // killough 5/13/98: in case netdemo has consoleplayer other than green
   ST_Start();
@@ -973,11 +906,7 @@ dboolean G_Responder (event_t* ev)
       return false;   // always let key up events filter down
 
     case ev_mouse:
-      mousebuttons[0] = ev->data1 & 1;
-      mousebuttons[1] = ev->data1 & 2;
-      mousebuttons[2] = ev->data1 & 4;
-      mousebuttons[3] = ev->data1 & 8;
-      mousebuttons[4] = ev->data1 & 16;
+      // fgs: mouse buttons are now virtual keys
       /*
        * bmead@surfree.com
        * Modified by Barry Mead after adding vastly more resolution
@@ -1001,14 +930,8 @@ dboolean G_Responder (event_t* ev)
       return true;    // eat events
 
     case ev_joystick:
-      joybuttons[0]  = ev->data1 & 1;
-      joybuttons[1]  = ev->data1 & 2;
-      joybuttons[2]  = ev->data1 & 4;
-      joybuttons[3]  = ev->data1 & 8;
-      joybuttons[4]  = ev->data1 & 16;
-      joybuttons[5]  = ev->data1 & 32;
-      joybuttons[6]  = ev->data1 & 64;
-      joybuttons[7]  = ev->data1 & 128;
+      // fgs: joystick buttons are now virtual keys
+      joyxmove = ev->data2;
       joyymove = ev->data3;
       return true;    // eat events
 
@@ -3905,9 +3828,8 @@ void P_WalkTicker()
   if (!walkcamera.type || menuactive)
     return;
 
-  strafe = gamekeydown[key_strafe] || mousebuttons[mousebstrafe]
-    || joybuttons[joybstrafe];
-  speed = autorun || gamekeydown[key_speed] || joybuttons[joybspeed]; // phares
+  strafe = gamekeydown[key_strafe];
+  speed = autorun || gamekeydown[key_speed]; // phares
 
   forward = side = 0;
   angturn = 0;
@@ -3964,10 +3886,6 @@ void P_WalkTicker()
   if (gamekeydown[key_strafeleft])
     side -= sidemove[speed];
 
-  //mouse
-  if (mousebuttons[mousebforward])
-    forward += forwardmove[speed];
-
   forward += mousey;
   if (strafe)
     side += mousex / 4;       /* mead  Don't want to strafe as fast as turns.*/
@@ -3981,8 +3899,7 @@ void P_WalkTicker()
     CheckPitch((signed int *) &walkcamera.pitch);
   }
 
-  if (gamekeydown[key_fire] || mousebuttons[mousebfire] ||
-      joybuttons[joybfire])
+  if (gamekeydown[key_fire])
   {
     walkcamera.x = players[0].mo->x;
     walkcamera.y = players[0].mo->y;
@@ -4067,7 +3984,7 @@ void G_ReadDemoContinueTiccmd (ticcmd_t* cmd)
 
   if (gametic >= demo_tics_count ||
     demo_continue_p > demobuffer + demolength ||
-    gamekeydown[key_demo_jointogame] || joybuttons[joybuse])
+    gamekeydown[key_demo_jointogame] || gamekeydown[key_use])
   {
     demo_continue_p = NULL;
     democontinue = false;

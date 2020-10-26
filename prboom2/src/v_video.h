@@ -302,6 +302,15 @@ void V_GetWideRect(int *x, int *y, int *w, int *h, enum patch_translation_e flag
 
 int V_BestColor(const unsigned char *palette, int r, int g, int b);
 
+// fgs: software screen scaling modes
+#define VID_SCALE_ASPECT -2
+#define VID_SCALE_INT    -1
+#define VID_SCALE_FULL    0
+#define VID_SCALE_1X      1
+#define VID_SCALE_2X      2
+#define VID_SCALE_3X      3
+#define VID_SCALE_4X      4
+
 #ifdef GL_DOOM
 #include "gl_struct.h"
 #endif

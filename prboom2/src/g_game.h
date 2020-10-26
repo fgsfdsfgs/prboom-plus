@@ -118,6 +118,14 @@ extern int  key_menu_backspace;                              //     ^
 extern int  key_menu_escape;                                 //     |
 extern int  key_menu_enter;                                  // phares 3/7/98
 extern int  key_menu_clear;
+extern int  key_menu_right_alt;
+extern int  key_menu_left_alt;
+extern int  key_menu_up_alt;
+extern int  key_menu_down_alt;
+extern int  key_menu_backspace_alt;
+extern int  key_menu_escape_alt;
+extern int  key_menu_enter_alt;
+extern int  key_menu_clear_alt;
 extern int  key_strafeleft;
 extern int  key_straferight;
 extern int  key_flyup;
@@ -127,6 +135,7 @@ extern int  key_fire;
 extern int  key_use;
 extern int  key_strafe;
 extern int  key_speed;
+extern int  key_escape_alt;
 extern int  key_escape;                                             // phares
 extern int  key_savegame;                                           //    |
 extern int  key_loadgame;                                           //    V
@@ -165,7 +174,6 @@ extern int  key_weapon8;
 extern int  key_weapon9;
 extern int  key_nextweapon;
 extern int  key_prevweapon;
-extern int  destination_keys[MAXPLAYERS];
 extern int  key_map_right;
 extern int  key_map_left;
 extern int  key_map_up;
@@ -182,18 +190,8 @@ extern int  key_map_rotate; // cph - map rotation
 extern int  key_map_overlay;// cph - map overlay
 extern int  key_map_textured;  //e6y: textured automap
 extern int  key_screenshot;    // killough 2/22/98 -- add key for screenshot
+extern int  destination_keys[MAXPLAYERS];
 extern int  autorun;           // always running?                   // phares
-extern int  mousebfire;
-extern int  mousebstrafe;
-extern int  mousebforward;
-extern int  mousebbackward;
-extern int  mousebuse;
-extern int  joybfire;
-extern int  joybstrafe;
-extern int  joybstrafeleft;
-extern int  joybstraferight;
-extern int  joybuse;
-extern int  joybspeed;
 
 extern int  defaultskill;      //jff 3/24/98 default skill
 extern dboolean haswolflevels;  //jff 4/18/98 wolf levels present

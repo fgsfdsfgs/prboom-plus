@@ -31,17 +31,10 @@
  *
  *-----------------------------------------------------------------------------*/
 
-extern int joybfire;
-extern int joybstrafe;
-extern int joybstrafeleft;
-extern int joybstraferight;
-extern int joybuse;
-extern int joybspeed;
-
-extern int joyleft;
-extern int joyright;
-extern int joyup;
-extern int joydown;
+extern int joyaxis_moveh;
+extern int joyaxis_movev;
+extern int joyaxis_lookh;
+extern int joyaxis_lookv;
 
 extern int usejoystick;
 

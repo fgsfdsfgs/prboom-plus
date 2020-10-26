@@ -515,7 +515,7 @@ void M_ChangeMaxViewPitch(void)
   viewpitch = 0;
 }
 
-void M_ChangeScreenMultipleFactor(void)
+void M_ChangeScreenScaling(void)
 {
   V_ChangeScreenResolution();
 }

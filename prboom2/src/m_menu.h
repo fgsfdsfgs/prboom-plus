@@ -178,9 +178,9 @@ typedef struct setup_menu_s
     struct setup_menu_s *menu;  /* next or prev menu */
   } var;
 
-  int         *m_mouse; /* mouse button value, or 0 if not shown */
-  int         *m_joy;   /* joystick button value, or 0 if not shown */
-  void (*action)(void); /* killough 10/98: function to call after changing */
+  int         *m_altkey;  /* alternate key value, or 0 if not shown */
+  int         *m_altkey2; /* second alternate key value, or 0 if not shown */
+  void (*action)(void);   /* killough 10/98: function to call after changing */
   const char **selectstrings; /* list of strings for choice value */
 } setup_menu_t;
 

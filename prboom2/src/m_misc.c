@@ -512,18 +512,6 @@ default_t defaults[] =
   //jff 4/3/98 allow unlimited sensitivity
   {"mouse_sensitivity_vert",{&mouseSensitivity_vert},{1},0,UL,
    def_int,ss_none}, /* adjust vertical (y) mouse sensitivity killough/mead */
-  //jff 3/8/98 allow -1 in mouse bindings to disable mouse function
-  {"mouseb_fire",{&mousebfire},{0},-1,MAX_MOUSEB,
-   def_int,ss_keys}, // mouse button number to use for fire
-  {"mouseb_strafe",{&mousebstrafe},{1},-1,MAX_MOUSEB,
-   def_int,ss_keys}, // mouse button number to use for strafing
-  {"mouseb_forward",{&mousebforward},{2},-1,MAX_MOUSEB,
-   def_int,ss_keys}, // mouse button number to use for forward motion
-  {"mouseb_backward",{&mousebbackward},{-1},-1,MAX_MOUSEB,
-   def_int,ss_keys}, // mouse button number to use for backward motion
-  {"mouseb_use", {&mousebuse},{-1},-1,MAX_MOUSEB,
-   def_int,ss_keys}, // mouse button number to use for using doors/switches
-  //jff 3/8/98 end of lower range change for -1 allowed in mouse binding
 
 // For key bindings, the values stored in the key_* variables       // phares
 // are the internal Doom Codes. The values stored in the default.cfg
@@ -688,22 +676,10 @@ default_t defaults[] =
   {"Joystick settings",{NULL},{0},UL,UL,def_none,ss_none},
   {"use_joystick",{&usejoystick},{1},0,2,
    def_int,ss_none}, // number of joystick to use (0 for none)
-  {"joy_left",{&joyleft},{7},  UL,UL,def_int,ss_none},
-  {"joy_right",{&joyright},{9},UL,UL,def_int,ss_none},
-  {"joy_up",  {&joyup},  {8},  UL,UL,def_int,ss_none},
-  {"joy_down",{&joydown},{6},  UL,UL,def_int,ss_none},
-  {"joyb_fire",{&joybfire},{2},0,UL,
-   def_int,ss_keys}, // joystick button number to use for fire
-  {"joyb_strafe",{&joybstrafe},{0},0,UL,
-   def_int,ss_keys}, // joystick button number to use for strafing
-  {"joyb_strafeleft",{&joybstrafeleft},{4},0,UL,
-   def_int,ss_keys}, // joystick button number to use for strafe left
-  {"joyb_straferight",{&joybstraferight},{5},0,UL,
-   def_int,ss_keys}, // joystick button number to use for strafe right
-  {"joyb_speed",{&joybspeed},{3},0,UL,
-   def_int,ss_keys}, // joystick button number to use for running
-  {"joyb_use",{&joybuse},{1},0,UL,
-   def_int,ss_keys}, // joystick button number to use for use/open
+  {"joyaxis_moveh",{&joyaxis_moveh},{0},UL,UL,def_int,ss_none},
+  {"joyaxis_movev",{&joyaxis_movev},{1},UL,UL,def_int,ss_none},
+  {"joyaxis_lookh",{&joyaxis_lookh},{2},UL,UL,def_int,ss_none},
+  {"joyaxis_lookv",{&joyaxis_lookv},{3},UL,UL,def_int,ss_none},
 
   {"Chat macros",{NULL},{0},UL,UL,def_none,ss_none},
   {"chatmacro0", {0,&chat_macros[0]}, {0,HUSTR_CHATMACRO0},UL,UL,
@@ -997,7 +973,13 @@ default_t defaults[] =
    def_bool,ss_stat},
   {"render_wipescreen", {&render_wipescreen},  {1},0,1,
    def_bool,ss_stat},
-  {"render_screen_multiply", {&render_screen_multiply},  {1},1,4,
+  {"render_screen_multiply", {&render_screen_multiply},  {1},
+#ifdef __vita__
+  -2, // additional options for auto scaling
+#else
+   1,
+#endif
+   4,
    def_int,ss_stat},
   {"render_aspect", {&render_aspect},  {0},0,4,
    def_int,ss_stat},

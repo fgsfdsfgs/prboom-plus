@@ -292,7 +292,7 @@ typedef enum {
 // cph - Add the numeric keypad keys, as suggested by krose 4/22/99:
 // The way numbers are assigned to keys is a mess, but it's too late to
 // change that easily. At least these additions are don neatly.
-// Codes 0x100-0x200 are reserved for number pad
+// Codes 0x100-0x120 are reserved for number pad
 
 #define KEYD_KEYPAD0      (0x100 + '0')
 #define KEYD_KEYPAD1      (0x100 + '1')
@@ -317,6 +317,26 @@ typedef enum {
 #define KEYD_MOUSE3     (0x80 + 0x62)
 #define KEYD_MWHEELUP   (0x80 + 0x6b)
 #define KEYD_MWHEELDOWN (0x80 + 0x6c)
+
+// fgs: virtual joystick keys
+#define KEYD_JOY_BASE   (0x120 + 0x00)
+#define KEYD_JOY_A      (0x120 + 0x00)
+#define KEYD_JOY_B      (0x120 + 0x01)
+#define KEYD_JOY_X      (0x120 + 0x02)
+#define KEYD_JOY_Y      (0x120 + 0x03)
+#define KEYD_JOY_BACK   (0x120 + 0x04)
+#define KEYD_JOY_GUIDE  (0x120 + 0x05)
+#define KEYD_JOY_START  (0x120 + 0x06)
+#define KEYD_JOY_LSTICK (0x120 + 0x07)
+#define KEYD_JOY_RSTICK (0x120 + 0x08)
+#define KEYD_JOY_L      (0x120 + 0x09)
+#define KEYD_JOY_R      (0x120 + 0x0a)
+#define KEYD_JOY_UP     (0x120 + 0x0b)
+#define KEYD_JOY_DOWN   (0x120 + 0x0c)
+#define KEYD_JOY_LEFT   (0x120 + 0x0d)
+#define KEYD_JOY_RIGHT  (0x120 + 0x0e)
+#define KEYD_JOY_LTRIG  (0x120 + 0x10)
+#define KEYD_JOY_RTRIG  (0x120 + 0x11)
 
 // phares 4/19/98:
 // Defines Setup Screen groups that config variables appear in.
