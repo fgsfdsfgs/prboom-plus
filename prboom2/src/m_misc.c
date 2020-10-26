@@ -395,7 +395,7 @@ default_t defaults[] =
 
   {"Video settings",{NULL},{0},UL,UL,def_none,ss_none},
 #ifdef GL_DOOM
-  #ifdef _MSC_VER
+  #if defined(_MSC_VER) || defined(__vita__)
     {"videomode",{NULL, &default_videomode},{0,"OpenGL"},UL,UL,def_str,ss_none},
   #else
     {"videomode",{NULL, &default_videomode},{0,"8"},UL,UL,def_str,ss_none},
@@ -403,8 +403,8 @@ default_t defaults[] =
 #else
   {"videomode",{NULL, &default_videomode},{0,"8"},UL,UL,def_str,ss_none},
 #endif
-  /* 640x480 default resolution */
-  {"screen_resolution",{NULL, &screen_resolution},{0,"640x480"},UL,UL,def_str,ss_none},
+  /* 320x200 default resolution */
+  {"screen_resolution",{NULL, &screen_resolution},{0,"320x200"},UL,UL,def_str,ss_none},
   {"use_fullscreen",{&use_fullscreen},{1},0,1, /* proff 21/05/2000 */
    def_bool,ss_none},
   {"render_vsync",{&render_vsync},{1},0,1,
