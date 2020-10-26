@@ -129,6 +129,8 @@ SDL_Rect dst_rect = { 0, 0, 0, 0 };
 
 #ifdef __vita__
 static GLuint sw_texture;
+static GLenum sw_texfmt;
+static GLenum sw_textype;
 #define DEFAULT_SCREEN_W 960
 #define DEFAULT_SCREEN_H 544
 #else
@@ -497,7 +499,7 @@ static void I_UploadNewPalette(int pal, int force)
   static int cachedgamma;
   static size_t num_pals;
 
-  if (V_GetMode() == VID_MODEGL)
+  if (V_GetMode() != VID_MODE8)
     return;
 
   if ((colours == NULL) || (cachedgamma != usegamma) || force) {
@@ -616,12 +618,13 @@ void I_FinishUpdate (void)
 
   // Blit from the paletted 8-bit screen buffer to the intermediate
   // 32-bit RGBA buffer that we can load into the texture.
-  SDL_LowerBlit(screen, &src_rect, buffer, &src_rect);
+  if (buffer != screen)
+    SDL_LowerBlit(screen, &src_rect, buffer, &src_rect);
 
 #ifdef __vita__
   // Update the intermediate texture with the contents of the RGBA buffer.
   glBindTexture(GL_TEXTURE_2D, sw_texture);
-  glTexSubImage2D(GL_TEXTURE_2D, 0, src_rect.x, src_rect.y, src_rect.w, src_rect.h, GL_BGRA, GL_UNSIGNED_BYTE, buffer->pixels);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, src_rect.x, src_rect.y, src_rect.w, src_rect.h, sw_texfmt, sw_textype, buffer->pixels);
 
   // Make sure the pillarboxes are kept clear each frame.
   glClear(GL_COLOR_BUFFER_BIT);
@@ -1286,8 +1289,9 @@ void I_UpdateVideoMode(void)
 #endif
 
     SDL_FreeSurface(screen);
-    SDL_FreeSurface(buffer);
-    
+    if (buffer != screen)
+      SDL_FreeSurface(buffer);
+
     sdl_renderer = NULL;
     sdl_window = NULL;
     screen = NULL;
@@ -1368,8 +1372,16 @@ void I_UpdateVideoMode(void)
     }
 
 #ifdef __vita__
-    buffer = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, 32, 0, 0, 0, 0);
-    SDL_FillRect(buffer, NULL, 0);
+    if (V_GetMode() != VID_MODE8)
+    {
+      // no use converting anything
+      buffer = screen;
+    }
+    else
+    {
+      buffer = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, 32, 0, 0, 0, 0);
+      SDL_FillRect(buffer, NULL, 0);
+    }
 
     // we're gonna be drawing fullscreen quads, so set normal orthographic projection
     glClearColor(0, 0, 0, 0);
@@ -1383,12 +1395,30 @@ void I_UpdateVideoMode(void)
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
 
+    // if the video mode is not indexed, we can use the screen surface as is
+    // otherwise we'll need to convert
+    switch (V_GetMode())
+    {
+      case VID_MODE16:
+        sw_textype = GL_UNSIGNED_SHORT_5_6_5;
+        sw_texfmt = GL_RGB;
+        break;
+      case VID_MODE15:
+        sw_textype = GL_UNSIGNED_SHORT_5_5_5_1;
+        sw_texfmt = GL_RGBA;
+        break;
+      default:
+        sw_textype = GL_UNSIGNED_BYTE;
+        sw_texfmt = GL_BGRA;
+        break;
+    }
+
     // generate frame texture and fill it with black (have to do it so vitaGL would allocate it)
     glGenTextures(1, &sw_texture);
     glBindTexture(GL_TEXTURE_2D, sw_texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, SCREENWIDTH, SCREENHEIGHT, 0, GL_BGRA, GL_UNSIGNED_BYTE, screen->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, sw_texfmt, SCREENWIDTH, SCREENHEIGHT, 0, sw_texfmt, sw_textype, screen->pixels);
 #else
     sdl_window = SDL_CreateWindow(
       PACKAGE_NAME " " PACKAGE_VERSION,
