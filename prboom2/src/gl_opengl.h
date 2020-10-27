@@ -47,6 +47,110 @@
 
 #include <vitaGL/source/vitaGL.h>
 
+// some extension function types that we won't use
+typedef void (*PFNGLCOLORTABLEEXTPROC) (GLenum target, GLenum internalFormat, GLsizei width, GLenum format, GLenum type, const GLvoid *table);
+typedef void (*PFNGLACTIVETEXTUREARBPROC)(GLenum texture);
+typedef void (*PFNGLCLIENTACTIVETEXTUREARBPROC) (GLenum texture);
+typedef void (*PFNGLMULTITEXCOORD2FARBPROC) (GLenum target, GLfloat s, GLfloat t);
+typedef void (*PFNGLMULTITEXCOORD2FVARBPROC) (GLenum target, const GLfloat *v);
+typedef void (*PFNGLBLENDCOLOREXTPROC) (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+typedef void (*PFNGLCOMPRESSEDTEXIMAGE2DARBPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid *data);
+typedef void (*PFNGLGENBUFFERSARBPROC) (GLsizei n, GLuint *buffers);
+typedef void (*PFNGLDELETEBUFFERSARBPROC) (GLsizei n, const GLuint *buffers);
+typedef void (*PFNGLBINDBUFFERARBPROC) (GLenum target, GLuint buffer);
+typedef void (*PFNGLBUFFERDATAARBPROC) (GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage);
+typedef void (*PFNGLBUFFERSUBDATAARBPROC) (GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid *data);
+typedef void (*PFNGLGETBUFFERPARAMETERIVARBPROC) (GLenum target, GLenum pname, GLint *params);
+typedef void *(*PFNGLMAPBUFFERARBPROC) (GLenum target, GLenum access);
+typedef GLboolean (*PFNGLUNMAPBUFFERARBPROC) (GLenum target);
+
+// don't have display lists
+
+#define glGenLists(n) (0)
+#define glNewList(i, m) do {} while (0)
+#define glEndList() do {} while (0)
+#define glDeleteLists(x, y) do {} while (0)
+#define glCallList(n) do {} while (0)
+#define glPixelStorei(x, y) do {} while (0)
+
+// don't have these either
+
+#define glFlush() do {} while (0)
+#define glHint(x, y) do {} while (0)
+#define glTexGenf(x, y, z) do {} while (0)
+#define glTexGenfv(x, y, z) do {} while (0)
+#define glShadeModel(x) do {} while (0)
+
+// some missing constants
+
+/* base */
+#define GL_POLYGON_SMOOTH   0x0B41
+#define GL_PACK_ALIGNMENT   0x0D05
+#define GL_UNPACK_ALIGNMENT 0x0CF5
+#define GL_SHADE_MODEL      0x0B54
+#define GL_FLAT             0x1D00
+#define GL_SMOOTH           0x1D01
+#define GL_TEXTURE_GEN_S    0x0C60
+#define GL_TEXTURE_GEN_T    0x0C61
+#define GL_TEXTURE_GEN_R    0x0C62
+#define GL_TEXTURE_GEN_Q    0x0C63
+#define GL_GENERATE_MIPMAP  0x8191
+#define GL_RGBA2            0x8055
+#define GL_RGBA4            0x8056
+#define GL_RGB5_A1          0x8057
+#define GL_RGBA8            0x8058
+
+/* GL_NV_depth_clamp */
+#define GL_DEPTH_CLAMP_NV   0x864F
+
+/* GL_EXT_texture_compression_s3tc */
+#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT  0x83F2
+
+/* GL_EXT_texture_filter_anisotropic */
+#define GL_TEXTURE_MAX_ANISOTROPY_EXT     0x84FE
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
+
+/* GL_EXT_shared_texture_palette */
+#define GL_SHARED_TEXTURE_PALETTE_EXT 0x81FB
+
+/* GL_EXT_texture_env_combine */
+#define GL_COMBINE        0x8570
+#define GL_COMBINE_RGB    0x8571
+#define GL_COMBINE_ALPHA  0x8572
+#define GL_RGB_SCALE      0x8573
+#define GL_ADD_SIGNED     0x8574
+#define GL_INTERPOLATE    0x8575
+#define GL_CONSTANT       0x8576
+#define GL_PRIMARY_COLOR  0x8577
+#define GL_PREVIOUS       0x8578
+#define GL_SOURCE0_RGB    0x8580
+#define GL_SOURCE1_RGB    0x8581
+#define GL_SOURCE2_RGB    0x8582
+#define GL_SOURCE0_ALPHA  0x8588
+#define GL_SOURCE1_ALPHA  0x8589
+#define GL_SOURCE2_ALPHA  0x858A
+#define GL_OPERAND0_RGB   0x8590
+#define GL_OPERAND1_RGB   0x8591
+#define GL_OPERAND2_RGB   0x8592
+#define GL_OPERAND0_ALPHA 0x8598
+#define GL_OPERAND1_ALPHA 0x8599
+#define GL_OPERAND2_ALPHA 0x859A
+
+/* GL_ARB_multisample */
+#define GL_MULTISAMPLE_ARB 0x809D
+
+/* GL_EXT_texture_env_dot3 */
+#define GL_DOT3_RGB       0x8740
+#define GL_DOT3_RGBA      0x8741
+
+/* some ARB postfixed stuff */
+#define GL_STATIC_DRAW_ARB GL_STATIC_DRAW
+#define GL_TEXTURE0_ARB    GL_TEXTURE0
+#define GL_TEXTURE1_ARB    GL_TEXTURE1
+#define GL_TEXTURE31_ARB   GL_TEXTURE31
+
+#define R_GL_MIPMAP_LINEAR_FILTER GL_LINEAR
+
 #else // __vita__
 
 #include <SDL_opengl.h>
@@ -63,6 +167,8 @@
 #include <GL/glu.h>	/* Header File For The GLU Library */
 #endif
 #endif
+
+#define R_GL_MIPMAP_LINEAR_FILTER GL_LINEAR_MIPMAP_LINEAR
 
 #endif // __vita__
 
@@ -114,6 +220,7 @@ extern dboolean gl_arb_shader_objects;
 // obsolete?
 extern PFNGLCOLORTABLEEXTPROC              GLEXT_glColorTableEXT;
 
+#ifdef USE_FBO_TECHNIQUE
 extern PFNGLBINDFRAMEBUFFEREXTPROC         GLEXT_glBindFramebufferEXT;
 extern PFNGLGENFRAMEBUFFERSEXTPROC         GLEXT_glGenFramebuffersEXT;
 extern PFNGLGENRENDERBUFFERSEXTPROC        GLEXT_glGenRenderbuffersEXT;
@@ -124,6 +231,7 @@ extern PFNGLFRAMEBUFFERTEXTURE2DEXTPROC    GLEXT_glFramebufferTexture2DEXT;
 extern PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC  GLEXT_glCheckFramebufferStatusEXT;
 extern PFNGLDELETEFRAMEBUFFERSEXTPROC      GLEXT_glDeleteFramebuffersEXT;
 extern PFNGLDELETERENDERBUFFERSEXTPROC     GLEXT_glDeleteRenderbuffersEXT;
+#endif
 
 /* ARB_multitexture command function pointers */
 extern PFNGLACTIVETEXTUREARBPROC           GLEXT_glActiveTextureARB;
@@ -181,6 +289,20 @@ void gld_InitOpenGL(dboolean compatibility_mode);
 void gld_EnableTexture2D(GLenum texture, int enable);
 void gld_EnableClientCoordArray(GLenum texture, int enable);
 void gld_EnableMultisample(int enable);
+
+// wrappers
+void gld_glBegin(GLenum prim);
+void gld_glVertex2f(float x, float y);
+void gld_glVertex2i(int x, int y);
+void gld_glVertex3f(float x, float y, float z);
+void gld_glVertex3fv(const float *v);
+void gld_glTexCoord2f(float u, float v);
+void gld_glTexCoord2fv(const float *v);
+void gld_glColor3f(float r, float g, float b);
+void gld_glColor4f(float r, float g, float b, float a);
+void gld_glColor4fv(const float *v);
+void gld_glColor4ubv(const unsigned char *v);
+void gld_glEnd(void);
 
 typedef enum
 {

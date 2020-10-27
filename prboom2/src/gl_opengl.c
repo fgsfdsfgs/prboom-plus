@@ -43,8 +43,6 @@
 #include "doomtype.h"
 #include "lprintf.h"
 
-#define isExtensionSupported(ext) strstr(extensions, ext)
-
 int gl_version;
 
 static dboolean gl_compatibility_mode;
@@ -91,6 +89,7 @@ int clieant_active_texture_enabled[32];
 // obsolete?
 PFNGLCOLORTABLEEXTPROC              GLEXT_glColorTableEXT              = NULL;
 
+#ifdef USE_FBO_TECNIQUE
 /* EXT_framebuffer_object */
 PFNGLBINDFRAMEBUFFEREXTPROC         GLEXT_glBindFramebufferEXT         = NULL;
 PFNGLGENFRAMEBUFFERSEXTPROC         GLEXT_glGenFramebuffersEXT         = NULL;
@@ -102,6 +101,7 @@ PFNGLFRAMEBUFFERTEXTURE2DEXTPROC    GLEXT_glFramebufferTexture2DEXT    = NULL;
 PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC  GLEXT_glCheckFramebufferStatusEXT  = NULL;
 PFNGLDELETEFRAMEBUFFERSEXTPROC      GLEXT_glDeleteFramebuffersEXT      = NULL;
 PFNGLDELETERENDERBUFFERSEXTPROC     GLEXT_glDeleteRenderbuffersEXT     = NULL;
+#endif
 
 /* ARB_multitexture command function pointers */
 PFNGLACTIVETEXTUREARBPROC        GLEXT_glActiveTextureARB              = NULL;
@@ -153,8 +153,18 @@ PFNGLGETACTIVEUNIFORMARBPROC     GLEXT_glGetActiveUniformARB = NULL;
 PFNGLGETUNIFORMFVARBPROC         GLEXT_glGetUniformfvARB = NULL;
 #endif
 
+#ifdef __vita__
+# define getProcAddress(name) (NULL)
+#else
+# define getProcAddress(name) SDL_GL_GetProcAddress(name)
+#endif
+
 void gld_InitOpenGLVersion(void)
 {
+#ifdef __vita__
+  // close enough
+  gl_version = OPENGL_VERSION_1_1;
+#else
   int MajorVersion, MinorVersion;
   gl_version = OPENGL_VERSION_1_0;
   if (sscanf((const char*)glGetString(GL_VERSION), "%d.%d", &MajorVersion, &MinorVersion) == 2)
@@ -174,7 +184,10 @@ void gld_InitOpenGLVersion(void)
       if (MinorVersion > 4) gl_version = OPENGL_VERSION_1_5;
     }
   }
+#endif
 }
+
+#define isExtensionSupported(ext) strstr(extensions, ext)
 
 void gld_InitOpenGL(dboolean compatibility_mode)
 {
@@ -202,7 +215,7 @@ void gld_InitOpenGL(dboolean compatibility_mode)
     if (gl_use_paletted_texture)
     {
       gl_paletted_texture = true;
-      GLEXT_glColorTableEXT = SDL_GL_GetProcAddress("glColorTableEXT");
+      GLEXT_glColorTableEXT = getProcAddress("glColorTableEXT");
       if (GLEXT_glColorTableEXT == NULL)
         gl_paletted_texture = false;
       else
@@ -214,7 +227,7 @@ void gld_InitOpenGL(dboolean compatibility_mode)
     if (gl_use_shared_texture_palette)
     {
       gl_shared_texture_palette = true;
-      GLEXT_glColorTableEXT = SDL_GL_GetProcAddress("glColorTableEXT");
+      GLEXT_glColorTableEXT = getProcAddress("glColorTableEXT");
       if (GLEXT_glColorTableEXT == NULL)
         gl_shared_texture_palette = false;
       else
@@ -230,10 +243,10 @@ void gld_InitOpenGL(dboolean compatibility_mode)
     isExtensionSupported("GL_ARB_multitexture") != NULL;
   if (gl_arb_multitexture)
   {
-    GLEXT_glActiveTextureARB        = SDL_GL_GetProcAddress("glActiveTextureARB");
-    GLEXT_glClientActiveTextureARB  = SDL_GL_GetProcAddress("glClientActiveTextureARB");
-    GLEXT_glMultiTexCoord2fARB      = SDL_GL_GetProcAddress("glMultiTexCoord2fARB");
-    GLEXT_glMultiTexCoord2fvARB     = SDL_GL_GetProcAddress("glMultiTexCoord2fvARB");
+    GLEXT_glActiveTextureARB        = getProcAddress("glActiveTextureARB");
+    GLEXT_glClientActiveTextureARB  = getProcAddress("glClientActiveTextureARB");
+    GLEXT_glMultiTexCoord2fARB      = getProcAddress("glMultiTexCoord2fARB");
+    GLEXT_glMultiTexCoord2fvARB     = getProcAddress("glMultiTexCoord2fvARB");
 
     if (!GLEXT_glActiveTextureARB   || !GLEXT_glClientActiveTextureARB ||
         !GLEXT_glMultiTexCoord2fARB || !GLEXT_glMultiTexCoord2fvARB)
@@ -250,7 +263,7 @@ void gld_InitOpenGL(dboolean compatibility_mode)
     isExtensionSupported("GL_ARB_texture_compression") != NULL;
   if (gl_arb_texture_compression)
   {
-    GLEXT_glCompressedTexImage2DARB = SDL_GL_GetProcAddress("glCompressedTexImage2DARB");
+    GLEXT_glCompressedTexImage2DARB = getProcAddress("glCompressedTexImage2DARB");
 
     if (!GLEXT_glCompressedTexImage2DARB)
       gl_arb_texture_compression = false;
@@ -258,6 +271,7 @@ void gld_InitOpenGL(dboolean compatibility_mode)
   if (gl_arb_texture_compression)
     lprintf(LO_INFO,"using GL_ARB_texture_compression\n");
 
+#ifdef USE_FBO_TECNIQUE
   //
   // EXT_framebuffer_object
   //
@@ -265,16 +279,16 @@ void gld_InitOpenGL(dboolean compatibility_mode)
     isExtensionSupported("GL_EXT_framebuffer_object") != NULL;
   if (gl_ext_framebuffer_object)
   {
-    GLEXT_glGenFramebuffersEXT         = SDL_GL_GetProcAddress("glGenFramebuffersEXT");
-    GLEXT_glBindFramebufferEXT         = SDL_GL_GetProcAddress("glBindFramebufferEXT");
-    GLEXT_glGenRenderbuffersEXT        = SDL_GL_GetProcAddress("glGenRenderbuffersEXT");
-    GLEXT_glBindRenderbufferEXT        = SDL_GL_GetProcAddress("glBindRenderbufferEXT");
-    GLEXT_glRenderbufferStorageEXT     = SDL_GL_GetProcAddress("glRenderbufferStorageEXT");
-    GLEXT_glFramebufferRenderbufferEXT = SDL_GL_GetProcAddress("glFramebufferRenderbufferEXT");
-    GLEXT_glFramebufferTexture2DEXT    = SDL_GL_GetProcAddress("glFramebufferTexture2DEXT");
-    GLEXT_glCheckFramebufferStatusEXT  = SDL_GL_GetProcAddress("glCheckFramebufferStatusEXT");
-    GLEXT_glDeleteFramebuffersEXT      = SDL_GL_GetProcAddress("glDeleteFramebuffersEXT");
-    GLEXT_glDeleteRenderbuffersEXT     = SDL_GL_GetProcAddress("glDeleteRenderbuffersEXT");
+    GLEXT_glGenFramebuffersEXT         = getProcAddress("glGenFramebuffersEXT");
+    GLEXT_glBindFramebufferEXT         = getProcAddress("glBindFramebufferEXT");
+    GLEXT_glGenRenderbuffersEXT        = getProcAddress("glGenRenderbuffersEXT");
+    GLEXT_glBindRenderbufferEXT        = getProcAddress("glBindRenderbufferEXT");
+    GLEXT_glRenderbufferStorageEXT     = getProcAddress("glRenderbufferStorageEXT");
+    GLEXT_glFramebufferRenderbufferEXT = getProcAddress("glFramebufferRenderbufferEXT");
+    GLEXT_glFramebufferTexture2DEXT    = getProcAddress("glFramebufferTexture2DEXT");
+    GLEXT_glCheckFramebufferStatusEXT  = getProcAddress("glCheckFramebufferStatusEXT");
+    GLEXT_glDeleteFramebuffersEXT      = getProcAddress("glDeleteFramebuffersEXT");
+    GLEXT_glDeleteRenderbuffersEXT     = getProcAddress("glDeleteRenderbuffersEXT");
 
     if (!GLEXT_glGenFramebuffersEXT || !GLEXT_glBindFramebufferEXT ||
         !GLEXT_glGenRenderbuffersEXT || !GLEXT_glBindRenderbufferEXT ||
@@ -285,6 +299,7 @@ void gld_InitOpenGL(dboolean compatibility_mode)
   }
   if (gl_ext_framebuffer_object)
     lprintf(LO_INFO,"using GL_EXT_framebuffer_object\n");
+#endif
 
   gl_ext_packed_depth_stencil = gl_ext_packed_depth_stencil_default &&
     isExtensionSupported("GL_EXT_packed_depth_stencil") != NULL;
@@ -299,7 +314,7 @@ void gld_InitOpenGL(dboolean compatibility_mode)
     isExtensionSupported("GL_EXT_blend_color") != NULL;
   if (gl_ext_blend_color)
   {
-    GLEXT_glBlendColorEXT = SDL_GL_GetProcAddress("glBlendColorEXT");
+    GLEXT_glBlendColorEXT = getProcAddress("glBlendColorEXT");
 
     if (!GLEXT_glBlendColorEXT)
       gl_ext_blend_color = false;
@@ -313,10 +328,10 @@ void gld_InitOpenGL(dboolean compatibility_mode)
     isExtensionSupported("GL_ARB_vertex_buffer_object") != NULL;
   if (gl_ext_arb_vertex_buffer_object)
   {
-    GLEXT_glGenBuffersARB = SDL_GL_GetProcAddress("glGenBuffersARB");
-    GLEXT_glDeleteBuffersARB = SDL_GL_GetProcAddress("glDeleteBuffersARB");
-    GLEXT_glBindBufferARB = SDL_GL_GetProcAddress("glBindBufferARB");
-    GLEXT_glBufferDataARB = SDL_GL_GetProcAddress("glBufferDataARB");
+    GLEXT_glGenBuffersARB = getProcAddress("glGenBuffersARB");
+    GLEXT_glDeleteBuffersARB = getProcAddress("glDeleteBuffersARB");
+    GLEXT_glBindBufferARB = getProcAddress("glBindBufferARB");
+    GLEXT_glBufferDataARB = getProcAddress("glBufferDataARB");
 
     if (!GLEXT_glGenBuffersARB || !GLEXT_glDeleteBuffersARB ||
         !GLEXT_glBindBufferARB || !GLEXT_glBufferDataARB)
@@ -332,14 +347,14 @@ void gld_InitOpenGL(dboolean compatibility_mode)
     isExtensionSupported("GL_ARB_pixel_buffer_object") != NULL;
   if (gl_arb_pixel_buffer_object)
   {
-    GLEXT_glGenBuffersARB = SDL_GL_GetProcAddress("glGenBuffersARB");
-    GLEXT_glBindBufferARB = SDL_GL_GetProcAddress("glBindBufferARB");
-    GLEXT_glBufferDataARB = SDL_GL_GetProcAddress("glBufferDataARB");
-    GLEXT_glBufferSubDataARB = SDL_GL_GetProcAddress("glBufferSubDataARB");
-    GLEXT_glDeleteBuffersARB = SDL_GL_GetProcAddress("glDeleteBuffersARB");
-    GLEXT_glGetBufferParameterivARB = SDL_GL_GetProcAddress("glGetBufferParameterivARB");
-    GLEXT_glMapBufferARB = SDL_GL_GetProcAddress("glMapBufferARB");
-    GLEXT_glUnmapBufferARB = SDL_GL_GetProcAddress("glUnmapBufferARB");
+    GLEXT_glGenBuffersARB = getProcAddress("glGenBuffersARB");
+    GLEXT_glBindBufferARB = getProcAddress("glBindBufferARB");
+    GLEXT_glBufferDataARB = getProcAddress("glBufferDataARB");
+    GLEXT_glBufferSubDataARB = getProcAddress("glBufferSubDataARB");
+    GLEXT_glDeleteBuffersARB = getProcAddress("glDeleteBuffersARB");
+    GLEXT_glGetBufferParameterivARB = getProcAddress("glGetBufferParameterivARB");
+    GLEXT_glMapBufferARB = getProcAddress("glMapBufferARB");
+    GLEXT_glUnmapBufferARB = getProcAddress("glUnmapBufferARB");
 
     if (!GLEXT_glGenBuffersARB || !GLEXT_glBindBufferARB ||
         !GLEXT_glBufferDataARB || !GLEXT_glBufferSubDataARB ||
@@ -368,29 +383,29 @@ void gld_InitOpenGL(dboolean compatibility_mode)
     isExtensionSupported ("GL_ARB_shading_language_100");
   if (gl_arb_shader_objects)
   {
-		GLEXT_glDeleteObjectARB        = SDL_GL_GetProcAddress("glDeleteObjectARB");
-		GLEXT_glGetHandleARB           = SDL_GL_GetProcAddress("glGetHandleARB");
-		GLEXT_glDetachObjectARB        = SDL_GL_GetProcAddress("glDetachObjectARB");
-		GLEXT_glCreateShaderObjectARB  = SDL_GL_GetProcAddress("glCreateShaderObjectARB");
-		GLEXT_glShaderSourceARB        = SDL_GL_GetProcAddress("glShaderSourceARB");
-		GLEXT_glCompileShaderARB       = SDL_GL_GetProcAddress("glCompileShaderARB");
-		GLEXT_glCreateProgramObjectARB = SDL_GL_GetProcAddress("glCreateProgramObjectARB");
-		GLEXT_glAttachObjectARB        = SDL_GL_GetProcAddress("glAttachObjectARB");
-		GLEXT_glLinkProgramARB         = SDL_GL_GetProcAddress("glLinkProgramARB");
-		GLEXT_glUseProgramObjectARB    = SDL_GL_GetProcAddress("glUseProgramObjectARB");
-		GLEXT_glValidateProgramARB     = SDL_GL_GetProcAddress("glValidateProgramARB");
+		GLEXT_glDeleteObjectARB        = getProcAddress("glDeleteObjectARB");
+		GLEXT_glGetHandleARB           = getProcAddress("glGetHandleARB");
+		GLEXT_glDetachObjectARB        = getProcAddress("glDetachObjectARB");
+		GLEXT_glCreateShaderObjectARB  = getProcAddress("glCreateShaderObjectARB");
+		GLEXT_glShaderSourceARB        = getProcAddress("glShaderSourceARB");
+		GLEXT_glCompileShaderARB       = getProcAddress("glCompileShaderARB");
+		GLEXT_glCreateProgramObjectARB = getProcAddress("glCreateProgramObjectARB");
+		GLEXT_glAttachObjectARB        = getProcAddress("glAttachObjectARB");
+		GLEXT_glLinkProgramARB         = getProcAddress("glLinkProgramARB");
+		GLEXT_glUseProgramObjectARB    = getProcAddress("glUseProgramObjectARB");
+		GLEXT_glValidateProgramARB     = getProcAddress("glValidateProgramARB");
 
-		GLEXT_glUniform1fARB = SDL_GL_GetProcAddress("glUniform1fARB");
-		GLEXT_glUniform2fARB = SDL_GL_GetProcAddress("glUniform2fARB");
-		GLEXT_glUniform1iARB = SDL_GL_GetProcAddress("glUniform1iARB");
+		GLEXT_glUniform1fARB = getProcAddress("glUniform1fARB");
+		GLEXT_glUniform2fARB = getProcAddress("glUniform2fARB");
+		GLEXT_glUniform1iARB = getProcAddress("glUniform1iARB");
 
-		GLEXT_glGetObjectParameterfvARB = SDL_GL_GetProcAddress("glGetObjectParameterfvARB");
-		GLEXT_glGetObjectParameterivARB = SDL_GL_GetProcAddress("glGetObjectParameterivARB");
-		GLEXT_glGetInfoLogARB           = SDL_GL_GetProcAddress("glGetInfoLogARB");
-		GLEXT_glGetAttachedObjectsARB   = SDL_GL_GetProcAddress("glGetAttachedObjectsARB");
-		GLEXT_glGetUniformLocationARB   = SDL_GL_GetProcAddress("glGetUniformLocationARB");
-		GLEXT_glGetActiveUniformARB     = SDL_GL_GetProcAddress("glGetActiveUniformARB");
-		GLEXT_glGetUniformfvARB         = SDL_GL_GetProcAddress("glGetUniformfvARB");
+		GLEXT_glGetObjectParameterfvARB = getProcAddress("glGetObjectParameterfvARB");
+		GLEXT_glGetObjectParameterivARB = getProcAddress("glGetObjectParameterivARB");
+		GLEXT_glGetInfoLogARB           = getProcAddress("glGetInfoLogARB");
+		GLEXT_glGetAttachedObjectsARB   = getProcAddress("glGetAttachedObjectsARB");
+		GLEXT_glGetUniformLocationARB   = getProcAddress("glGetUniformLocationARB");
+		GLEXT_glGetActiveUniformARB     = getProcAddress("glGetActiveUniformARB");
+		GLEXT_glGetUniformfvARB         = getProcAddress("glGetUniformfvARB");
 
     if (!GLEXT_glDeleteObjectARB || !GLEXT_glGetHandleARB ||
         !GLEXT_glDetachObjectARB || !GLEXT_glCreateShaderObjectARB ||
@@ -656,3 +671,119 @@ void SetTextureMode(tex_mode_e type)
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   }
 }
+
+#ifdef __vita__
+
+#define MAX_VERTICES 8192
+
+static unsigned short *vtx_idx;
+static float *vtx_pos, *vtx_posptr;
+static float *vtx_tex, *vtx_texptr;
+static float *vtx_col, *vtx_colptr;
+static float vtx_curcol[4] = { 1.f, 1.f, 1.f, 1.f };
+static int vtx_num = 0;
+static GLenum vtx_curprim = 0;
+
+void gld_glBegin(GLenum prim)
+{
+  if (vtx_pos == NULL)
+  {
+    unsigned int i;
+    vtx_pos = malloc(sizeof(float) * 3 * MAX_VERTICES);
+    vtx_tex = malloc(sizeof(float) * 2 * MAX_VERTICES);
+    vtx_col = malloc(sizeof(float) * 4 * MAX_VERTICES);
+    vtx_idx = malloc(sizeof(short) * 1 * MAX_VERTICES);
+    if (!vtx_pos || !vtx_tex || !vtx_col || !vtx_idx)
+      I_Error("could not allocate vertex buffers");
+    for (i = 0; i < MAX_VERTICES; ++i)
+      vtx_idx[i] = i; // indices are always sequential here
+  }
+
+  vtx_posptr = vtx_pos;
+  vtx_texptr = vtx_tex;
+  vtx_colptr = vtx_col;
+  vtx_num = 0;
+  vtx_curprim = prim;
+}
+
+void gld_glVertex2f(float x, float y) { gld_glVertex3f(x, y, 0.f); }
+void gld_glVertex2i(int x, int y) { gld_glVertex3f(x, y, 0.f); }
+void gld_glVertex3fv(const float *v) { gld_glVertex3f(v[0], v[1], v[2]); }
+void gld_glVertex3f(float x, float y, float z)
+{
+  *(vtx_colptr++) = vtx_curcol[0];
+  *(vtx_colptr++) = vtx_curcol[1];
+  *(vtx_colptr++) = vtx_curcol[2];
+  *(vtx_colptr++) = vtx_curcol[3];
+  *(vtx_posptr++) = x;
+  *(vtx_posptr++) = y;
+  *(vtx_posptr++) = z;
+  vtx_num++;
+}
+
+void gld_glTexCoord2fv(const float *v) { gld_glTexCoord2f(v[0], v[1]); }
+void gld_glTexCoord2f(float u, float v)
+{
+  *(vtx_texptr++) = u;
+  *(vtx_texptr++) = v;
+}
+
+void gld_glColor3f(float r, float g, float b) { glColor4f(r, g, b, 1.f); }
+void gld_glColor4fv(const float *v) { glColor4f(v[0], v[1], v[2], v[3]); }
+void gld_glColor4ubv(const unsigned char *v) { glColor4f(v[0] / 255.f, v[1] / 255.f, v[2] / 255.f, v[3] / 255.f); }
+void gld_glColor4f(float r, float g, float b, float a)
+{
+  vtx_curcol[0] = r;
+  vtx_curcol[1] = g;
+  vtx_curcol[2] = b;
+  vtx_curcol[3] = a;
+}
+
+void gld_glEnd(void)
+{
+  if (!vtx_num || !vtx_curprim)
+    return;
+
+  vglIndexPointerMapped(vtx_idx);
+  glEnableClientState(GL_VERTEX_ARRAY);
+  vglVertexPointerMapped(vtx_pos);
+  glEnableClientState(GL_COLOR_ARRAY);
+  vglColorPointerMapped(GL_FLOAT, vtx_col);
+  if (vtx_texptr != vtx_tex)
+  {
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    vglTexCoordPointerMapped(vtx_tex);
+  }
+  else
+  {
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  }
+
+  vglDrawObjects(vtx_curprim, vtx_num, GL_TRUE);
+
+  if (vtx_texptr != vtx_tex)
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_COLOR_ARRAY);
+
+  vtx_curprim = 0;
+  vtx_num = 0;
+}
+
+#else
+
+void gld_glBegin(GLenum prim) { gld_glBegin(prim); }
+void gld_glVertex2f(float x, float y) { glVertex2f(x, y); }
+void gld_glVertex2i(int x, int y) { glVertex2i(x, y); }
+void gld_glVertex3f(float x, float y, float z) { glVertex3f(x, y, z); }
+void gld_glVertex3fv(const float *v) { glVertex3fv(v); }
+void gld_glTexCoord2f(float u, float v) { glTexCoord2f(u, v); }
+void gld_glTexCoord2fv(const float *v) { glTexCoord2fv(v); }
+void gld_glColor3f(float r, float g, float b) { glColor3f(r, g, b); }
+void gld_glColor4f(float r, float g, float b, float a) { glColor4f(r, g, b, a); }
+void gld_glColor4fv(const float *v) { glColor4fv(v); }
+void gld_glColor4ubv(const unsigned char *v) { glColor4ubv(v); }
+void gld_glEnd(void) { gld_glEnd(); }
+
+#endif
+

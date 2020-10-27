@@ -355,7 +355,10 @@ function(AddGameExecutable TARGET SOURCES)
     install(TARGETS ${TARGET} COMPONENT "Game executable" RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 endfunction()
 
-AddGameExecutable(prboom-plus "${PRBOOM_PLUS_SOURCES}")
+# for Vita only build GLBoom if possible
+if((NOT VITA) OR (NOT BUILD_GL))
+    AddGameExecutable(prboom-plus "${PRBOOM_PLUS_SOURCES}")
+endif()
 
 # GLBoom main executable
 
@@ -389,22 +392,33 @@ if(OPENGL_FOUND AND OPENGL_GLU_FOUND)
     AddGameExecutable(glboom-plus "${GLBOOM_PLUS_SOURCES}")
     target_compile_definitions(glboom-plus PRIVATE
         GL_DOOM
-        USE_SHADERS
-        USE_FBO_TECHNIQUE
-        USE_GLU_IMAGESCALE
-        USE_GLU_MIPMAP
-        USE_GLU_TESS
     )
-    target_link_libraries(glboom-plus PRIVATE
-        ${OPENGL_gl_LIBRARY}
-        ${OPENGL_glu_LIBRARY}
-    )
+
+    if(NOT VITA)
+        # we already link to vitaGL anyway
+        target_link_libraries(glboom-plus PRIVATE
+            ${OPENGL_gl_LIBRARY}
+            ${OPENGL_glu_LIBRARY}
+        )
+        # can't do this shit on the Vita
+        target_compile_definitions(glboom-plus PRIVATE
+            USE_SHADERS
+            USE_FBO_TECHNIQUE
+            USE_GLU_IMAGESCALE
+            USE_GLU_MIPMAP
+            USE_GLU_TESS
+        )
+    endif()
 endif()
 
 if(VITA)
     # HACK: vita_create_self prepends CMAKE_CURRENT_BINARY_DIR to the source if it's a target,
     #       which is set to src/ for some reason
-    vita_create_self(prboom-plus.self "../prboom-plus")
+    if(BUILD_GL)
+        vita_create_self(prboom-plus.self "../glboom-plus")
+    else()
+        vita_create_self(prboom-plus.self "../prboom-plus")
+    endif()
     vita_create_vpk(prboom-plus.vpk ${VITA_TITLEID} prboom-plus.self NAME ${VITA_NAME})
 endif()
 

@@ -65,7 +65,13 @@ check_include_file("asm/byteorder.h" HAVE_ASM_BYTEORDER_H)
 
 option(BUILD_GL "Enable OpenGL rendering code" ON)
 if(BUILD_GL)
-    find_package(OpenGL)
+    if(VITA)
+        # we got vitaGL
+        set(OPENGL_FOUND TRUE)
+        set(OPENGL_GLU_FOUND TRUE)
+    else()
+        find_package(OpenGL)
+    endif()
 endif()
 
 find_package(SDL2 REQUIRED)

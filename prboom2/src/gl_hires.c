@@ -103,16 +103,16 @@ int gld_ProgressRestoreScreen(void)
     gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
     
     glBindTexture(GL_TEXTURE_2D, progress_texid);
-    glColor3f(1.0f, 1.0f, 1.0f);
+    gld_glColor3f(1.0f, 1.0f, 1.0f);
     
-    glBegin(GL_TRIANGLE_STRIP);
+    gld_glBegin(GL_TRIANGLE_STRIP);
     {
-      glTexCoord2f(fU1, fV1); glVertex2f(0.0f, 0.0f);
-      glTexCoord2f(fU1, fV2); glVertex2f(0.0f, (float)SCREENHEIGHT);
-      glTexCoord2f(fU2, fV1); glVertex2f((float)SCREENWIDTH, 0.0f);
-      glTexCoord2f(fU2, fV2); glVertex2f((float)SCREENWIDTH, (float)SCREENHEIGHT);
+      gld_glTexCoord2f(fU1, fV1); gld_glVertex2f(0.0f, 0.0f);
+      gld_glTexCoord2f(fU1, fV2); gld_glVertex2f(0.0f, (float)SCREENHEIGHT);
+      gld_glTexCoord2f(fU2, fV1); gld_glVertex2f((float)SCREENWIDTH, 0.0f);
+      gld_glTexCoord2f(fU2, fV2); gld_glVertex2f((float)SCREENWIDTH, (float)SCREENHEIGHT);
     }
-    glEnd();
+    gld_glEnd();
 
     return true;
   }

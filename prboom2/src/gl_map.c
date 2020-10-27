@@ -109,10 +109,14 @@ void gld_InitMapPics(void)
         }
         else
         {
+#ifdef USE_GLU_MIPMAP
           gluBuild2DMipmaps(GL_TEXTURE_2D, gl_tex_format, surf->w, surf->h, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels);
+#else
+          glTexImage2D(GL_TEXTURE_2D, 0, gl_tex_format, surf->w, surf->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surf->pixels);
+#endif
         }
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);//tex_filter[MIP_PATCH].min_filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, R_GL_MIPMAP_LINEAR_FILTER);//tex_filter[MIP_PATCH].min_filter);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//tex_filter[MIP_PATCH].mag_filter);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -196,20 +200,20 @@ void gld_DrawNiceThings(int fx, int fy, int fw, int fh)
     {
       map_nice_thing_t *thing = &((map_nice_thing_t*)things->data)[i];
 
-      glColor4ubv(&thing->v[0].r);
+      gld_glColor4ubv(&thing->v[0].r);
 
-      glBegin(GL_TRIANGLE_FAN);
+      gld_glBegin(GL_TRIANGLE_FAN);
       {
-        glTexCoord2f(thing->v[0].u, thing->v[0].v);
-        glVertex2f(thing->v[0].x, thing->v[0].y);
-        glTexCoord2f(thing->v[1].u, thing->v[1].v);
-        glVertex2f(thing->v[1].x, thing->v[1].y);
-        glTexCoord2f(thing->v[2].u, thing->v[2].v);
-        glVertex2f(thing->v[2].x, thing->v[2].y);
-        glTexCoord2f(thing->v[3].u, thing->v[3].v);
-        glVertex2f(thing->v[3].x, thing->v[3].y);
+        gld_glTexCoord2f(thing->v[0].u, thing->v[0].v);
+        gld_glVertex2f(thing->v[0].x, thing->v[0].y);
+        gld_glTexCoord2f(thing->v[1].u, thing->v[1].v);
+        gld_glVertex2f(thing->v[1].x, thing->v[1].y);
+        gld_glTexCoord2f(thing->v[2].u, thing->v[2].v);
+        gld_glVertex2f(thing->v[2].x, thing->v[2].y);
+        gld_glTexCoord2f(thing->v[3].u, thing->v[3].v);
+        gld_glVertex2f(thing->v[3].x, thing->v[3].y);
       }
-      glEnd();
+      gld_glEnd();
     }
 #endif
   }

@@ -147,16 +147,16 @@ void gld_SplitLeftEdge(const GLWall *wall, dboolean detail)
         }
         else
         {
-          glTexCoord2f(
+          gld_glTexCoord2f(
             s * tex->detail_width + tex->detail->offsetx,
             t * tex->detail_height + tex->detail->offsety);
         }
       }
       else
       {
-        glTexCoord2f(s, t);
+        gld_glTexCoord2f(s, t);
       }
-      glVertex3f(wall->glseg->x1, vi->heightlist[i], wall->glseg->z1);
+      gld_glVertex3f(wall->glseg->x1, vi->heightlist[i], wall->glseg->z1);
       i++;
     }
   }
@@ -209,16 +209,16 @@ void gld_SplitRightEdge(const GLWall *wall, dboolean detail)
         }
         else
         {
-          glTexCoord2f(
+          gld_glTexCoord2f(
             s * tex->detail_width + tex->detail->offsetx,
             t * tex->detail_height + tex->detail->offsety);
         }
       }
       else
       {
-        glTexCoord2f(s, t);
+        gld_glTexCoord2f(s, t);
       }
-      glVertex3f(wall->glseg->x2, vi->heightlist[i], wall->glseg->z2);
+      gld_glVertex3f(wall->glseg->x2, vi->heightlist[i], wall->glseg->z2);
       i--;
     }
   }

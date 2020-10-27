@@ -83,7 +83,7 @@ tex_filter_t tex_filter[MIP_COUNT];
 
 const char *gl_tex_format_string;
 //int gl_tex_format=GL_RGBA8;
-int gl_tex_format=GL_RGB5_A1;
+int gl_tex_format=GL_RGBA;
 //int gl_tex_format=GL_RGBA4;
 //int gl_tex_format=GL_RGBA2;
 
