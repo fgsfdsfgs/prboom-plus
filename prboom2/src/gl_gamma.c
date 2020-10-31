@@ -65,7 +65,9 @@ static Uint16 gl_oldHardwareGamma[3][256];
 //
 void gld_CheckHardwareGamma(void)
 {
+#ifndef __vita__
   gl_DeviceSupportsGamma = (-1 != SDL_GetWindowGammaRamp(sdl_window, gl_oldHardwareGamma[0], gl_oldHardwareGamma[1], gl_oldHardwareGamma[2]));
+#endif
 
   if (gl_DeviceSupportsGamma)
   {

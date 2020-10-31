@@ -206,6 +206,9 @@ void gld_InitOpenGL(dboolean compatibility_mode)
   // Any textures sizes are allowed
   gl_arb_texture_non_power_of_two = gl_arb_texture_non_power_of_two_default &&
     isExtensionSupported("GL_ARB_texture_non_power_of_two") != NULL;
+#ifdef __vita__
+  gl_arb_texture_non_power_of_two = true;
+#endif
   if (gl_arb_texture_non_power_of_two)
     lprintf(LO_INFO, "using GL_ARB_texture_non_power_of_two\n");
 
@@ -254,6 +257,12 @@ void gld_InitOpenGL(dboolean compatibility_mode)
   }
   if (gl_arb_multitexture)
     lprintf(LO_INFO,"using GL_ARB_multitexture\n");
+
+#ifdef __vita__
+  // just in case
+  GLEXT_glActiveTextureARB = glActiveTexture;
+  GLEXT_glClientActiveTextureARB = glClientActiveTexture;
+#endif
 
   //
   // ARB_texture_compression
@@ -728,9 +737,9 @@ void gld_glTexCoord2f(float u, float v)
   *(vtx_texptr++) = v;
 }
 
-void gld_glColor3f(float r, float g, float b) { glColor4f(r, g, b, 1.f); }
-void gld_glColor4fv(const float *v) { glColor4f(v[0], v[1], v[2], v[3]); }
-void gld_glColor4ubv(const unsigned char *v) { glColor4f(v[0] / 255.f, v[1] / 255.f, v[2] / 255.f, v[3] / 255.f); }
+void gld_glColor3f(float r, float g, float b) { gld_glColor4f(r, g, b, 1.f); }
+void gld_glColor4fv(const float *v) { gld_glColor4f(v[0], v[1], v[2], v[3]); }
+void gld_glColor4ubv(const unsigned char *v) { gld_glColor4f(v[0] / 255.f, v[1] / 255.f, v[2] / 255.f, v[3] / 255.f); }
 void gld_glColor4f(float r, float g, float b, float a)
 {
   vtx_curcol[0] = r;
@@ -746,13 +755,13 @@ void gld_glEnd(void)
 
   vglIndexPointerMapped(vtx_idx);
   glEnableClientState(GL_VERTEX_ARRAY);
-  vglVertexPointerMapped(vtx_pos);
+  vglVertexPointer(3, GL_FLOAT, 0, vtx_num, vtx_pos);
   glEnableClientState(GL_COLOR_ARRAY);
-  vglColorPointerMapped(GL_FLOAT, vtx_col);
+  vglColorPointer(4, GL_FLOAT, 0, vtx_num, vtx_col);
   if (vtx_texptr != vtx_tex)
   {
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    vglTexCoordPointerMapped(vtx_tex);
+    vglTexCoordPointer(2, GL_FLOAT, 0, vtx_num, vtx_tex);
   }
   else
   {
@@ -772,7 +781,7 @@ void gld_glEnd(void)
 
 #else
 
-void gld_glBegin(GLenum prim) { gld_glBegin(prim); }
+void gld_glBegin(GLenum prim) { glBegin(prim); }
 void gld_glVertex2f(float x, float y) { glVertex2f(x, y); }
 void gld_glVertex2i(int x, int y) { glVertex2i(x, y); }
 void gld_glVertex3f(float x, float y, float z) { glVertex3f(x, y, z); }
@@ -783,7 +792,7 @@ void gld_glColor3f(float r, float g, float b) { glColor3f(r, g, b); }
 void gld_glColor4f(float r, float g, float b, float a) { glColor4f(r, g, b, a); }
 void gld_glColor4fv(const float *v) { glColor4fv(v); }
 void gld_glColor4ubv(const unsigned char *v) { glColor4ubv(v); }
-void gld_glEnd(void) { gld_glEnd(); }
+void gld_glEnd(void) { glEnd(); }
 
 #endif
 

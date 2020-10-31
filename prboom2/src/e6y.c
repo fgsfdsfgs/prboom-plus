@@ -1254,7 +1254,9 @@ int HU_DrawDemoProgress(int force)
   }
 
   prev_len = len;
-  
+
+  I_StartRendering();
+
   V_FillRect(0, 0, SCREENHEIGHT - 4, len - 0, 4, 4);
   if (len > 4)
     V_FillRect(0, 2, SCREENHEIGHT - 3, len - 4, 2, 0);

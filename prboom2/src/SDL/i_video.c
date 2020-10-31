@@ -556,6 +556,20 @@ void I_UpdateNoBlit (void)
 }
 
 //
+// I_StartRendering
+static int in_render_frame = 0;
+void I_StartRendering (void)
+{
+  if (!in_render_frame)
+  {
+    in_render_frame = 1;
+#ifdef __vita__
+    vglStartRendering();
+#endif
+  }
+}
+
+//
 // I_FinishUpdate
 //
 static int newpal = 0;
@@ -580,6 +594,13 @@ void I_FinishUpdate (void)
   if (V_GetMode() == VID_MODEGL) {
     // proff 04/05/2000: swap OpenGL buffers
     gld_Finish();
+#ifdef __vita__
+    if (in_render_frame)
+    {
+      in_render_frame = 0;
+      vglStopRendering();
+    }
+#endif
     return;
   }
 #endif
@@ -622,6 +643,8 @@ void I_FinishUpdate (void)
     SDL_LowerBlit(screen, &src_rect, buffer, &src_rect);
 
 #ifdef __vita__
+  I_StartRendering(); // in case we're not rendering yet
+
   // Update the intermediate texture with the contents of the RGBA buffer.
   glBindTexture(GL_TEXTURE_2D, sw_texture);
   glTexSubImage2D(GL_TEXTURE_2D, 0, src_rect.x, src_rect.y, src_rect.w, src_rect.h, sw_texfmt, sw_textype, buffer->pixels);
@@ -640,6 +663,12 @@ void I_FinishUpdate (void)
     glTexCoord2i(0, 1);
     glVertex3f(dst_rect.x, dst_rect.y + dst_rect.h, 0);
   glEnd();
+
+  if (in_render_frame)
+  {
+    in_render_frame = 0;
+    vglStopRendering();
+  }
 #else
   // Update the intermediate texture with the contents of the RGBA buffer.
   SDL_UpdateTexture(sdl_texture, &src_rect, buffer->pixels, buffer->pitch);

@@ -224,6 +224,7 @@ static void D_Wipe(void)
   int wipestart = I_GetTime () - 1;
 
   if (!render_wipescreen) return;//e6y
+
   do
     {
       int nowtime, tics;
@@ -235,6 +236,7 @@ static void D_Wipe(void)
         }
       while (!tics);
       wipestart = nowtime;
+      I_StartRendering();
       done = wipe_ScreenWipe(tics);
       I_UpdateNoBlit();
       M_Drawer();                   // menu is drawn even on top of wipes
@@ -285,6 +287,8 @@ void D_Display (fixed_t frac)
 
   if (!I_StartDisplay())
     return;
+
+  I_StartRendering();
 
   if (setsizeneeded) {               // change the view size if needed
     R_ExecuteSetViewSize();

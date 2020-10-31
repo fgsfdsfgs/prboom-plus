@@ -71,10 +71,12 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
+
 #ifdef __vita__
 #include <vitaGL/source/vitaGL.h>
 #include <psp2/io/stat.h> 
 #include <dirent.h>
+SceUInt32 sceUserMainThreadStackSize = 1 * 1024 * 1024;
 #endif
 
 #ifndef PRBOOM_SERVER
@@ -143,10 +145,6 @@ dboolean I_StartDisplay(void)
   if (realframe)
     saved_gametic = gametic;
 
-#ifdef __vita__
-  vglStartRendering();
-#endif
-
   start_displaytime = SDL_GetTicks();
   InDisplay = true;
   return true;
@@ -154,9 +152,6 @@ dboolean I_StartDisplay(void)
 
 void I_EndDisplay(void)
 {
-#ifdef __vita__
-  vglStopRendering();
-#endif
   displaytime = SDL_GetTicks() - start_displaytime;
   InDisplay = false;
 }

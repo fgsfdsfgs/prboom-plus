@@ -129,7 +129,7 @@ int gl_mask_sprite_threshold;
 float gl_mask_sprite_threshold_f;
 
 GLuint gld_DisplayList=0;
-int fog_density=200;
+int gl_fog_density=200;
 static float extra_red=0.0f;
 static float extra_green=0.0f;
 static float extra_blue=0.0f;
@@ -406,9 +406,6 @@ void gld_Init(int width, int height)
   //e6y
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
-  gld_Finish();
-  glClear(GL_COLOR_BUFFER_BIT);
-  glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
 
   // e6y
   // if you have a prior crash in the game,
@@ -1080,7 +1077,9 @@ void gld_Finish(void)
   {
     glFinish();
   }
+#ifndef __vita__
   SDL_GL_SwapWindow(sdl_window);
+#endif
 }
 
 GLuint flats_vbo_id = 0; // ID of VBO

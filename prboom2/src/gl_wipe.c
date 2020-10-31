@@ -47,7 +47,6 @@ static GLuint wipe_scr_start_tex = 0;
 static GLuint wipe_scr_end_tex = 0;
 #ifdef __vita__
 static unsigned char *scr_buffer = NULL;
-static GLuint scr_size = 0;
 #endif
 
 GLuint CaptureScreenAsTexID(void)
@@ -65,19 +64,9 @@ GLuint CaptureScreenAsTexID(void)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 #ifdef __vita__
-  if (scr_size != SCREENWIDTH * SCREENHEIGHT)
-  {
-    free(scr_buffer);
-    scr_size = SCREENWIDTH * SCREENHEIGHT;
-    scr_buffer = malloc(scr_size * 4);
-  }
-  if (scr_buffer)
-  {
-    glReadPixels(0, 0, SCREENWIDTH, SCREENHEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, scr_buffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-      gld_GetTexDimension(SCREENWIDTH), gld_GetTexDimension(SCREENHEIGHT), 
-      0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-  }
+  scr_buffer = malloc(3 * 1024 * 544);
+  if (!scr_buffer) return 0;
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, scr_buffer);
 #else
   glTexImage2D(GL_TEXTURE_2D, 0, 3, 
     gld_GetTexDimension(SCREENWIDTH), gld_GetTexDimension(SCREENHEIGHT), 

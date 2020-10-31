@@ -113,7 +113,7 @@ int gld_ProgressRestoreScreen(void)
       gld_glTexCoord2f(fU2, fV2); gld_glVertex2f((float)SCREENWIDTH, (float)SCREENHEIGHT);
     }
     gld_glEnd();
-
+    
     return true;
   }
 
@@ -124,9 +124,13 @@ int gld_ProgressEnd(void)
 {
   if (progress_texid != 0)
   {
+    I_StartRendering();
     gld_ProgressRestoreScreen();
     I_FinishUpdate();
+    I_StartRendering();
     gld_ProgressRestoreScreen();
+    I_FinishUpdate();
+    glFinish();
     glDeleteTextures(1, &progress_texid);
     progress_texid = 0;
     return true;
@@ -149,6 +153,8 @@ void gld_ProgressUpdate(const char * text, int progress, int total)
   if (tic - lastupdate < 100)
     return;
   lastupdate = tic;
+
+  I_StartRendering();
 
   if ((text) && (strlen(text) > 0) && strcmp((last_text[0] ? last_text : ""), text))
   {

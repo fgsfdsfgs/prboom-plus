@@ -75,12 +75,14 @@ int lprintf(OutputLevels pri, const char *s, ...)
   va_end(v);
 
 #ifdef __vita__
-  FILE *fout;
-  fout = fopen("ux0:/data/prboom/log.log", "a");
-  if (fout)
   {
-    fprintf(fout, "%s", msg);
-    fclose(fout);
+    static FILE *fout = NULL;
+    fout = fopen("ux0:/data/prboom/log.log", fout ? "a" : "w");
+    if (fout)
+    {
+      fprintf(fout, "%s", msg);
+      fclose(fout);
+    }
   }
 #endif
 
