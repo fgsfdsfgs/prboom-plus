@@ -1221,6 +1221,7 @@ void I_InitGraphics(void)
       render_multisampling <= 1 ? SCE_GXM_MULTISAMPLE_NONE :
       render_multisampling == 2 ? SCE_GXM_MULTISAMPLE_2X :
                                   SCE_GXM_MULTISAMPLE_4X;
+    vglUseVram(GL_TRUE);
     vglInitExtended(0x800000, DEFAULT_SCREEN_W, DEFAULT_SCREEN_H, 0x1000000, gxm_ms);
     vglWaitVblankStart(GL_TRUE);
     // create a fake SDL window for events and shit
