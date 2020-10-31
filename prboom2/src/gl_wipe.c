@@ -64,7 +64,7 @@ GLuint CaptureScreenAsTexID(void)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 #ifdef __vita__
-  scr_buffer = malloc(3 * 1024 * 544);
+  if (!scr_buffer) scr_buffer = malloc(3 * 960 * 544);
   if (!scr_buffer) return 0;
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, scr_buffer);
 #else

@@ -113,6 +113,7 @@ int gl_colorbuffer_bits=16;
 int gl_depthbuffer_bits=16;
 
 extern void M_QuitDOOM(int choice);
+extern void gld_ResetWrapper(void);
 int use_fullscreen;
 int desired_fullscreen;
 int render_vsync;
@@ -599,6 +600,7 @@ void I_FinishUpdate (void)
     {
       in_render_frame = 0;
       vglStopRendering();
+      gld_ResetWrapper();
     }
 #endif
     return;

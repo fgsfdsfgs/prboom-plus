@@ -170,9 +170,9 @@ void gld_DrawNiceThings(int fx, int fy, int fw, int fh)
 
 #if defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
   // activate vertex array, texture coord array and color arrays
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
+  gld_glEnableClientState(GL_VERTEX_ARRAY);
+  gld_glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  gld_glEnableClientState(GL_COLOR_ARRAY);
 #endif
 
   for (i = 0; i < am_icon_count; i++)
@@ -189,11 +189,11 @@ void gld_DrawNiceThings(int fx, int fy, int fw, int fh)
       map_nice_thing_t *thing = &((map_nice_thing_t*)things->data)[0];
 
       // activate and specify pointers to arrays
-      glVertexPointer(2, GL_FLOAT, sizeof(thing->v[0]), &thing->v[0].x);
-      glTexCoordPointer(2, GL_FLOAT, sizeof(thing->v[0]), &thing->v[0].u);
-      glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(thing->v[0]), &thing->v[0].r);
+      gld_glVertexPointer(2, GL_FLOAT, sizeof(thing->v[0]), &thing->v[0].x);
+      gld_glTexCoordPointer(2, GL_FLOAT, sizeof(thing->v[0]), &thing->v[0].u);
+      gld_glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(thing->v[0]), &thing->v[0].r);
 
-      glDrawArrays(GL_QUADS, 0, things->count * 4);
+      gld_glDrawArrays(GL_QUADS, 0, things->count * 4);
     }
 #else
     for (i = 0; i < things->count; i++)
@@ -220,9 +220,9 @@ void gld_DrawNiceThings(int fx, int fy, int fw, int fh)
 
 #if defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
   // deactivate vertex array, texture coord array and color arrays
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
+  gld_glDisableClientState(GL_VERTEX_ARRAY);
+  gld_glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  gld_glDisableClientState(GL_COLOR_ARRAY);
 #endif
 
   gld_ResetLastTexture();
@@ -247,17 +247,17 @@ void gld_DrawMapLines(void)
     map_point_t *point = (map_point_t*)map_lines.data;
 
     gld_EnableTexture2D(GL_TEXTURE0_ARB, false);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
+    gld_glEnableClientState(GL_VERTEX_ARRAY);
+    gld_glEnableClientState(GL_COLOR_ARRAY);
 
-    glVertexPointer(2, GL_FLOAT, sizeof(point[0]), &point->x);
-    glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(point[0]), &point->r);
+    gld_glVertexPointer(2, GL_FLOAT, sizeof(point[0]), &point->x);
+    gld_glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(point[0]), &point->r);
 
-    glDrawArrays(GL_LINES, 0, map_lines.count * 2);
+    gld_glDrawArrays(GL_LINES, 0, map_lines.count * 2);
 
     gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_COLOR_ARRAY);
+    gld_glDisableClientState(GL_VERTEX_ARRAY);
+    gld_glDisableClientState(GL_COLOR_ARRAY);
   }
 #endif
 }

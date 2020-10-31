@@ -1112,8 +1112,8 @@ void gld_PreprocessLevel(void)
       GLEXT_glBindBufferARB(GL_ARRAY_BUFFER, flats_vbo_id);
     }
 
-    glVertexPointer(3, GL_FLOAT, sizeof(flats_vbo[0]), flats_vbo_x);
-    glTexCoordPointer(2, GL_FLOAT, sizeof(flats_vbo[0]), flats_vbo_u);
+    gld_glVertexPointer(3, GL_FLOAT, sizeof(flats_vbo[0]), flats_vbo_x);
+    gld_glTexCoordPointer(2, GL_FLOAT, sizeof(flats_vbo[0]), flats_vbo_u);
   }
 #endif
 

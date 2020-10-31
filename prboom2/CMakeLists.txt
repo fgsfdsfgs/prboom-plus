@@ -210,7 +210,7 @@ else()
         -ffast-math"
     )
     if (VITA)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mtune=cortex-a9 -mfpu=neon -mthumb -O2 -g -fsigned-char -fno-short-enums -flto")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mtune=cortex-a9 -mfpu=neon -mthumb -O3 -g -fsigned-char -fno-short-enums -flto")
         set(CMAKE_LD_FLAGS "${CMAKE_LD_FLAGS} -g")
     endif()
 endif()

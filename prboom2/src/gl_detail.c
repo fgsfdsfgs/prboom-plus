@@ -208,12 +208,12 @@ void gld_PreprocessDetail(void)
   {
     GLEXT_glClientActiveTextureARB(GL_TEXTURE0_ARB);
 #if defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
-    glTexCoordPointer(2, GL_FLOAT, sizeof(flats_vbo[0]), flats_vbo_u);
+    gld_glTexCoordPointer(2, GL_FLOAT, sizeof(flats_vbo[0]), flats_vbo_u);
 #endif
 
     GLEXT_glClientActiveTextureARB(GL_TEXTURE1_ARB);
 #if defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
-    glTexCoordPointer(2, GL_FLOAT, sizeof(flats_vbo[0]), flats_vbo_u);
+    gld_glTexCoordPointer(2, GL_FLOAT, sizeof(flats_vbo[0]), flats_vbo_u);
 #endif
     GLEXT_glClientActiveTextureARB(GL_TEXTURE0_ARB);
 
@@ -434,7 +434,7 @@ void gld_DrawFlatDetail_NoARB(GLFlat *flat)
       for (loopnum=0; loopnum<sectorloops[flat->sectornum].loopcount; loopnum++)
       {
         currentloop=&sectorloops[flat->sectornum].loops[loopnum];
-        glDrawArrays(currentloop->mode,currentloop->vertexindex,currentloop->vertexcount);
+        gld_glDrawArrays(currentloop->mode,currentloop->vertexindex,currentloop->vertexcount);
       }
     }
 #else

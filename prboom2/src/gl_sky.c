@@ -843,14 +843,14 @@ static void RenderDome(SkyBoxParams_t *sky)
   }
 
   // activate and specify pointers to arrays
-  glVertexPointer(3, GL_FLOAT, sizeof(vbo->data[0]), sky_vbo_x);
-  glTexCoordPointer(2, GL_FLOAT, sizeof(vbo->data[0]), sky_vbo_u);
-  glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(vbo->data[0]), sky_vbo_r);
+  gld_glVertexPointer(3, GL_FLOAT, sizeof(vbo->data[0]), sky_vbo_x);
+  gld_glTexCoordPointer(2, GL_FLOAT, sizeof(vbo->data[0]), sky_vbo_u);
+  gld_glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(vbo->data[0]), sky_vbo_r);
 
   // activate vertex array, texture coord array and color arrays
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
+  gld_glEnableClientState(GL_VERTEX_ARRAY);
+  gld_glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  gld_glEnableClientState(GL_COLOR_ARRAY);
 #endif
 
   if (!gl_stretchsky)
@@ -880,7 +880,7 @@ static void RenderDome(SkyBoxParams_t *sky)
         continue;
 
 #if defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
-      glDrawArrays(loop->mode, loop->vertexindex, loop->vertexcount);
+      gld_glDrawArrays(loop->mode, loop->vertexindex, loop->vertexcount);
 #else
       {
         int k;
@@ -903,7 +903,7 @@ static void RenderDome(SkyBoxParams_t *sky)
 
   glScalef(1.0f, 1.0f, 1.0f);
 
-  // current color is undefined after glDrawArrays
+  // current color is undefined after gld_glDrawArrays
   gld_glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 #if defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
@@ -913,7 +913,7 @@ static void RenderDome(SkyBoxParams_t *sky)
     GLEXT_glBindBufferARB(GL_ARRAY_BUFFER, 0);
   }
   // deactivate color array
-  glDisableClientState(GL_COLOR_ARRAY);
+  gld_glDisableClientState(GL_COLOR_ARRAY);
 #endif
 }
 

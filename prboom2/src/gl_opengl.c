@@ -571,7 +571,7 @@ void gld_EnableClientCoordArray(GLenum texture, int enable)
     if (!clieant_active_texture_enabled[arb])
     {
       GLEXT_glClientActiveTextureARB(texture);
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      gld_glEnableClientState(GL_TEXTURE_COORD_ARRAY);
       GLEXT_glClientActiveTextureARB(GL_TEXTURE0_ARB);
 
       clieant_active_texture_enabled[arb] = enable;
@@ -582,7 +582,7 @@ void gld_EnableClientCoordArray(GLenum texture, int enable)
     if (clieant_active_texture_enabled[arb])
     {
       GLEXT_glClientActiveTextureARB(texture);
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      gld_glDisableClientState(GL_TEXTURE_COORD_ARRAY);
       GLEXT_glClientActiveTextureARB(GL_TEXTURE0_ARB);
 
       clieant_active_texture_enabled[arb] = enable;
@@ -683,15 +683,24 @@ void SetTextureMode(tex_mode_e type)
 
 #ifdef __vita__
 
-#define MAX_VERTICES 8192
+#define MAX_VERTICES 16384
 
 static unsigned short *vtx_idx;
-static float *vtx_pos, *vtx_posptr;
-static float *vtx_tex, *vtx_texptr;
-static float *vtx_col, *vtx_colptr;
+static float *vtx_pos, *vtx_posptr, *vtx_posstart;
+static float *vtx_tex, *vtx_texptr, *vtx_texstart;
+static float *vtx_col, *vtx_colptr, *vtx_colstart;
+static float *vtx_tmp, *vtx_tmpptr, *vtx_tmpstart;
 static float vtx_curcol[4] = { 1.f, 1.f, 1.f, 1.f };
 static int vtx_num = 0;
 static GLenum vtx_curprim = 0;
+
+void gld_ResetWrapper(void)
+{
+  vtx_posptr = vtx_posstart = vtx_pos;
+  vtx_texptr = vtx_texstart = vtx_tex;
+  vtx_colptr = vtx_colstart = vtx_col;
+  vtx_tmpptr = vtx_tmpstart = vtx_tmp;
+}
 
 void gld_glBegin(GLenum prim)
 {
@@ -701,16 +710,15 @@ void gld_glBegin(GLenum prim)
     vtx_pos = malloc(sizeof(float) * 3 * MAX_VERTICES);
     vtx_tex = malloc(sizeof(float) * 2 * MAX_VERTICES);
     vtx_col = malloc(sizeof(float) * 4 * MAX_VERTICES);
+    vtx_tmp = malloc(sizeof(float) * 4 * MAX_VERTICES);
     vtx_idx = malloc(sizeof(short) * 1 * MAX_VERTICES);
-    if (!vtx_pos || !vtx_tex || !vtx_col || !vtx_idx)
+    if (!vtx_pos || !vtx_tex || !vtx_col || !vtx_idx || !vtx_tmp)
       I_Error("could not allocate vertex buffers");
     for (i = 0; i < MAX_VERTICES; ++i)
       vtx_idx[i] = i; // indices are always sequential here
+    gld_ResetWrapper();
   }
 
-  vtx_posptr = vtx_pos;
-  vtx_texptr = vtx_tex;
-  vtx_colptr = vtx_col;
   vtx_num = 0;
   vtx_curprim = prim;
 }
@@ -755,13 +763,13 @@ void gld_glEnd(void)
 
   vglIndexPointerMapped(vtx_idx);
   glEnableClientState(GL_VERTEX_ARRAY);
-  vglVertexPointer(3, GL_FLOAT, 0, vtx_num, vtx_pos);
+  vglVertexPointerMapped(vtx_posstart);
   glEnableClientState(GL_COLOR_ARRAY);
-  vglColorPointer(4, GL_FLOAT, 0, vtx_num, vtx_col);
-  if (vtx_texptr != vtx_tex)
+  vglColorPointerMapped(GL_FLOAT, vtx_colstart);
+  if (vtx_texptr != vtx_texstart)
   {
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    vglTexCoordPointer(2, GL_FLOAT, 0, vtx_num, vtx_tex);
+    vglTexCoordPointerMapped(vtx_texstart);
   }
   else
   {
@@ -770,17 +778,121 @@ void gld_glEnd(void)
 
   vglDrawObjects(vtx_curprim, vtx_num, GL_TRUE);
 
-  if (vtx_texptr != vtx_tex)
+  if (vtx_texptr != vtx_texstart)
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
 
   vtx_curprim = 0;
   vtx_num = 0;
+  vtx_posstart = vtx_posptr;
+  vtx_colstart = vtx_colptr;
+  vtx_texstart = vtx_texptr;
+}
+
+// custom array drawing functions
+
+static struct VtxArray
+{
+  GLboolean enabled;
+  GLint size;
+  GLenum type;
+  GLsizei stride;
+  const GLchar *ptr;
+} vtx_arrays[3];
+
+void gld_glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)
+{
+  vtx_arrays[0].size = size;
+  vtx_arrays[0].type = type;
+  vtx_arrays[0].stride = stride;
+  vtx_arrays[0].ptr = pointer;
+}
+
+void gld_glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)
+{
+  vtx_arrays[1].size = size;
+  vtx_arrays[1].type = type;
+  vtx_arrays[1].stride = stride;
+  vtx_arrays[1].ptr = pointer;
+}
+
+void gld_glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)
+{
+  vtx_arrays[2].size = size;
+  vtx_arrays[2].type = type;
+  vtx_arrays[2].stride = stride;
+  vtx_arrays[2].ptr = pointer;
+}
+
+void gld_glEnableClientState(GLenum array)
+{
+  switch (array) {
+    case GL_VERTEX_ARRAY:        vtx_arrays[0].enabled = GL_TRUE; break;
+    case GL_COLOR_ARRAY:         vtx_arrays[1].enabled = GL_TRUE; break;
+    case GL_TEXTURE_COORD_ARRAY: vtx_arrays[2].enabled = GL_TRUE; break;
+    default:                     break;
+  }
+  glEnableClientState(array);
+}
+
+void gld_glDisableClientState(GLenum array)
+{
+  switch (array) {
+    case GL_VERTEX_ARRAY:        vtx_arrays[0].enabled = GL_FALSE; break;
+    case GL_COLOR_ARRAY:         vtx_arrays[1].enabled = GL_FALSE; break;
+    case GL_TEXTURE_COORD_ARRAY: vtx_arrays[2].enabled = GL_FALSE; break;
+    default:                     break;
+  }
+  glDisableClientState(array);
+}
+
+void gld_glDrawArrays(GLenum mode, GLint first, GLsizei count)
+{
+  int i;
+
+  vglIndexPointerMapped(vtx_idx);
+
+  // bind colors if enabled, otherwise fill with current color and enable anyway
+  if (vtx_arrays[1].enabled)
+  {
+    vglColorPointer(vtx_arrays[1].size, vtx_arrays[1].type, vtx_arrays[1].stride,
+      count, vtx_arrays[1].ptr + first * vtx_arrays[1].stride);
+  }
+  else
+  {
+    for (i = 0; i < count; ++i)
+    {
+      *(vtx_tmpptr++) = vtx_curcol[0];
+      *(vtx_tmpptr++) = vtx_curcol[1];
+      *(vtx_tmpptr++) = vtx_curcol[2];
+      *(vtx_tmpptr++) = vtx_curcol[3];
+    }
+    glEnableClientState(GL_COLOR_ARRAY);
+    vglColorPointerMapped(GL_FLOAT, vtx_tmpstart);
+    vtx_tmpstart = vtx_tmpptr;
+  }
+
+  if (vtx_arrays[2].enabled)
+    vglTexCoordPointer(vtx_arrays[2].size, vtx_arrays[2].type, vtx_arrays[2].stride,
+      count, vtx_arrays[2].ptr + first * vtx_arrays[2].stride);
+
+  // bind vertices and draw
+  if (vtx_arrays[0].enabled)
+  {
+    vglVertexPointer(vtx_arrays[0].size, vtx_arrays[0].type, vtx_arrays[0].stride,
+      count, vtx_arrays[0].ptr + first * vtx_arrays[0].stride);
+    vglDrawObjects(mode, count, GL_TRUE);
+  }
+
+  // re-disable color array if it was disabled
+  if (!vtx_arrays[1].enabled)
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 #else
 
+void gld_ResetWrapper(void) { }
 void gld_glBegin(GLenum prim) { glBegin(prim); }
 void gld_glVertex2f(float x, float y) { glVertex2f(x, y); }
 void gld_glVertex2i(int x, int y) { glVertex2i(x, y); }
@@ -793,6 +905,12 @@ void gld_glColor4f(float r, float g, float b, float a) { glColor4f(r, g, b, a); 
 void gld_glColor4fv(const float *v) { glColor4fv(v); }
 void gld_glColor4ubv(const unsigned char *v) { glColor4ubv(v); }
 void gld_glEnd(void) { glEnd(); }
+void gld_glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) { glVertexPointer(size, type, stride, pointer); }
+void gld_glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) { glColorPointer(size, type, stride, pointer); }
+void gld_glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) { glTexCoordPointer(size, type, stride, pointer); }
+void gld_glEnableClientState(GLenum array) { glEnableClientState(array); }
+void gld_glDisableClientState(GLenum array) { glDisableClientState(array); }
+void gld_glDrawArrays(GLenum mode, GLint first, GLsizei count) { glDrawArrays(mode, first, count); }
 
 #endif
 

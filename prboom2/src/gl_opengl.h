@@ -303,6 +303,13 @@ void gld_glColor4f(float r, float g, float b, float a);
 void gld_glColor4fv(const float *v);
 void gld_glColor4ubv(const unsigned char *v);
 void gld_glEnd(void);
+void gld_glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
+void gld_glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
+void gld_glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
+void gld_glEnableClientState(GLenum array);
+void gld_glDisableClientState(GLenum array);
+void gld_glDrawArrays(GLenum mode, GLint first, GLsizei count);
+void gld_ResetWrapper(void);
 
 typedef enum
 {
