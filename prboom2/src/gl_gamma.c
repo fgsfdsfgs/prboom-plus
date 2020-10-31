@@ -49,12 +49,17 @@
 #include "m_argv.h"
 #include "lprintf.h"
 
+#include "gl_opengl.h"
+
 #ifndef HIBYTE
 #define HIBYTE(W) (((W) >> 8) & 0xFF)
 #endif
 
 int useglgamma;
 int gl_DeviceSupportsGamma = false;
+
+int gl_fake_gamma = 1;
+int gl_fake_gamma_value = 1;
 
 static Uint16 gl_oldHardwareGamma[3][256];
 
@@ -122,7 +127,14 @@ int gld_SetGammaRamp(int gamma)
   Uint16 gammatable[256];
 
   if (!gl_DeviceSupportsGamma)
+  {
+    if (gl_fake_gamma)
+    {
+      gl_fake_gamma_value = gamma;
+      return true;
+    }
     return false;
+  }
 
   if (gamma == -1)
   {
@@ -181,7 +193,7 @@ void gld_ResetGammaRamp(void)
 
 void gld_ApplyGammaRamp(byte *buf, int pitch, int width, int height)
 {
-  if (gl_hardware_gamma)
+  if (gl_hardware_gamma && gl_DeviceSupportsGamma)
   {
     int w, h;
     byte *pixel;
@@ -201,4 +213,33 @@ void gld_ApplyGammaRamp(byte *buf, int pitch, int width, int height)
       }
     }
   }
+}
+
+void gld_BlendFakeGamma(void)
+{
+  float gammaf;
+
+  if (gl_fake_gamma_value <= 0)
+    return;
+
+  gammaf = (float)gl_fake_gamma_value / (float)MAX_GLGAMMA;
+
+  glDisable(GL_DEPTH_TEST);
+  glDepthMask(GL_FALSE);
+  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+  glDisable(GL_ALPHA_TEST);
+  glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+
+  gld_glColor4f(1.f, 1.f, 1.f, gammaf);
+  gld_glBegin(GL_TRIANGLE_STRIP);
+    gld_glVertex3f(0.f, 0.f, 0.f);
+    gld_glVertex3f(SCREENWIDTH, 0.f, 0.f);
+    gld_glVertex3f(0.f, SCREENHEIGHT, 0.f);
+    gld_glVertex3f(SCREENWIDTH, SCREENHEIGHT, 0.f);
+  gld_glEnd();
+
+  glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  glDepthMask(GL_TRUE);
+  glEnable(GL_ALPHA_TEST);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

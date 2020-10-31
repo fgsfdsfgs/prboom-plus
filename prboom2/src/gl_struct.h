@@ -82,10 +82,13 @@ extern gl_lightmode_t gl_lightmode_default;
 extern const char *gl_lightmodes[];
 extern int gl_light_ambient;
 extern int useglgamma;
+extern int gl_fake_gamma;
+extern int gl_fake_gamma_value;
 int gld_SetGammaRamp(int gamma);
 void gld_CheckHardwareGamma(void);
 void gld_FlushTextures(void);
 void gld_ApplyGammaRamp(byte *buf, int pitch, int width, int height);
+void gld_BlendFakeGamma(void);
 void M_ChangeLightMode(void);
 
 //detail

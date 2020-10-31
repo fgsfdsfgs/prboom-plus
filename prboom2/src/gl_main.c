@@ -405,7 +405,15 @@ void gld_Init(int width, int height)
 
   //e6y
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+  // do a couple dummy frames so there's something in the fb
+  I_StartRendering();
   glClear(GL_COLOR_BUFFER_BIT);
+  I_FinishUpdate();
+  I_StartRendering();
+  glClear(GL_COLOR_BUFFER_BIT);
+  I_FinishUpdate();
+  glFinish();
 
   // e6y
   // if you have a prior crash in the game,
@@ -1319,6 +1327,8 @@ void gld_EndDrawScene(void)
     // below if scene is in texture
     if (!invul_method)
     {
+      if (gl_fake_gamma)
+        gld_BlendFakeGamma();
       gld_ProcessExtraAlpha();
     }
 
@@ -1390,6 +1400,8 @@ void gld_EndDrawScene(void)
 
     if (!invul_method)
     {
+      if (gl_fake_gamma)
+        gld_BlendFakeGamma();
       gld_ProcessExtraAlpha();
     }
   }

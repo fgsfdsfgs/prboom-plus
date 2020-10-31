@@ -468,7 +468,7 @@ default_t defaults[] =
   {"gl_use_display_lists",{&gl_use_display_lists},{0},0,1,
    def_bool,ss_none},
 
-  {"gl_finish",{&gl_finish},{1},0,1,
+  {"gl_finish",{&gl_finish},{0},0,1,
    def_bool,ss_none},
   {"gl_clear",{&gl_clear},{0},0,1,
    def_bool,ss_none},
@@ -481,7 +481,7 @@ default_t defaults[] =
   {"gl_depthbuffer_bits",{&gl_depthbuffer_bits},{24},16,32,
    def_int,ss_none},
   {"gl_texture_filter",{(int*)&gl_texture_filter},
-   {filter_nearest_mipmap_linear}, filter_nearest, filter_count - 1, def_int,ss_none},
+   {filter_nearest}, filter_nearest, filter_count - 1, def_int,ss_none},
   {"gl_sprite_filter",{(int*)&gl_sprite_filter},
    {filter_nearest}, filter_nearest, filter_linear_mipmap_nearest, def_int,ss_none},
   {"gl_patch_filter",{(int*)&gl_patch_filter},
