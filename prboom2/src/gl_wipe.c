@@ -42,6 +42,7 @@
 #include "m_random.h"
 #include "lprintf.h"
 #include "e6y.h"
+#include "i_video.h"
 
 static GLuint wipe_scr_start_tex = 0;
 static GLuint wipe_scr_end_tex = 0;
@@ -66,6 +67,7 @@ GLuint CaptureScreenAsTexID(void)
 #ifdef __vita__
   if (!scr_buffer) scr_buffer = malloc(3 * 960 * 544);
   if (!scr_buffer) return 0;
+  glReadPixels(0, 0, SCREENWIDTH, SCREENHEIGHT, GL_RGB, GL_UNSIGNED_BYTE, scr_buffer);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, scr_buffer);
 #else
   glTexImage2D(GL_TEXTURE_2D, 0, 3, 
@@ -164,7 +166,10 @@ int gld_wipe_StartScreen(void)
 
 int gld_wipe_EndScreen(void)
 {
-  glFlush();
+  glFinish();
+#ifdef __vita__
+  I_FinishUpdate();
+#endif
   wipe_scr_end_tex = CaptureScreenAsTexID();
 
   return 0;

@@ -242,4 +242,5 @@ void gld_BlendFakeGamma(void)
   glDepthMask(GL_TRUE);
   glEnable(GL_ALPHA_TEST);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_DEPTH_TEST);
 }

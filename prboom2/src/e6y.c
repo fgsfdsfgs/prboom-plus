@@ -482,7 +482,7 @@ void M_ChangeMouseLook(void)
 #ifdef GL_DOOM
   if (gl_skymode == skytype_auto)
 #ifdef __vita__
-    gl_drawskys = skytype_skydome;
+    gl_drawskys = (movement_mouselook ? skytype_skydome : skytype_screen);
 #else
     gl_drawskys = (movement_mouselook ? skytype_skydome : skytype_standard);
 #endif

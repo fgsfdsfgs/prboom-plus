@@ -527,8 +527,8 @@ void gld_DrawScreenSkybox(void)
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
 
-    glPushMatrix();
     glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
     glLoadIdentity();
 
     gld_glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -936,8 +936,8 @@ void gld_DrawDomeSkyBox(void)
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glPushMatrix();
     glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
     glLoadIdentity();
 
     glRotatef(roll,  0.0f, 0.0f, 1.0f);

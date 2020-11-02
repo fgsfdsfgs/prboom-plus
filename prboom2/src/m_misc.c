@@ -498,7 +498,7 @@ default_t defaults[] =
    def_int,ss_none},
   {"gl_skymode",{(int*)&gl_skymode},
   {skytype_auto}, skytype_auto, skytype_count - 1, def_int,ss_none},
-  {"gl_sky_detail",{&gl_sky_detail},{16},1,32,
+  {"gl_sky_detail",{&gl_sky_detail},{8},1,32,
    def_int,ss_none},
   {"gl_use_paletted_texture",{&gl_use_paletted_texture},{0},0,1,
    def_bool,ss_none},

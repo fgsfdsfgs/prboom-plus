@@ -206,9 +206,6 @@ void gld_InitOpenGL(dboolean compatibility_mode)
   // Any textures sizes are allowed
   gl_arb_texture_non_power_of_two = gl_arb_texture_non_power_of_two_default &&
     isExtensionSupported("GL_ARB_texture_non_power_of_two") != NULL;
-#ifdef __vita__
-  gl_arb_texture_non_power_of_two = true;
-#endif
   if (gl_arb_texture_non_power_of_two)
     lprintf(LO_INFO, "using GL_ARB_texture_non_power_of_two\n");
 
@@ -470,6 +467,15 @@ void gld_InitOpenGL(dboolean compatibility_mode)
     GLEXT_CLAMP_TO_EDGE = GL_CLAMP;
     gl_version = OPENGL_VERSION_1_1;
   }
+
+#ifdef __vita__
+  // wrong some rights
+  GLEXT_CLAMP_TO_EDGE = GL_CLAMP_TO_EDGE;
+  gl_arb_texture_non_power_of_two = true;
+  gl_arb_texture_compression = true;
+  // gl_use_stencil = true;
+  GLEXT_glCompressedTexImage2DARB = glCompressedTexImage2D;
+#endif
 
   //init states manager
   gld_EnableMultisample(true);
@@ -833,7 +839,6 @@ void gld_glEnableClientState(GLenum array)
     case GL_TEXTURE_COORD_ARRAY: vtx_arrays[2].enabled = GL_TRUE; break;
     default:                     break;
   }
-  glEnableClientState(array);
 }
 
 void gld_glDisableClientState(GLenum array)
@@ -844,7 +849,6 @@ void gld_glDisableClientState(GLenum array)
     case GL_TEXTURE_COORD_ARRAY: vtx_arrays[2].enabled = GL_FALSE; break;
     default:                     break;
   }
-  glDisableClientState(array);
 }
 
 void gld_glDrawArrays(GLenum mode, GLint first, GLsizei count)
@@ -854,6 +858,7 @@ void gld_glDrawArrays(GLenum mode, GLint first, GLsizei count)
   vglIndexPointerMapped(vtx_idx);
 
   // bind colors if enabled, otherwise fill with current color and enable anyway
+  glEnableClientState(GL_COLOR_ARRAY);
   if (vtx_arrays[1].enabled)
   {
     vglColorPointer(vtx_arrays[1].size, vtx_arrays[1].type, vtx_arrays[1].stride,
@@ -868,26 +873,34 @@ void gld_glDrawArrays(GLenum mode, GLint first, GLsizei count)
       *(vtx_tmpptr++) = vtx_curcol[2];
       *(vtx_tmpptr++) = vtx_curcol[3];
     }
-    glEnableClientState(GL_COLOR_ARRAY);
     vglColorPointerMapped(GL_FLOAT, vtx_tmpstart);
     vtx_tmpstart = vtx_tmpptr;
   }
 
   if (vtx_arrays[2].enabled)
+  {
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     vglTexCoordPointer(vtx_arrays[2].size, vtx_arrays[2].type, vtx_arrays[2].stride,
       count, vtx_arrays[2].ptr + first * vtx_arrays[2].stride);
+  }
+  else
+  {
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  }
 
   // bind vertices and draw
   if (vtx_arrays[0].enabled)
   {
+    glEnableClientState(GL_VERTEX_ARRAY);
     vglVertexPointer(vtx_arrays[0].size, vtx_arrays[0].type, vtx_arrays[0].stride,
       count, vtx_arrays[0].ptr + first * vtx_arrays[0].stride);
     vglDrawObjects(mode, count, GL_TRUE);
+    glDisableClientState(GL_VERTEX_ARRAY);
   }
 
-  // re-disable color array if it was disabled
-  if (!vtx_arrays[1].enabled)
-    glDisableClientState(GL_COLOR_ARRAY);
+  if (vtx_arrays[2].enabled)
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  glDisableClientState(GL_COLOR_ARRAY);
 }
 
 #else

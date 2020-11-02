@@ -1168,6 +1168,7 @@ void gld_StartDrawScene(void)
   glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
   glScissor(viewwindowx, SCREENHEIGHT-(viewheight+viewwindowy), viewwidth, viewheight);
   glEnable(GL_SCISSOR_TEST);
+  glEnable(GL_DEPTH_TEST);
   // Player coordinates
   xCamera=-(float)viewx/MAP_SCALE;
   yCamera=(float)viewy/MAP_SCALE;
@@ -1411,6 +1412,7 @@ void gld_EndDrawScene(void)
   glDisable(GL_ALPHA_TEST);
   if (gl_shared_texture_palette)
     glDisable(GL_SHARED_TEXTURE_PALETTE_EXT);
+  glDisable(GL_DEPTH_TEST);
 }
 
 static void gld_AddDrawWallItem(GLDrawItemType itemtype, void *itemdata)
@@ -2994,7 +2996,7 @@ void gld_DrawScene(player_t *player)
       gld_DrawDomeSkyBox();
     }
     //e6y: 3d emulation of screen quad
-    if (gl_drawskys == skytype_screen)
+    else if (gl_drawskys == skytype_screen)
     {
       gld_DrawScreenSkybox();
     }
