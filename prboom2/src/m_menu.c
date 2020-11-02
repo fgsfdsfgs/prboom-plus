@@ -3102,6 +3102,12 @@ setup_menu_t* gen_settings[] =
 #define G_Y 23
 #define G_X2 284
 
+#ifdef __vita__
+#define S_MKEEP S_KEEP
+#else
+#define S_MKEEP 0
+#endif
+
 static const char *videomodes[] = {
   "8bit","15bit","16bit", "32bit", "OpenGL", NULL};
 
@@ -3111,12 +3117,12 @@ static const char *gltexformats[] = {
 setup_menu_t gen_settings1[] = { // General Settings screen1
 
   {"Video",                          S_SKIP|S_TITLE,     m_null, G_X, G_Y+ 1*8},
-  {"Video mode",                     S_CHOICE,           m_null, G_X, G_Y+ 2*8, {"videomode"}, 0, 0, M_ChangeVideoMode, videomodes},
-  {"Screen Resolution",              S_CHOICE,           m_null, G_X, G_Y+ 3*8, {"screen_resolution"}, 0, 0, M_ChangeVideoMode, screen_resolutions_list},
+  {"Video mode",                     S_CHOICE|S_MKEEP,   m_null, G_X, G_Y+ 2*8, {"videomode"}, 0, 0, M_ChangeVideoMode, videomodes},
+  {"Screen Resolution",              S_CHOICE|S_MKEEP,   m_null, G_X, G_Y+ 3*8, {"screen_resolution"}, 0, 0, M_ChangeVideoMode, screen_resolutions_list},
   {"Aspect Ratio",                   S_CHOICE,           m_null, G_X, G_Y+ 4*8, {"render_aspect"}, 0, 0, M_ChangeAspectRatio, render_aspects_list},
-  {"Fullscreen Video mode",          S_YESNO,            m_null, G_X, G_Y+ 5*8, {"use_fullscreen"}, 0, 0, M_ChangeFullScreen},
+  {"Fullscreen Video mode",          S_YESNO|S_MKEEP,    m_null, G_X, G_Y+ 5*8, {"use_fullscreen"}, 0, 0, M_ChangeFullScreen},
   {"Status Bar and Menu Appearance", S_CHOICE,           m_null, G_X, G_Y+ 6*8, {"render_stretch_hud"}, 0, 0, M_ChangeStretch, render_stretch_list},
-  {"Vertical Sync",                  S_YESNO,            m_null, G_X, G_Y+ 7*8, {"render_vsync"}, 0, 0, M_ChangeVideoMode},
+  {"Vertical Sync",                  S_YESNO|S_MKEEP,    m_null, G_X, G_Y+ 7*8, {"render_vsync"}, 0, 0, M_ChangeVideoMode},
   
   {"Enable Translucency",            S_YESNO,            m_null, G_X, G_Y+10*8, {"translucency"}, 0, 0, M_Trans},
   {"Translucency filter percentage", S_NUM,              m_null, G_X, G_Y+11*8, {"tran_filter_pct"}, 0, 0, M_Trans},
@@ -3166,15 +3172,15 @@ static const char *gen_compstrings[] =
 
 setup_menu_t gen_settings2[] = { // General Settings screen2
 
-  {"Input Devices",                    S_SKIP|S_TITLE, m_null, G_X, G_Y+ 1*8},
-  {"Enable Mouse",                     S_YESNO, m_null, G_X, G_Y+ 2*8, {"use_mouse"}},
-  {"Enable Joystick",                  S_YESNO, m_null, G_X, G_Y+ 3*8, {"use_joystick"}},
+  {"Input Devices",                    S_SKIP|S_TITLE,  m_null, G_X, G_Y+ 1*8},
+  {"Enable Mouse",                     S_YESNO|S_MKEEP, m_null, G_X, G_Y+ 2*8, {"use_mouse"}},
+  {"Enable Joystick",                  S_YESNO|S_MKEEP, m_null, G_X, G_Y+ 3*8, {"use_joystick"}},
 
-  {"Files Preloaded at Game Startup",  S_SKIP|S_TITLE, m_null, G_X, G_Y + 5*8},
-  {"WAD # 1",                          S_FILE, m_null, GF_X, G_Y+ 6*8, {"wadfile_1"}}, 
-  {"WAD #2",                           S_FILE, m_null, GF_X, G_Y+ 7*8, {"wadfile_2"}},
-  {"DEH/BEX # 1",                      S_FILE, m_null, GF_X, G_Y+ 8*8, {"dehfile_1"}},
-  {"DEH/BEX #2",                       S_FILE, m_null, GF_X, G_Y+ 9*8, {"dehfile_2"}},
+  {"Files Preloaded at Game Startup",  S_SKIP|S_TITLE,  m_null, G_X, G_Y + 5*8},
+  {"WAD # 1",                          S_FILE, m_null,  GF_X, G_Y+ 6*8, {"wadfile_1"}}, 
+  {"WAD #2",                           S_FILE, m_null,  GF_X, G_Y+ 7*8, {"wadfile_2"}},
+  {"DEH/BEX # 1",                      S_FILE, m_null,  GF_X, G_Y+ 8*8, {"dehfile_1"}},
+  {"DEH/BEX #2",                       S_FILE, m_null,  GF_X, G_Y+ 9*8, {"dehfile_2"}},
 
   {"Miscellaneous",                    S_SKIP|S_TITLE,  m_null, G_X, G_Y+11*8},
   {"Maximum number of player corpses", S_NUM|S_PRGWARN, m_null, G_X, G_Y+12*8, {"max_player_corpse"}},
@@ -3256,7 +3262,7 @@ setup_menu_t gen_settings5[] = { // General Settings screen3
   {"Screen Scaling",            S_CHOICE,m_null,G_X,G_Y+2*8, {"render_screen_multiply"}, 0, 0, M_ChangeScreenScaling, renderscalemodes + 2},
 #ifdef GL_DOOM
   {"OpenGL Options",            S_SKIP|S_TITLE,m_null,G_X,G_Y+5*8},
-  {"Multisampling (0-None)",    S_NUM|S_PRGWARN|S_CANT_GL_ARB_MULTISAMPLEFACTOR,m_null,G_X,G_Y+6*8, {"render_multisampling"}, 0, 0, M_ChangeMultiSample},
+  {"Multisampling (0-None)",    S_NUM|S_PRGWARN|S_CANT_GL_ARB_MULTISAMPLEFACTOR|S_MKEEP,m_null,G_X,G_Y+6*8, {"render_multisampling"}, 0, 0, M_ChangeMultiSample},
   {"Field Of View",             S_NUM,    m_null, G_X, G_Y+ 7*8, {"render_fov"}, 0, 0, M_ChangeFOV},
   {"Sector Light Mode",         S_CHOICE, m_null, G_X, G_Y+ 8*8, {"gl_lightmode"}, 0, 0, M_ChangeLightMode, gl_lightmodes},
   {"Allow Fog",                 S_YESNO,  m_null, G_X, G_Y+ 9*8, {"gl_fog"}, 0, 0, M_ChangeAllowFog},
@@ -5338,7 +5344,7 @@ dboolean M_Responder (event_t* ev) {
     return true;
   }
 
-      if (ch == key_menu_enter || ch == key_menu_enter_alt)
+      if ((ch == key_menu_enter || ch == key_menu_enter_alt) && !(ptr1->m_flags & S_KEEP))
   {
     int flags = ptr1->m_flags;
 
