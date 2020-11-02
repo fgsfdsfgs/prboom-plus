@@ -225,7 +225,6 @@ void gld_BlendFakeGamma(void)
   gammaf = (float)gl_fake_gamma_value / (float)MAX_GLGAMMA;
 
   glDisable(GL_DEPTH_TEST);
-  glDepthMask(GL_FALSE);
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   glDisable(GL_ALPHA_TEST);
   glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
@@ -239,7 +238,6 @@ void gld_BlendFakeGamma(void)
   gld_glEnd();
 
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  glDepthMask(GL_TRUE);
   glEnable(GL_ALPHA_TEST);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_DEPTH_TEST);
