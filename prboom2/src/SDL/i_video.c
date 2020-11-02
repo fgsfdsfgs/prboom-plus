@@ -975,6 +975,11 @@ void I_CalculateRes(int width, int height)
 // For example glboom.exe -geom 1025x768 -nowindow will set 1024x768.
 // It affects only fullscreen modes.
   if (V_GetMode() == VID_MODEGL) {
+#ifdef __vita__
+    // always run in max res in GL mode
+    width = DEFAULT_SCREEN_W;
+    height = DEFAULT_SCREEN_H;
+#endif
     if ( desired_fullscreen )
     {
       I_ClosestResolution(&width, &height);
