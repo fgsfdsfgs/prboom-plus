@@ -808,8 +808,32 @@ void gld_FillPatch(int lump, int x, int y, int width, int height, enum patch_tra
 
 void gld_DrawLine_f(float x0, float y0, float x1, float y1, int BaseColor)
 {
-#if defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
   const unsigned char *playpal = V_GetPlaypal();
+#if defined(__vita__)
+  // TODO: figure out how to fucking make GL_LINES work
+  // HACK: draw fucking quads instead of lines
+  float dx, dy, t;
+  float alpha = ((automapmode & am_overlay) ? map_lines_overlay_trans / 100.0f : 1.0f);
+  if (alpha == 0)
+    return;
+
+  dx = y1 - y0;
+  dy = x0 - x1;
+  t = 1.f / sqrtf(dx * dx + dy * dy);
+  dx *= t;
+  dy *= t;
+
+  gld_glColor4f((float)playpal[3*BaseColor]/255.0f,
+            (float)playpal[3*BaseColor+1]/255.0f,
+            (float)playpal[3*BaseColor+2]/255.0f,
+            alpha);
+  gld_glBegin(GL_TRIANGLE_STRIP);
+    gld_glVertex2f( x0, y0 );
+    gld_glVertex2f( x1, y1 );
+    gld_glVertex2f( x0 + dx, y0 + dy);
+    gld_glVertex2f( x1 + dx, y1 + dy);
+  gld_glEnd();
+#elif defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
   unsigned char r, g, b, a;
   map_line_t *line;
   
@@ -837,8 +861,6 @@ void gld_DrawLine_f(float x0, float y0, float x1, float y1, int BaseColor)
   line->point[1].b = b;
   line->point[1].a = a;
 #else
-  const unsigned char *playpal = V_GetPlaypal();
-  
   float alpha = ((automapmode & am_overlay) ? map_lines_overlay_trans / 100.0f : 1.0f);
   if (alpha == 0)
     return;
