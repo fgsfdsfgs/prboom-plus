@@ -55,8 +55,17 @@
 #include "e6y.h"//e6y
 #include "i_capture.h"
 
+#ifdef __vita__
+#define LOGFILE "ux0:/data/prboom/log.log"
+#else
+#define LOGFILE "log.log"
+#endif
+
 int cons_error_mask = -1-LO_INFO; /* all but LO_INFO when redir'd */
 int cons_output_mask = -1;        /* all output enabled */
+int log_to_file = 0;
+
+static FILE *flog = NULL;
 
 /* cphipps - enlarged message buffer and made non-static
  * We still have to be careful here, this function can be called after exit
@@ -74,17 +83,15 @@ int lprintf(OutputLevels pri, const char *s, ...)
   doom_vsnprintf(msg,sizeof(msg),s,v);    /* print message in buffer  */
   va_end(v);
 
-#ifdef __vita__
+  if (log_to_file)
   {
-    static FILE *fout = NULL;
-    fout = fopen("ux0:/data/prboom/log.log", fout ? "a" : "w");
-    if (fout)
+    flog = fopen(LOGFILE, flog ? "a" : "w");
+    if (flog)
     {
-      fprintf(fout, "%s", msg);
-      fclose(fout);
+      fprintf(flog, "%s", msg);
+      fclose(flog);
     }
   }
-#endif
 
   if (lvl&cons_output_mask)               /* mask output as specified */
   {

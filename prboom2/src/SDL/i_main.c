@@ -527,6 +527,8 @@ int main(int argc, char **argv)
   lprintf(LO_INFO,"M_LoadDefaults: Load system defaults.\n");
   M_LoadDefaults();              // load before initing other systems
 
+  log_to_file = M_CheckParm("-logfile");
+
   /* Version info */
   lprintf(LO_INFO,"\n");
   PrintVer();
