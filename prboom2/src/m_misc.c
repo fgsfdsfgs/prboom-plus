@@ -683,6 +683,8 @@ default_t defaults[] =
   {"joyaxis_movev",{&joyaxis_movev},{1},UL,UL,def_int,ss_none},
   {"joyaxis_lookh",{&joyaxis_lookh},{2},UL,UL,def_int,ss_none},
   {"joyaxis_lookv",{&joyaxis_lookv},{3},UL,UL,def_int,ss_none},
+  {"joy_deadzone_left",{&joy_deadzone_left},{1},0,16,def_int,ss_none},
+  {"joy_deadzone_right",{&joy_deadzone_right},{1},0,16,def_int,ss_none},
 
   {"Chat macros",{NULL},{0},UL,UL,def_none,ss_none},
   {"chatmacro0", {0,&chat_macros[0]}, {0,HUSTR_CHATMACRO0},UL,UL,

@@ -36,6 +36,9 @@ extern int joyaxis_movev;
 extern int joyaxis_lookh;
 extern int joyaxis_lookv;
 
+extern int joy_deadzone_left;
+extern int joy_deadzone_right;
+
 extern int usejoystick;
 
 void I_InitJoystick(void);

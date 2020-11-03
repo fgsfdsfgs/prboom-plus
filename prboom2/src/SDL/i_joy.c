@@ -53,12 +53,19 @@ int joyaxis_movev;
 int joyaxis_lookh;
 int joyaxis_lookv;
 
+// 0-16
+int joy_deadzone_left = 1;
+int joy_deadzone_right = 1;
+
 int usejoystick;
 
 static SDL_GameController *joystick;
 static int joystick_num;
 
 static int prev_axis[SDL_CONTROLLER_AXIS_MAX];
+
+static int real_deadzone_left;
+static int real_deadzone_right;
 
 static void I_EndJoystick(void)
 {
@@ -70,12 +77,19 @@ static void I_EndJoystick(void)
   }
 }
 
+static inline int GetAxis(const int axis)
+{
+  const int val = SDL_GameControllerGetAxis(joystick, axis);
+  const int dz = (axis < 2) ? real_deadzone_left : real_deadzone_right;
+  return (abs(val) > dz) ? val : 0;
+}
+
 static inline int JoystickMove(const int axis)
 {
   int axis_value;
   if (axis >= 0 && axis < SDL_CONTROLLER_AXIS_MAX)
   {
-    prev_axis[axis] = SDL_GameControllerGetAxis(joystick, axis);
+    prev_axis[axis] = GetAxis(axis);
     axis_value = prev_axis[axis] / 3000;
     if (abs(axis_value) < 7) axis_value = 0;
     return axis_value;
@@ -85,16 +99,10 @@ static inline int JoystickMove(const int axis)
 
 static inline int JoystickLook(const int axis)
 {
-  int axis_value, delta;
   if (axis >= 0 && axis < SDL_CONTROLLER_AXIS_MAX)
   {
-    axis_value = SDL_GameControllerGetAxis(joystick, axis);
-    delta = axis_value - prev_axis[axis];
-    if (delta)
-    {
-      prev_axis[axis] = axis_value;
-      return delta << 4;
-    }
+    prev_axis[axis] = GetAxis(axis);
+    return prev_axis[axis] >> 4;
   }
   return 0;
 }
@@ -106,6 +114,9 @@ void I_PollJoystick(void)
   int i;
 
   if (!usejoystick || !joystick) return;
+
+  real_deadzone_left =  32768.f * (float)joy_deadzone_left  / 16.f;
+  real_deadzone_right = 32768.f * (float)joy_deadzone_right / 16.f;
 
   // movement uses the old joystick system
 
@@ -120,7 +131,7 @@ void I_PollJoystick(void)
   ev.type = ev_mouse;
   ev.data1 = 0;
   ev.data2 = JoystickLook(joyaxis_lookh);
-  ev.data3 = JoystickLook(joyaxis_lookv);
+  ev.data3 = -JoystickLook(joyaxis_lookv);
   if (ev.data2 || ev.data3) D_PostEvent(&ev);
 
   // triggers generate keypresses

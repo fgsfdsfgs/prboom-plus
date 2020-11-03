@@ -3175,22 +3175,24 @@ setup_menu_t gen_settings2[] = { // General Settings screen2
   {"Input Devices",                    S_SKIP|S_TITLE,  m_null, G_X, G_Y+ 1*8},
   {"Enable Mouse",                     S_YESNO|S_MKEEP, m_null, G_X, G_Y+ 2*8, {"use_mouse"}},
   {"Enable Joystick",                  S_YESNO|S_MKEEP, m_null, G_X, G_Y+ 3*8, {"use_joystick"}},
+  {"Left Stick Deadzone",              S_CHOICE,        m_null, G_X, G_Y+ 4*8, {"joy_deadzone_left"}},
+  {"Right Stick Deadzone",             S_CHOICE,        m_null, G_X, G_Y+ 5*8, {"joy_deadzone_right"}},
 
-  {"Files Preloaded at Game Startup",  S_SKIP|S_TITLE,  m_null, G_X, G_Y + 5*8},
-  {"WAD # 1",                          S_FILE, m_null,  GF_X, G_Y+ 6*8, {"wadfile_1"}}, 
-  {"WAD #2",                           S_FILE, m_null,  GF_X, G_Y+ 7*8, {"wadfile_2"}},
-  {"DEH/BEX # 1",                      S_FILE, m_null,  GF_X, G_Y+ 8*8, {"dehfile_1"}},
-  {"DEH/BEX #2",                       S_FILE, m_null,  GF_X, G_Y+ 9*8, {"dehfile_2"}},
+  {"Files Preloaded at Game Startup",  S_SKIP|S_TITLE,  m_null, G_X, G_Y+ 7*8},
+  {"WAD # 1",                          S_FILE, m_null,  GF_X, G_Y+ 8*8, {"wadfile_1"}}, 
+  {"WAD #2",                           S_FILE, m_null,  GF_X, G_Y+ 9*8, {"wadfile_2"}},
+  {"DEH/BEX # 1",                      S_FILE, m_null,  GF_X, G_Y+10*8, {"dehfile_1"}},
+  {"DEH/BEX #2",                       S_FILE, m_null,  GF_X, G_Y+11*8, {"dehfile_2"}},
 
-  {"Miscellaneous",                    S_SKIP|S_TITLE,  m_null, G_X, G_Y+11*8},
-  {"Maximum number of player corpses", S_NUM|S_PRGWARN, m_null, G_X, G_Y+12*8, {"max_player_corpse"}},
-  {"Game speed, percentage of normal", S_NUM|S_PRGWARN, m_null, G_X, G_Y+13*8, {"realtic_clock_rate"}},
-  {"Default skill level",              S_CHOICE,        m_null, G_X, G_Y+14*8, {"default_skill"}, 0, 0, NULL, gen_skillstrings},
-  {"Default compatibility level",      S_CHOICE,        m_null, G_X, G_Y+15*8, {"default_compatibility_level"}, 0, 0, NULL, &gen_compstrings[1]},
-  {"Show ENDOOM screen",               S_YESNO,         m_null, G_X, G_Y+16*8, {"showendoom"}},
-  {"Fullscreen menu background",       S_YESNO, m_null, G_X, G_Y + 17*8, {"menu_background"}},
+  {"Miscellaneous",                    S_SKIP|S_TITLE,  m_null, G_X, G_Y+13*8},
+  {"Maximum number of player corpses", S_NUM|S_PRGWARN, m_null, G_X, G_Y+14*8, {"max_player_corpse"}},
+  {"Game speed, percentage of normal", S_NUM|S_PRGWARN, m_null, G_X, G_Y+15*8, {"realtic_clock_rate"}},
+  {"Default skill level",              S_CHOICE,        m_null, G_X, G_Y+16*8, {"default_skill"}, 0, 0, NULL, gen_skillstrings},
+  {"Default compatibility level",      S_CHOICE,        m_null, G_X, G_Y+17*8, {"default_compatibility_level"}, 0, 0, NULL, &gen_compstrings[1]},
+  {"Show ENDOOM screen",               S_YESNO,         m_null, G_X, G_Y+18*8, {"showendoom"}},
+  {"Fullscreen menu background",       S_YESNO, m_null, G_X, G_Y + 19*8, {"menu_background"}},
 #ifdef USE_WINDOWS_LAUNCHER
-  {"Use In-Game Launcher",             S_CHOICE,        m_null, G_X, G_Y+ 18*8, {"launcher_enable"}, 0, 0, NULL, launcher_enable_states},
+  {"Use In-Game Launcher",             S_CHOICE,        m_null, G_X, G_Y+ 20*8, {"launcher_enable"}, 0, 0, NULL, launcher_enable_states},
 #endif
 
 
