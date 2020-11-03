@@ -524,6 +524,11 @@ void M_ChangeScreenScaling(void)
   V_ChangeScreenResolution();
 }
 
+void M_ChangeGamma(void)
+{
+  V_SetPalette(0);
+}
+
 dboolean GetMouseLook(void)
 {
   return movement_mouselook;
@@ -682,6 +687,16 @@ void M_ChangeTextureUseHires(void)
 void M_ChangeTextureHQResize(void)
 {
   gld_FlushTextures();
+}
+
+void M_ChangeGLGamma(void)
+{
+  if (V_GetMode() == VID_MODEGL && gl_hardware_gamma)
+  {
+    if (useglgamma > MAX_GLGAMMA || useglgamma < 0)
+      useglgamma = 0;
+    gld_SetGammaRamp(useglgamma);
+  }
 }
 #endif //GL_DOOM
 

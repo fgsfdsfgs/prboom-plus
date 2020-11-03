@@ -222,7 +222,7 @@ void gld_BlendFakeGamma(void)
   if (gl_fake_gamma_value <= 0)
     return;
 
-  gammaf = (float)gl_fake_gamma_value / (float)MAX_GLGAMMA;
+  gammaf = (float)(MAX_GLGAMMA - gl_fake_gamma_value) / (float)MAX_GLGAMMA;
 
   glDisable(GL_DEPTH_TEST);
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);

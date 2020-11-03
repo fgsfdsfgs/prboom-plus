@@ -3260,6 +3260,7 @@ static const char *renderscalemodes[] = {
 setup_menu_t gen_settings5[] = { // General Settings screen3
   {"Software Options",          S_SKIP|S_TITLE, m_null, G_X, G_Y+1*8},
   {"Screen Scaling",            S_CHOICE,m_null,G_X,G_Y+2*8, {"render_screen_multiply"}, 0, 0, M_ChangeScreenScaling, renderscalemodes + 2},
+  {"Software Gamma",            S_CHOICE,m_null,G_X,G_Y+3*8, {"usegamma"}, 0, 0, M_ChangeGamma},
 #ifdef GL_DOOM
   {"OpenGL Options",            S_SKIP|S_TITLE,m_null,G_X,G_Y+5*8},
   {"Multisampling (0-None)",    S_NUM|S_PRGWARN|S_CANT_GL_ARB_MULTISAMPLEFACTOR|S_MKEEP,m_null,G_X,G_Y+6*8, {"render_multisampling"}, 0, 0, M_ChangeMultiSample},
@@ -3267,12 +3268,13 @@ setup_menu_t gen_settings5[] = { // General Settings screen3
   {"Sector Light Mode",         S_CHOICE, m_null, G_X, G_Y+ 8*8, {"gl_lightmode"}, 0, 0, M_ChangeLightMode, gl_lightmodes},
   {"Allow Fog",                 S_YESNO,  m_null, G_X, G_Y+ 9*8, {"gl_fog"}, 0, 0, M_ChangeAllowFog},
   {"Simple Shadows",            S_YESNO,  m_null, G_X, G_Y+10*8, {"gl_shadows"}},
+  {"GL Gamma",                  S_CHOICE, m_null, G_X, G_Y+11*8, {"useglgamma"}, 0, 0, M_ChangeGLGamma},
 
-  {"Paper Items",               S_YESNO,  m_null, G_X, G_Y+12*8, {"render_paperitems"}},
-  {"Smooth sprite edges",       S_YESNO,  m_null, G_X, G_Y+13*8, {"gl_sprite_blend"}},
-  {"Adjust Sprite Clipping",    S_CHOICE, m_null, G_X, G_Y+14*8, {"gl_spriteclip"}, 0, 0, M_ChangeSpriteClip, gl_spriteclipmodes},
-  {"Item out of Floor offset",  S_NUM,    m_null, G_X, G_Y+15*8, {"gl_sprite_offset"}, 0, 0, M_ChangeSpriteClip},
-  {"Health Bar Above Monsters", S_YESNO,  m_null, G_X, G_Y+16*8, {"health_bar"}},
+  {"Paper Items",               S_YESNO,  m_null, G_X, G_Y+13*8, {"render_paperitems"}},
+  {"Smooth sprite edges",       S_YESNO,  m_null, G_X, G_Y+14*8, {"gl_sprite_blend"}},
+  {"Adjust Sprite Clipping",    S_CHOICE, m_null, G_X, G_Y+15*8, {"gl_spriteclip"}, 0, 0, M_ChangeSpriteClip, gl_spriteclipmodes},
+  {"Item out of Floor offset",  S_NUM,    m_null, G_X, G_Y+16*8, {"gl_sprite_offset"}, 0, 0, M_ChangeSpriteClip},
+  {"Health Bar Above Monsters", S_YESNO,  m_null, G_X, G_Y+17*8, {"health_bar"}},
 #endif
 
   {"<- PREV",S_SKIP|S_PREV, m_null,KB_PREV, KB_Y+20*8, {gen_settings4}},

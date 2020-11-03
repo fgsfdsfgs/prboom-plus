@@ -201,7 +201,9 @@ void M_ChangeAllowBoomColormaps(void);
 void M_ChangeTextureUseHires(void);
 void M_ChangeAllowFog(void);
 void M_ChangeTextureHQResize(void);
+void M_ChangeGLGamma(void);
 #endif
+void M_ChangeGamma(void);
 void M_ChangeSpeed(void);
 void M_ChangeScreenScaling(void);
 void M_ChangeInterlacedScanning(void);

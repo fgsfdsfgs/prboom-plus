@@ -1207,6 +1207,7 @@ void gld_StartDrawScene(void)
   gl_use_fog = !gl_compatibility &&
     (gl_fog || gl_lightmode == gl_lightmode_fogbased) &&
     !frame_fixedcolormap && !boom_cm;
+  lprintf(LO_INFO, "gl_use_fog = %d (compat %d)\n", gl_use_fog, gl_compatibility);
 
 //e6y
   mlook_or_fov = GetMouseLook() || (render_fov != FOV90);
