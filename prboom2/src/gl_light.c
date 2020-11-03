@@ -437,14 +437,8 @@ void gld_SetFog(float fogdensity)
 void gl_EnableFog(int on)
 {
   if (on) 
-  {
-    if (!gl_fogenabled)
     glEnable(GL_FOG);
-  }
   else 
-  {
-    if (gl_fogenabled)
-      glDisable(GL_FOG);
-  }
+    glDisable(GL_FOG);
   gl_fogenabled=on;
 }
