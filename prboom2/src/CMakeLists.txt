@@ -334,10 +334,10 @@ function(AddGameExecutable TARGET SOURCES)
     endif()
 
     if(VITA)
-        target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../vita)
+        target_include_directories(${TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/vita)
         # HACK: this adds libraries in a severely fucked up order and our pkg-config seems to do jack shit,
         #       so we just re-add them by hand
-        target_link_libraries(${TARGET} PRIVATE SDL2_net SDL2_image SDL2_mixer SDL2 vita2d vitaGL mathneon png jpeg mikmod mpg123 vorbisfile vorbis ogg FLAC z m c)
+        target_link_libraries(${TARGET} PRIVATE tess SDL2_net SDL2_image SDL2_mixer SDL2 vita2d vitaGL mathneon png jpeg mikmod mpg123 vorbisfile vorbis ogg FLAC z m c)
         target_link_libraries(${TARGET} PRIVATE SceLibKernel_stub SceAppMgr_stub SceSysmodule_stub SceCtrl_stub SceTouch_stub SceNet_stub SceNetCtl_stub)
         target_link_libraries(${TARGET} PRIVATE SceAppUtil_stub ScePower_stub SceCommonDialog_stub SceAudio_stub SceGxm_stub SceDisplay_stub SceHid_stub)
     endif()
@@ -392,6 +392,7 @@ if(OPENGL_FOUND AND OPENGL_GLU_FOUND)
     AddGameExecutable(glboom-plus "${GLBOOM_PLUS_SOURCES}")
     target_compile_definitions(glboom-plus PRIVATE
         GL_DOOM
+        USE_GLU_TESS
     )
 
     if(NOT VITA)
@@ -406,7 +407,6 @@ if(OPENGL_FOUND AND OPENGL_GLU_FOUND)
             USE_FBO_TECHNIQUE
             USE_GLU_IMAGESCALE
             USE_GLU_MIPMAP
-            USE_GLU_TESS
         )
     endif()
 endif()

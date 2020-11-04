@@ -515,6 +515,8 @@ int main(int argc, char **argv)
   myargv = (char**)malloc(sizeof(myargv[0]) * myargc);
   memcpy(myargv, argv, sizeof(myargv[0]) * myargc);
 
+  log_to_file = M_CheckParm("-logfile");
+
   // e6y: Check for conflicts.
   // Conflicting command-line parameters could cause the engine to be confused 
   // in some cases. Added checks to prevent this.
@@ -526,8 +528,6 @@ int main(int argc, char **argv)
   //jff 9/3/98 use logical output routine
   lprintf(LO_INFO,"M_LoadDefaults: Load system defaults.\n");
   M_LoadDefaults();              // load before initing other systems
-
-  log_to_file = M_CheckParm("-logfile");
 
   /* Version info */
   lprintf(LO_INFO,"\n");

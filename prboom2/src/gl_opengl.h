@@ -46,6 +46,7 @@
 #ifdef __vita__
 
 #include <vitaGL/source/vitaGL.h>
+#include <libtess/glu.h>
 
 // some extension function types that we won't use
 typedef void (*PFNGLCOLORTABLEEXTPROC) (GLenum target, GLenum internalFormat, GLsizei width, GLenum format, GLenum type, const GLvoid *table);
