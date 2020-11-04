@@ -4199,6 +4199,25 @@ int M_GetKeyString(int c,int offset)
       case KEYD_MOUSE1:     s = "MB1"; break;
       case KEYD_MOUSE2:     s = "MB2"; break;
       case KEYD_MOUSE3:     s = "MB3"; break;
+#ifdef __vita__
+      case KEYD_JOY_A:      s = "CROS"; break;
+      case KEYD_JOY_B:      s = "CIRC"; break;
+      case KEYD_JOY_X:      s = "SQR"; break;
+      case KEYD_JOY_Y:      s = "TRG"; break;
+      case KEYD_JOY_BACK:   s = "SEL"; break;
+      case KEYD_JOY_GUIDE:  s = "PSBT"; break;
+      case KEYD_JOY_START:  s = "STRT"; break;
+      case KEYD_JOY_LSTICK: s = "LST"; break;
+      case KEYD_JOY_RSTICK: s = "RST"; break;
+      case KEYD_JOY_L:      s = "LSHD"; break;
+      case KEYD_JOY_R:      s = "RSHD"; break;
+      case KEYD_JOY_UP:     s = "DPUP"; break;
+      case KEYD_JOY_DOWN:   s = "DPDN"; break;
+      case KEYD_JOY_LEFT:   s = "DPLT"; break;
+      case KEYD_JOY_RIGHT:  s = "DPRT"; break;
+      case KEYD_JOY_LTRIG:  s = "LTRG"; break;
+      case KEYD_JOY_RTRIG:  s = "RTRG"; break;
+#else
       case KEYD_JOY_A:      s = "JBA"; break;
       case KEYD_JOY_B:      s = "JBB"; break;
       case KEYD_JOY_X:      s = "JBX"; break;
@@ -4216,6 +4235,7 @@ int M_GetKeyString(int c,int offset)
       case KEYD_JOY_RIGHT:  s = "JBDR"; break;
       case KEYD_JOY_LTRIG:  s = "JBLT"; break;
       case KEYD_JOY_RTRIG:  s = "JBRT"; break;
+#endif
       case 0:               s = "NONE"; break;
       default:              s = "JUNK"; break;
       }
