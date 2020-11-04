@@ -4154,7 +4154,7 @@ int M_GetKeyString(int c,int offset)
 
     // cph - Keypad keys, general code reorganisation to
     //  make this smaller and neater.
-    if ((0x100 <= c) && (c < 0x200)) {
+    if ((0x100 <= c) && (c < 0x120)) {
       if (c == KEYD_KEYPADENTER)
   s = "PADE";
       else {
