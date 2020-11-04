@@ -77,6 +77,7 @@
 #include <psp2/io/stat.h> 
 #include <dirent.h>
 SceUInt32 sceUserMainThreadStackSize = 1 * 1024 * 1024;
+unsigned int _newlib_heap_size_user = 128 * 1024 * 1024;
 #endif
 
 #ifndef PRBOOM_SERVER
@@ -524,6 +525,10 @@ char* I_FindFileInternal(const char* wfname, const char* ext, dboolean isStatic)
     const char *(*func)(void); // for I_DoomExeDir
   } search0[] = {
     {NULL, NULL, NULL, I_DoomExeDir}, // config directory
+#ifdef __vita__
+    {NULL, "iwads", NULL, I_DoomExeDir},
+    {NULL, "pwads", NULL, I_DoomExeDir},
+#endif
     {NULL}, // current working directory
     {NULL, NULL, "DOOMWADDIR"}, // run-time $DOOMWADDIR
     {DOOMWADDIR}, // build-time configured DOOMWADDIR
