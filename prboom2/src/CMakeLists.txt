@@ -416,10 +416,17 @@ if(VITA)
     #       which is set to src/ for some reason
     if(BUILD_GL)
         vita_create_self(prboom-plus.self "../glboom-plus")
+        add_dependencies(prboom-plus.self glboom-plus)
     else()
         vita_create_self(prboom-plus.self "../prboom-plus")
+        add_dependencies(prboom-plus.self prboom-plus)
     endif()
-    vita_create_vpk(prboom-plus.vpk ${VITA_TITLEID} prboom-plus.self NAME ${VITA_NAME})
+    vita_create_vpk(
+        prboom-plus.vpk ${VITA_TITLEID} "${CMAKE_BINARY_DIR}/vita/launcher/vlauncher.self" NAME ${VITA_NAME}
+        FILE "${CMAKE_BINARY_DIR}/src/prboom-plus.self" "prboom.bin"
+        FILE "${CMAKE_SOURCE_DIR}/data/vita/launcher/fnt_buttons.png" "data/launcher/fnt_buttons.png"
+    )
+    add_dependencies(prboom-plus.vpk prboom-plus.self)
 endif()
 
 # PrBoom-Plus server executable
