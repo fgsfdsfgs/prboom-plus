@@ -515,6 +515,7 @@ default_t defaults[] =
   //jff 4/3/98 allow unlimited sensitivity
   {"mouse_sensitivity_vert",{&mouseSensitivity_vert},{1},0,UL,
    def_int,ss_none}, /* adjust vertical (y) mouse sensitivity killough/mead */
+  {"mouse_no_vert",{&mouse_novert},{2},0,2,def_int,ss_none},
 
 // For key bindings, the values stored in the key_* variables       // phares
 // are the internal Doom Codes. The values stored in the default.cfg
@@ -679,12 +680,13 @@ default_t defaults[] =
   {"Joystick settings",{NULL},{0},UL,UL,def_none,ss_none},
   {"use_joystick",{&usejoystick},{1},0,2,
    def_int,ss_none}, // number of joystick to use (0 for none)
-  {"joyaxis_moveh",{&joyaxis_moveh},{0},UL,UL,def_int,ss_none},
-  {"joyaxis_movev",{&joyaxis_movev},{1},UL,UL,def_int,ss_none},
-  {"joyaxis_lookh",{&joyaxis_lookh},{2},UL,UL,def_int,ss_none},
-  {"joyaxis_lookv",{&joyaxis_lookv},{3},UL,UL,def_int,ss_none},
+  {"joyaxis_moveh",{&joyaxis_moveh},{0},0,3,def_int,ss_none},
+  {"joyaxis_movev",{&joyaxis_movev},{1},0,3,def_int,ss_none},
+  {"joyaxis_lookh",{&joyaxis_lookh},{2},0,3,def_int,ss_none},
+  {"joyaxis_lookv",{&joyaxis_lookv},{3},0,3,def_int,ss_none},
   {"joy_deadzone_left",{&joy_deadzone_left},{1},0,16,def_int,ss_none},
   {"joy_deadzone_right",{&joy_deadzone_right},{1},0,16,def_int,ss_none},
+  {"joy_permastrafe",{&joy_permastrafe},{1},0,1,def_bool,ss_none},
 
   {"Chat macros",{NULL},{0},UL,UL,def_none,ss_none},
   {"chatmacro0", {0,&chat_macros[0]}, {0,HUSTR_CHATMACRO0},UL,UL,

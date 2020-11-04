@@ -57,6 +57,8 @@ int joyaxis_lookv;
 int joy_deadzone_left = 1;
 int joy_deadzone_right = 1;
 
+int joy_permastrafe = 1;
+
 int usejoystick;
 
 static SDL_GameController *joystick;

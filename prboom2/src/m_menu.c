@@ -82,6 +82,8 @@ extern dboolean chat_on;          // in heads-up code
 int mouseSensitivity_horiz; // has default   //  killough
 int mouseSensitivity_vert;  // has default
 
+int mouse_novert;
+
 int showMessages;    // Show messages has default, 0 = off, 1 = on
 
 int hide_setup=1; // killough 5/15/98
@@ -3177,20 +3179,21 @@ setup_menu_t gen_settings2[] = { // General Settings screen2
   {"Enable Joystick",                  S_YESNO|S_MKEEP, m_null, G_X, G_Y+ 3*8, {"use_joystick"}},
   {"Left Stick Deadzone",              S_CHOICE,        m_null, G_X, G_Y+ 4*8, {"joy_deadzone_left"}},
   {"Right Stick Deadzone",             S_CHOICE,        m_null, G_X, G_Y+ 5*8, {"joy_deadzone_right"}},
+  {"Turn Axis Always Strafes",         S_YESNO,         m_null, G_X, G_Y+ 6*8, {"joy_permastrafe"}},
 
-  {"Files Preloaded at Game Startup",  S_SKIP|S_TITLE,  m_null, G_X, G_Y+ 7*8},
-  {"WAD # 1",                          S_FILE, m_null,  GF_X, G_Y+ 8*8, {"wadfile_1"}}, 
-  {"WAD #2",                           S_FILE, m_null,  GF_X, G_Y+ 9*8, {"wadfile_2"}},
-  {"DEH/BEX # 1",                      S_FILE, m_null,  GF_X, G_Y+10*8, {"dehfile_1"}},
-  {"DEH/BEX #2",                       S_FILE, m_null,  GF_X, G_Y+11*8, {"dehfile_2"}},
+  {"Files Preloaded at Game Startup",  S_SKIP|S_TITLE,  m_null, G_X, G_Y+ 8*8},
+  {"WAD # 1",                          S_FILE, m_null,  GF_X, G_Y+ 9*8, {"wadfile_1"}}, 
+  {"WAD #2",                           S_FILE, m_null,  GF_X, G_Y+10*8, {"wadfile_2"}},
+  {"DEH/BEX # 1",                      S_FILE, m_null,  GF_X, G_Y+11*8, {"dehfile_1"}},
+  {"DEH/BEX #2",                       S_FILE, m_null,  GF_X, G_Y+12*8, {"dehfile_2"}},
 
-  {"Miscellaneous",                    S_SKIP|S_TITLE,  m_null, G_X, G_Y+13*8},
-  {"Maximum number of player corpses", S_NUM|S_PRGWARN, m_null, G_X, G_Y+14*8, {"max_player_corpse"}},
-  {"Game speed, percentage of normal", S_NUM|S_PRGWARN, m_null, G_X, G_Y+15*8, {"realtic_clock_rate"}},
-  {"Default skill level",              S_CHOICE,        m_null, G_X, G_Y+16*8, {"default_skill"}, 0, 0, NULL, gen_skillstrings},
-  {"Default compatibility level",      S_CHOICE,        m_null, G_X, G_Y+17*8, {"default_compatibility_level"}, 0, 0, NULL, &gen_compstrings[1]},
-  {"Show ENDOOM screen",               S_YESNO,         m_null, G_X, G_Y+18*8, {"showendoom"}},
-  {"Fullscreen menu background",       S_YESNO, m_null, G_X, G_Y + 19*8, {"menu_background"}},
+  {"Miscellaneous",                    S_SKIP|S_TITLE,  m_null, G_X, G_Y+14*8},
+  {"Maximum number of player corpses", S_NUM|S_PRGWARN, m_null, G_X, G_Y+15*8, {"max_player_corpse"}},
+  {"Game speed, percentage of normal", S_NUM|S_PRGWARN, m_null, G_X, G_Y+16*8, {"realtic_clock_rate"}},
+  {"Default skill level",              S_CHOICE,        m_null, G_X, G_Y+17*8, {"default_skill"}, 0, 0, NULL, gen_skillstrings},
+  {"Default compatibility level",      S_CHOICE,        m_null, G_X, G_Y+18*8, {"default_compatibility_level"}, 0, 0, NULL, &gen_compstrings[1]},
+  {"Show ENDOOM screen",               S_YESNO,         m_null, G_X, G_Y+19*8, {"showendoom"}},
+  {"Fullscreen menu background",       S_YESNO, m_null, G_X, G_Y + 20*8, {"menu_background"}},
 #ifdef USE_WINDOWS_LAUNCHER
   {"Use In-Game Launcher",             S_CHOICE,        m_null, G_X, G_Y+ 20*8, {"launcher_enable"}, 0, 0, NULL, launcher_enable_states},
 #endif
@@ -3200,6 +3203,8 @@ setup_menu_t gen_settings2[] = { // General Settings screen2
   {"NEXT ->",S_SKIP|S_NEXT,m_null,KB_NEXT,KB_Y+20*8, {gen_settings3}},
   {0,S_SKIP|S_END,m_null}
 };
+
+static const char *novertstr[] = { "off", "on", "auto" };
 
 setup_menu_t gen_settings3[] = { // General Settings screen2
   {"Demos",                       S_SKIP|S_TITLE, m_null, G_X, G_Y+ 1*8},
@@ -3213,12 +3218,13 @@ setup_menu_t gen_settings3[] = { // General Settings screen2
   {"Permanent Strafe50",          S_YESNO, m_null, G_X, G_Y+ 9*8, {"movement_strafe50"}, 0, 0, M_ChangeSpeed},
 
   {"Mouse",                       S_SKIP|S_TITLE,m_null, G_X, G_Y+11*8},
-  {"Dbl-Click As Use",            S_YESNO, m_null, G_X, G_Y+12*8, {"mouse_doubleclick_as_use"}},
-  {"Carry Fractional Tics",       S_YESNO, m_null, G_X, G_Y+13*8, {"mouse_carrytics"}},
-  {"Enable Mouselook",            S_YESNO, m_null, G_X, G_Y+14*8, {"movement_mouselook"}, 0, 0, M_ChangeMouseLook},
-  {"Invert Mouse",                S_YESNO, m_null, G_X, G_Y+15*8, {"movement_mouseinvert"}, 0, 0, M_ChangeMouseInvert},
-  {"Max View Pitch",              S_NUM,   m_null, G_X, G_Y+16*8, {"movement_maxviewpitch"}, 0, 0, M_ChangeMaxViewPitch},
-  {"Mouse Strafe Divisor",        S_NUM,   m_null, G_X, G_Y+17*8, {"movement_mousestrafedivisor"}},
+  {"Dbl-Click As Use",            S_YESNO,  m_null, G_X, G_Y+12*8, {"mouse_doubleclick_as_use"}},
+  {"Carry Fractional Tics",       S_YESNO,  m_null, G_X, G_Y+13*8, {"mouse_carrytics"}},
+  {"Enable Mouselook",            S_YESNO,  m_null, G_X, G_Y+14*8, {"movement_mouselook"}, 0, 0, M_ChangeMouseLook},
+  {"Invert Mouse",                S_YESNO,  m_null, G_X, G_Y+15*8, {"movement_mouseinvert"}, 0, 0, M_ChangeMouseInvert},
+  {"Max View Pitch",              S_NUM,    m_null, G_X, G_Y+16*8, {"movement_maxviewpitch"}, 0, 0, M_ChangeMaxViewPitch},
+  {"Mouse Strafe Divisor",        S_NUM,    m_null, G_X, G_Y+17*8, {"movement_mousestrafedivisor"}},
+  {"No Vertical Movement",        S_CHOICE, m_null, G_X, G_Y+18*8, {"mouse_no_vert"}, 0, 0, NULL, novertstr},
 
   {"<- PREV",S_SKIP|S_PREV, m_null,KB_PREV, KB_Y+20*8, {gen_settings2}},
   {"NEXT ->",S_SKIP|S_NEXT,m_null,KB_NEXT,KB_Y+20*8, {gen_settings4}},

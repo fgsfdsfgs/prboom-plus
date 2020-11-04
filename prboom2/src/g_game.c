@@ -82,6 +82,7 @@
 #include "lprintf.h"
 #include "i_main.h"
 #include "i_system.h"
+#include "i_joy.h"
 #include "r_demo.h"
 #include "r_fps.h"
 #include "e6y.h"//e6y
@@ -481,10 +482,6 @@ void G_BuildTiccmd(ticcmd_t* cmd)
         side += sidemove[speed];
       if (gamekeydown[key_left])
         side -= sidemove[speed];
-      if (joyxmove > 0)
-        side += sidemove[speed];
-      if (joyxmove < 0)
-        side -= sidemove[speed];
     }
   else
     {
@@ -492,6 +489,17 @@ void G_BuildTiccmd(ticcmd_t* cmd)
         cmd->angleturn -= angleturn[tspeed];
       if (gamekeydown[key_left])
         cmd->angleturn += angleturn[tspeed];
+    }
+
+  if (strafe || joy_permastrafe)
+    {
+      if (joyxmove > 0)
+        side += sidemove[speed];
+      if (joyxmove < 0)
+        side -= sidemove[speed];
+    }
+  else
+    {
       if (joyxmove > 0)
         cmd->angleturn -= angleturn[tspeed];
       if (joyxmove < 0)
@@ -916,6 +924,10 @@ dboolean G_Responder (event_t* ev)
        */
       //e6y mousex += (ev->data2*(mouseSensitivity_horiz))/10;  /* killough */
       //e6y mousey += (ev->data3*(mouseSensitivity_vert))/10;  /*Mead rm *4 */
+
+      // disable vertical movement if novert is 1 or auto and mouselook is disabled
+      if (mouse_novert == 1 || (mouse_novert == 2 && !GetMouseLook()))
+        ev->data3 = 0;
 
       //e6y
       mousex += (AccelerateMouse(ev->data2)*(mouseSensitivity_horiz))/10;  /* killough */
@@ -3856,10 +3868,6 @@ void P_WalkTicker()
         side += sidemove[speed];
       if (gamekeydown[key_left])
         side -= sidemove[speed];
-      if (joyxmove > 0)
-        side += sidemove[speed];
-      if (joyxmove < 0)
-        side -= sidemove[speed];
     }
   else
     {
@@ -3867,6 +3875,17 @@ void P_WalkTicker()
         angturn -= angleturn[tspeed];
       if (gamekeydown[key_left])
         angturn += angleturn[tspeed];
+    }
+
+  if (strafe || joy_permastrafe)
+    {
+      if (joyxmove > 0)
+        side += sidemove[speed];
+      if (joyxmove < 0)
+        side -= sidemove[speed];
+    }
+  else
+    {
       if (joyxmove > 0)
         angturn -= angleturn[tspeed];
       if (joyxmove < 0)
