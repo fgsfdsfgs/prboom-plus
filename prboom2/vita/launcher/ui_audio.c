@@ -30,7 +30,7 @@ static struct Option audio_opts[] =
     },
     {
         OPT_CHOICE,
-        "Music type",
+        "MIDI player",
         "snd_midiplayer", NULL,
         .choice =
         {
