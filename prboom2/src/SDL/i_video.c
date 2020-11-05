@@ -558,6 +558,7 @@ void I_UpdateNoBlit (void)
 
 //
 // I_StartRendering
+//
 static int in_render_frame = 0;
 void I_StartRendering (void)
 {
@@ -568,6 +569,27 @@ void I_StartRendering (void)
     vglStartRendering();
 #endif
   }
+}
+
+//
+// I_StopRendering
+//
+void I_StopRendering(int wait)
+{
+#ifdef __vita__
+  if (in_render_frame)
+  {
+    in_render_frame = 0;
+    vglStopRendering();
+#ifdef GL_DOOM
+    gld_ResetWrapper();
+#endif
+  }
+#endif
+#ifdef GL_DOOM
+  if (wait)
+    glFinish();
+#endif
 }
 
 //
@@ -595,14 +617,7 @@ void I_FinishUpdate (void)
   if (V_GetMode() == VID_MODEGL) {
     // proff 04/05/2000: swap OpenGL buffers
     gld_Finish();
-#ifdef __vita__
-    if (in_render_frame)
-    {
-      in_render_frame = 0;
-      vglStopRendering();
-      gld_ResetWrapper();
-    }
-#endif
+    I_StopRendering(0);
     return;
   }
 #endif
@@ -666,11 +681,7 @@ void I_FinishUpdate (void)
     glVertex3f(dst_rect.x, dst_rect.y + dst_rect.h, 0);
   glEnd();
 
-  if (in_render_frame)
-  {
-    in_render_frame = 0;
-    vglStopRendering();
-  }
+  I_StopRendering(0);
 #else
   // Update the intermediate texture with the contents of the RGBA buffer.
   SDL_UpdateTexture(sdl_texture, &src_rect, buffer->pixels, buffer->pitch);

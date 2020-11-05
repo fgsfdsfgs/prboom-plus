@@ -77,9 +77,10 @@ void I_ShutdownGraphics(void);
 /* Takes full 8 bit values. */
 void I_SetPalette(int pal); /* CPhipps - pass down palette number */
 
-void I_StartRendering (void);
-void I_UpdateNoBlit (void);
-void I_FinishUpdate (void);
+void I_StartRendering(void);
+void I_StopRendering(int wait);
+void I_UpdateNoBlit(void);
+void I_FinishUpdate(void);
 
 int I_ScreenShot (const char *fname);
 // NSM expose lower level screen data grab for vidcap

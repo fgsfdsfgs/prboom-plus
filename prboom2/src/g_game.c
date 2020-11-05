@@ -1963,8 +1963,11 @@ void G_DoLoadGame(void)
   int savegame_compatibility = -1;
   //e6y: numeric version number of package should be zero before initializing from savegame
   unsigned int packageversion = 0;
-  char maplump[8];
+  char maplump[9];
   int time, ttime;
+
+  // wait until all GL draw ops finish up
+  I_StopRendering(1);
 
   length = G_SaveGameName(NULL, 0, savegameslot, demoplayback);
   name = malloc(length+1);
@@ -2123,7 +2126,9 @@ void G_DoLoadGame(void)
     R_ExecuteSetViewSize ();
 
   // draw the pattern into the back screen
+  I_StartRendering ();
   R_FillBackScreen ();
+  I_StopRendering (1);
 
   /* killough 12/98: support -recordfrom and -loadgame -playdemo */
   if (!command_loadgame)
