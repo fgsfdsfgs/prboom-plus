@@ -70,6 +70,14 @@
 #include "e6y_launcher.h"
 #endif
 
+#ifdef __vita__
+#define S_MKEEP S_KEEP
+#define S_NCHOICE S_CHOICE
+#else
+#define S_MKEEP 0
+#define S_NCHOICE S_NUM
+#endif
+
 extern patchnum_t hu_font[HU_FONTSIZE];
 extern dboolean  message_dontfuckwithme;
 
@@ -2456,7 +2464,7 @@ setup_menu_t keys_settings6[] =  // Key Binding screen strings
   {"SPEED UP"             ,S_KEY     ,m_scrn,KB_X,KB_Y+ 1*8,{&key_speed_up}},
   {"SPEED DOWN"           ,S_KEY     ,m_scrn,KB_X,KB_Y+ 2*8,{&key_speed_down}},
   {"RESET TO DEFAULT"     ,S_KEY     ,m_scrn,KB_X,KB_Y+ 3*8,{&key_speed_default}},
-  {"STEP OF CHANGE (0-AUTO)" ,S_NUM  ,m_null,KB_X,KB_Y+ 4*8, {"speed_step"}},
+  {"STEP OF CHANGE (0-AUTO)",S_NCHOICE,m_null,KB_X,KB_Y+ 4*8, {"speed_step"}},
   {"DEMOS"                ,S_SKIP|S_TITLE,m_null,KB_X,KB_Y+5*8},
   {"START/STOP SKIPPING"  ,S_KEY     ,m_scrn,KB_X,KB_Y+ 6*8,{&key_demo_skip}},
   {"END LEVEL"            ,S_KEY     ,m_scrn,KB_X,KB_Y+ 7*8,{&key_demo_endlevel}},
@@ -2682,15 +2690,15 @@ setup_menu_t stat_settings1[] =  // Status Bar and HUD Settings screen
 
   {"HEADS-UP DISPLAY"  ,S_SKIP|S_TITLE,m_null,SB_X,SB_Y+ 6*8},
 
-  {"HEALTH LOW/OK"     ,S_NUM       ,m_null,SB_X,SB_Y+ 7*8, {"health_red"}},
-  {"HEALTH OK/GOOD"    ,S_NUM       ,m_null,SB_X,SB_Y+ 8*8, {"health_yellow"}},
-  {"HEALTH GOOD/EXTRA" ,S_NUM       ,m_null,SB_X,SB_Y+ 9*8, {"health_green"}},
+  {"HEALTH LOW/OK"     ,S_NCHOICE,m_null,SB_X,SB_Y+ 7*8, {"health_red"}},
+  {"HEALTH OK/GOOD"    ,S_NCHOICE,m_null,SB_X,SB_Y+ 8*8, {"health_yellow"}},
+  {"HEALTH GOOD/EXTRA" ,S_NCHOICE,m_null,SB_X,SB_Y+ 9*8, {"health_green"}},
   {"ARMOR COLOR DEPENDS ON TYPE",S_YESNO, m_null,SB_X,SB_Y+ 10*8, {"sts_armorcolor_type"}},
-  {"ARMOR LOW/OK"      ,S_NUM       ,m_null,SB_X,SB_Y+11*8, {"armor_red"}},
-  {"ARMOR OK/GOOD"     ,S_NUM       ,m_null,SB_X,SB_Y+12*8, {"armor_yellow"}},
-  {"ARMOR GOOD/EXTRA"  ,S_NUM       ,m_null,SB_X,SB_Y+13*8, {"armor_green"}},
-  {"AMMO LOW/OK"       ,S_NUM       ,m_null,SB_X,SB_Y+14*8, {"ammo_red"}},
-  {"AMMO OK/GOOD"      ,S_NUM       ,m_null,SB_X,SB_Y+15*8, {"ammo_yellow"}},
+  {"ARMOR LOW/OK"      ,S_NCHOICE,m_null,SB_X,SB_Y+11*8, {"armor_red"}},
+  {"ARMOR OK/GOOD"     ,S_NCHOICE,m_null,SB_X,SB_Y+12*8, {"armor_yellow"}},
+  {"ARMOR GOOD/EXTRA"  ,S_NCHOICE,m_null,SB_X,SB_Y+13*8, {"armor_green"}},
+  {"AMMO LOW/OK"       ,S_NCHOICE,m_null,SB_X,SB_Y+14*8, {"ammo_red"}},
+  {"AMMO OK/GOOD"      ,S_NCHOICE,m_null,SB_X,SB_Y+15*8, {"ammo_yellow"}},
   {"BACKPACK CHANGES THRESHOLDS",S_CHOICE,m_null,SB_X,SB_Y+16*8, 
    {"ammo_colour_behaviour"},0,0,NULL,ammo_colour_behaviour_list},
 
@@ -2800,17 +2808,17 @@ setup_menu_t auto_settings1[] =  // 1st AutoMap Settings screen
   {"Show coordinates of automap pointer",     S_YESNO,m_null,AU_X,AU_Y+1*8, {"map_point_coord"}},  // killough 10/98
   {"Show Secrets only after entering",        S_YESNO,m_null,AU_X,AU_Y+2*8, {"map_secret_after"}},
   {"Update unexplored parts in automap mode", S_YESNO,m_null,AU_X,AU_Y+3*8, {"map_always_updates"}},
-  {"Grid cell size (8..256)",                 S_NUM,  m_null,AU_X,AU_Y+4*8, {"map_grid_size"}},
-  {"Scroll / Zoom speed  (1..32)",            S_NUM,  m_null,AU_X,AU_Y+5*8, {"map_scroll_speed"}},
+  {"Grid cell size (8..256)",                 S_NCHOICE,m_null,AU_X,AU_Y+4*8, {"map_grid_size"}},
+  {"Scroll / Zoom speed  (1..32)",            S_NCHOICE,m_null,AU_X,AU_Y+5*8, {"map_scroll_speed"}},
   {"Use mouse wheel for zooming",             S_YESNO,m_null,AU_X,AU_Y+6*8, {"map_wheel_zoom"}},
   {"Apply multisampling",                     S_YESNO,m_null,AU_X,AU_Y+7*8, {"map_use_multisamling"}, 0, 0, M_ChangeMapMultisamling},
 #ifdef GL_DOOM
   {"Enable textured display",                 S_YESNO,m_null,AU_X,AU_Y+8*8, {"map_textured"}, 0, 0, M_ChangeMapTextured},
   {"Things appearance",                       S_CHOICE,m_null,AU_X,AU_Y+9*8, {"map_things_appearance"}, 0, 0, NULL, map_things_appearance_list},
   {"Translucency percentage",                 S_SKIP|S_TITLE,m_null,AU_X,AU_Y+10*8},
-  {"Textured automap",                        S_NUM,  m_null,AU_X,AU_Y+11*8, {"map_textured_trans"}},
-  {"Textured automap in overlay mode",        S_NUM,  m_null,AU_X,AU_Y+12*8, {"map_textured_overlay_trans"}},
-  {"Lines in overlay mode",                   S_NUM,  m_null,AU_X,AU_Y+13*8, {"map_lines_overlay_trans"}},
+  {"Textured automap",                        S_NCHOICE,m_null,AU_X,AU_Y+11*8, {"map_textured_trans"}},
+  {"Textured automap in overlay mode",        S_NCHOICE,m_null,AU_X,AU_Y+12*8, {"map_textured_overlay_trans"}},
+  {"Lines in overlay mode",                   S_NCHOICE,m_null,AU_X,AU_Y+13*8, {"map_lines_overlay_trans"}},
 #endif
 
   // Button for resetting to defaults
@@ -3018,10 +3026,10 @@ setup_menu_t enem_settings1[] =  // Enemy Settings screen
   {"Rescue Dying Friends",S_YESNO,m_null,E_X,E_Y+ enem_help_friends*8, {"help_friends"}},
 
   // killough 7/19/98
-  {"Number Of Single-Player Helper Dogs",S_NUM|S_LEVWARN,m_null,E_X,E_Y+ enem_helpers*8, {"player_helpers"}},
+  {"Number Of Single-Player Helper Dogs",S_NCHOICE|S_LEVWARN,m_null,E_X,E_Y+ enem_helpers*8, {"player_helpers"}},
 
   // killough 8/8/98
-  {"Distance Friends Stay Away",S_NUM,m_null,E_X,E_Y+ enem_distfriend*8, {"friend_distance"}},
+  {"Distance Friends Stay Away",S_NCHOICE,m_null,E_X,E_Y+ enem_distfriend*8, {"friend_distance"}},
 
   {"Allow dogs to jump down",S_YESNO,m_null,E_X,E_Y+ enem_dog_jumping*8, {"dog_jumping"}},
 
@@ -3108,12 +3116,6 @@ setup_menu_t* gen_settings[] =
 #define G_Y 23
 #define G_X2 284
 
-#ifdef __vita__
-#define S_MKEEP S_KEEP
-#else
-#define S_MKEEP 0
-#endif
-
 static const char *videomodes[] = {
   "8bit","15bit","16bit", "32bit", "OpenGL", NULL};
 
@@ -3131,11 +3133,11 @@ setup_menu_t gen_settings1[] = { // General Settings screen1
   {"Vertical Sync",                  S_YESNO|S_MKEEP,    m_null, G_X, G_Y+ 7*8, {"render_vsync"}, 0, 0, M_ChangeVideoMode},
   
   {"Enable Translucency",            S_YESNO,            m_null, G_X, G_Y+10*8, {"translucency"}, 0, 0, M_Trans},
-  {"Translucency filter percentage", S_NUM,              m_null, G_X, G_Y+11*8, {"tran_filter_pct"}, 0, 0, M_Trans},
+  {"Translucency filter percentage", S_NCHOICE,              m_null, G_X, G_Y+11*8, {"tran_filter_pct"}, 0, 0, M_Trans},
   {"Uncapped Framerate",             S_YESNO,            m_null, G_X, G_Y+12*8, {"uncapped_framerate"}, 0, 0, M_ChangeUncappedFrameRate},
 
   {"Sound & Music",                  S_SKIP|S_TITLE,     m_null, G_X, G_Y+14*8},
-  {"Number of Sound Channels",       S_NUM|S_PRGWARN,    m_null, G_X, G_Y+15*8, {"snd_channels"}},
+  {"Number of Sound Channels",       S_NCHOICE|S_PRGWARN,    m_null, G_X, G_Y+15*8, {"snd_channels"}},
   {"Enable v1.1 Pitch Effects",      S_YESNO,            m_null, G_X, G_Y+16*8, {"pitched_sounds"}},
   {"PC Speaker emulation",           S_YESNO|S_PRGWARN,  m_null, G_X, G_Y+17*8, {"snd_pcspeaker"}},
   {"Preferred MIDI player",          S_CHOICE|S_PRGWARN, m_null, G_X, G_Y+18*8, {"snd_midiplayer"}, 0, 0, M_ChangeMIDIPlayer, midiplayers},
@@ -3185,21 +3187,21 @@ setup_menu_t gen_settings2[] = { // General Settings screen2
   {"Right Stick Deadzone",             S_CHOICE,        m_null, G_X, G_Y+ 5*8, {"joy_deadzone_right"}},
   {"Turn Axis Always Strafes",         S_YESNO,         m_null, G_X, G_Y+ 6*8, {"joy_permastrafe"}},
 
-  {"Files Preloaded at Game Startup",  S_SKIP|S_TITLE,  m_null, G_X, G_Y+ 8*8},
-  {"WAD # 1",                          S_FILE, m_null,  GF_X, G_Y+ 9*8, {"wadfile_1"}}, 
-  {"WAD #2",                           S_FILE, m_null,  GF_X, G_Y+10*8, {"wadfile_2"}},
-  {"DEH/BEX # 1",                      S_FILE, m_null,  GF_X, G_Y+11*8, {"dehfile_1"}},
-  {"DEH/BEX #2",                       S_FILE, m_null,  GF_X, G_Y+12*8, {"dehfile_2"}},
+  {"Files Preloaded at Game Startup",  S_SKIP|S_TITLE, m_null,   G_X, G_Y+ 7*8},
+  {"WAD # 1",                          S_FILE|S_MKEEP, m_null,  GF_X, G_Y+ 8*8, {"wadfile_1"}}, 
+  {"WAD #2",                           S_FILE|S_MKEEP, m_null,  GF_X, G_Y+ 9*8, {"wadfile_2"}},
+  {"DEH/BEX # 1",                      S_FILE|S_MKEEP, m_null,  GF_X, G_Y+10*8, {"dehfile_1"}},
+  {"DEH/BEX #2",                       S_FILE|S_MKEEP, m_null,  GF_X, G_Y+11*8, {"dehfile_2"}},
 
-  {"Miscellaneous",                    S_SKIP|S_TITLE,  m_null, G_X, G_Y+14*8},
-  {"Maximum number of player corpses", S_NUM|S_PRGWARN, m_null, G_X, G_Y+15*8, {"max_player_corpse"}},
-  {"Game speed, percentage of normal", S_NUM|S_PRGWARN, m_null, G_X, G_Y+16*8, {"realtic_clock_rate"}},
-  {"Default skill level",              S_CHOICE,        m_null, G_X, G_Y+17*8, {"default_skill"}, 0, 0, NULL, gen_skillstrings},
-  {"Default compatibility level",      S_CHOICE,        m_null, G_X, G_Y+18*8, {"default_compatibility_level"}, 0, 0, NULL, &gen_compstrings[1]},
-  {"Show ENDOOM screen",               S_YESNO,         m_null, G_X, G_Y+19*8, {"showendoom"}},
-  {"Fullscreen menu background",       S_YESNO, m_null, G_X, G_Y + 20*8, {"menu_background"}},
+  {"Miscellaneous",                    S_SKIP|S_TITLE,  m_null, G_X, G_Y+12*8},
+  {"Maximum number of player corpses", S_NCHOICE|S_PRGWARN, m_null, G_X, G_Y+13*8, {"max_player_corpse"}},
+  {"Game speed, percentage of normal", S_NCHOICE|S_PRGWARN, m_null, G_X, G_Y+14*8, {"realtic_clock_rate"}},
+  {"Default skill level",              S_CHOICE,        m_null, G_X, G_Y+15*8, {"default_skill"}, 0, 0, NULL, gen_skillstrings},
+  {"Default compatibility level",      S_CHOICE,        m_null, G_X, G_Y+16*8, {"default_compatibility_level"}, 0, 0, NULL, &gen_compstrings[1]},
+  {"Show ENDOOM screen",               S_YESNO,         m_null, G_X, G_Y+17*8, {"showendoom"}},
+  {"Fullscreen menu background",       S_YESNO, m_null, G_X, G_Y + 18*8, {"menu_background"}},
 #ifdef USE_WINDOWS_LAUNCHER
-  {"Use In-Game Launcher",             S_CHOICE,        m_null, G_X, G_Y+ 20*8, {"launcher_enable"}, 0, 0, NULL, launcher_enable_states},
+  {"Use In-Game Launcher",             S_CHOICE,        m_null, G_X, G_Y+ 19*8, {"launcher_enable"}, 0, 0, NULL, launcher_enable_states},
 #endif
 
 
@@ -3215,8 +3217,8 @@ setup_menu_t gen_settings3[] = { // General Settings screen2
   {"Use Extended Format",         S_YESNO|S_PRGWARN, m_null,G_X,G_Y+ 2*8, {"demo_extendedformat"}, 0, 0, M_ChangeDemoExtendedFormat},
   {"Overwrite Existing",          S_YESNO, m_null, G_X, G_Y+ 3*8, {"demo_overwriteexisting"}},
   {"Smooth Demo Playback",        S_YESNO, m_null, G_X, G_Y+ 4*8, {"demo_smoothturns"}, 0, 0, M_ChangeDemoSmoothTurns},
-  {"Smooth Demo Playback Factor", S_NUM,   m_null, G_X, G_Y+ 5*8, {"demo_smoothturnsfactor"}, 0, 0, M_ChangeDemoSmoothTurns},
-  {"Quickstart Window (ms)",      S_NUM,   m_null, G_X, G_Y+6*8, {"quickstart_window_ms"}},
+  {"Smooth Demo Playback Factor", S_NCHOICE,   m_null, G_X, G_Y+ 5*8, {"demo_smoothturnsfactor"}, 0, 0, M_ChangeDemoSmoothTurns},
+  {"Quickstart Window (ms)",      S_NCHOICE,   m_null, G_X, G_Y+6*8, {"quickstart_window_ms"}},
 
   {"Movements",                   S_SKIP|S_TITLE,m_null,G_X, G_Y+8*8},
   {"Permanent Strafe50",          S_YESNO, m_null, G_X, G_Y+ 9*8, {"movement_strafe50"}, 0, 0, M_ChangeSpeed},
@@ -3226,8 +3228,8 @@ setup_menu_t gen_settings3[] = { // General Settings screen2
   {"Carry Fractional Tics",       S_YESNO,  m_null, G_X, G_Y+13*8, {"mouse_carrytics"}},
   {"Enable Mouselook",            S_YESNO,  m_null, G_X, G_Y+14*8, {"movement_mouselook"}, 0, 0, M_ChangeMouseLook},
   {"Invert Mouse",                S_YESNO,  m_null, G_X, G_Y+15*8, {"movement_mouseinvert"}, 0, 0, M_ChangeMouseInvert},
-  {"Max View Pitch",              S_NUM,    m_null, G_X, G_Y+16*8, {"movement_maxviewpitch"}, 0, 0, M_ChangeMaxViewPitch},
-  {"Mouse Strafe Divisor",        S_NUM,    m_null, G_X, G_Y+17*8, {"movement_mousestrafedivisor"}},
+  {"Max View Pitch",              S_NCHOICE,    m_null, G_X, G_Y+16*8, {"movement_maxviewpitch"}, 0, 0, M_ChangeMaxViewPitch},
+  {"Mouse Strafe Divisor",        S_NCHOICE,    m_null, G_X, G_Y+17*8, {"movement_mousestrafedivisor"}},
   {"No Vertical Movement",        S_CHOICE, m_null, G_X, G_Y+18*8, {"mouse_no_vert"}, 0, 0, NULL, novertstr},
 
   {"<- PREV",S_SKIP|S_PREV, m_null,KB_PREV, KB_Y+20*8, {gen_settings2}},
@@ -3275,8 +3277,8 @@ setup_menu_t gen_settings5[] = { // General Settings screen3
   {"Software Gamma",            S_CHOICE,m_null,G_X,G_Y+3*8, {"usegamma"}, 0, 0, M_ChangeGamma},
 #ifdef GL_DOOM
   {"OpenGL Options",            S_SKIP|S_TITLE,m_null,G_X,G_Y+5*8},
-  {"Multisampling (0-None)",    S_NUM|S_PRGWARN|S_CANT_GL_ARB_MULTISAMPLEFACTOR|S_MKEEP,m_null,G_X,G_Y+6*8, {"render_multisampling"}, 0, 0, M_ChangeMultiSample},
-  {"Field Of View",             S_NUM,    m_null, G_X, G_Y+ 7*8, {"render_fov"}, 0, 0, M_ChangeFOV},
+  {"Multisampling (0-None)",    S_NCHOICE|S_PRGWARN|S_CANT_GL_ARB_MULTISAMPLEFACTOR|S_MKEEP,m_null,G_X,G_Y+6*8, {"render_multisampling"}, 0, 0, M_ChangeMultiSample},
+  {"Field Of View",             S_NCHOICE,    m_null, G_X, G_Y+ 7*8, {"render_fov"}, 0, 0, M_ChangeFOV},
   {"Sector Light Mode",         S_CHOICE, m_null, G_X, G_Y+ 8*8, {"gl_lightmode"}, 0, 0, M_ChangeLightMode, gl_lightmodes},
   {"Allow Fog",                 S_YESNO,  m_null, G_X, G_Y+ 9*8, {"gl_fog"}, 0, 0, M_ChangeAllowFog},
   {"Simple Shadows",            S_YESNO,  m_null, G_X, G_Y+10*8, {"gl_shadows"}},
@@ -3285,7 +3287,7 @@ setup_menu_t gen_settings5[] = { // General Settings screen3
   {"Paper Items",               S_YESNO,  m_null, G_X, G_Y+13*8, {"render_paperitems"}},
   {"Smooth sprite edges",       S_YESNO,  m_null, G_X, G_Y+14*8, {"gl_sprite_blend"}},
   {"Adjust Sprite Clipping",    S_CHOICE, m_null, G_X, G_Y+15*8, {"gl_spriteclip"}, 0, 0, M_ChangeSpriteClip, gl_spriteclipmodes},
-  {"Item out of Floor offset",  S_NUM,    m_null, G_X, G_Y+16*8, {"gl_sprite_offset"}, 0, 0, M_ChangeSpriteClip},
+  {"Item out of Floor offset",  S_NCHOICE,    m_null, G_X, G_Y+16*8, {"gl_sprite_offset"}, 0, 0, M_ChangeSpriteClip},
   {"Health Bar Above Monsters", S_YESNO,  m_null, G_X, G_Y+17*8, {"health_bar"}},
 #endif
 
@@ -3691,7 +3693,7 @@ setup_menu_t mess_settings1[] =  // Messages screen
    M_Y + mess_color_play*8, {"hudcolor_mesg"}},
 
 #if 0
-  {"Message Duration During Play (ms)", S_NUM, m_null, M_X,
+  {"Message Duration During Play (ms)", S_NCHOICE, m_null, M_X,
    M_Y  + mess_timer*8, {"message_timer"}},
 #endif
 
@@ -3699,7 +3701,7 @@ setup_menu_t mess_settings1[] =  // Messages screen
    M_Y + mess_color_chat*8, {"hudcolor_chat"}},
 
 #if 0
-  {"Chat Message Duration (ms)", S_NUM, m_null, M_X,
+  {"Chat Message Duration (ms)", S_NCHOICE, m_null, M_X,
    M_Y  + mess_chat_timer*8, {"chat_msg_timer"}},
 #endif
 
@@ -3710,11 +3712,11 @@ setup_menu_t mess_settings1[] =  // Messages screen
   {"Message Listing Review is Temporary",  S_YESNO,  m_null,  M_X,
    M_Y + mess_timed*8, {"hud_msg_timed"}},
 
-  {"Message Review Duration (ms)", S_NUM, m_null, M_X,
+  {"Message Review Duration (ms)", S_NCHOICE, m_null, M_X,
    M_Y  + mess_hud_timer*8, {"hud_msg_timer"}},
 #endif
 
-  {"Number of Review Message Lines", S_NUM, m_null,  M_X,
+  {"Number of Review Message Lines", S_NCHOICE, m_null,  M_X,
    M_Y + mess_lines*8, {"hud_msg_lines"}},
 
 #if 0
