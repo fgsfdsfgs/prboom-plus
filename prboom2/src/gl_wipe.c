@@ -84,7 +84,7 @@ int gld_wipe_doMelt(int ticks, int *y_lookup)
   int i;
   int total_w, total_h;
   float fU1, fU2, fV1, fV2;
-  float sx_prev, sy_prev, tx_prev;
+  float dU, x0, y0, u0;
 
   total_w = gld_GetTexDimension(SCREENWIDTH);
   total_h = gld_GetTexDimension(SCREENHEIGHT);
@@ -93,6 +93,7 @@ int gld_wipe_doMelt(int ticks, int *y_lookup)
   fV1 = (float)SCREENHEIGHT / (float)total_h;
   fU2 = (float)SCREENWIDTH / (float)total_w;
   fV2 = 0.0f;
+  dU = 1.f / (float)total_w;
   
   gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
   
@@ -111,29 +112,15 @@ int gld_wipe_doMelt(int ticks, int *y_lookup)
   glBindTexture(GL_TEXTURE_2D, wipe_scr_start_tex);
   gld_glColor3f(1.0f, 1.0f, 1.0f);
 
-  sx_prev = 0.f;
-  sy_prev = MAX(0, y_lookup[0]);
-  tx_prev = 0.f;
-
-  gld_glBegin(GL_QUADS);
-
-  for (i=1; i <= SCREENWIDTH; i++)
+  gld_glBegin(GL_TRIANGLE_STRIP);
+  for (i = 0; i < SCREENWIDTH; ++i)
   {
-    int yoffs = MAX(0, y_lookup[i]);
-    
-    float tx = (float) i / total_w;
-    float sx = (float) i;
-    float sy = (float) yoffs;
-
-    gld_glTexCoord2f(tx_prev, fV1); gld_glVertex2f(sx_prev, sy_prev);
-    gld_glTexCoord2f(tx_prev, fV2); gld_glVertex2f(sx_prev, sy_prev + (float)SCREENHEIGHT);
-    gld_glTexCoord2f(tx,      fV2); gld_glVertex2f(sx,      sy      + (float)SCREENHEIGHT);
-    gld_glTexCoord2f(tx,      fV1); gld_glVertex2f(sx,      sy);
-
-    sx_prev = sx; sy_prev = sy;
-    tx_prev = tx;
+    x0 = (float) i;
+    y0 = (float) y_lookup[i];
+    u0 = fU1 + dU * i;
+    gld_glTexCoord2f(u0, fV1); gld_glVertex2f(x0, y0);
+    gld_glTexCoord2f(u0, fV2); gld_glVertex2f(x0, y0 + (float)SCREENHEIGHT);
   }
-  
   gld_glEnd();
   
   return 0;
@@ -141,6 +128,8 @@ int gld_wipe_doMelt(int ticks, int *y_lookup)
 
 int gld_wipe_exitMelt(int ticks)
 {
+  glFinish();
+
   if (wipe_scr_start_tex != 0)
   {
     glDeleteTextures(1, &wipe_scr_start_tex);
@@ -166,10 +155,8 @@ int gld_wipe_StartScreen(void)
 
 int gld_wipe_EndScreen(void)
 {
-  glFinish();
-#ifdef __vita__
-  I_FinishUpdate();
-#endif
+  I_StopRendering(1);
+
   wipe_scr_end_tex = CaptureScreenAsTexID();
 
   return 0;
