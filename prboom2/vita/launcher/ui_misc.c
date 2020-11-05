@@ -29,6 +29,7 @@ static struct Option misc_opts[] =
     { OPT_BOOLEAN, "Record demo" },
     { OPT_INTEGER, "Skill", .inum = { 0, 5, 1, 0 } },
     { OPT_INTEGER, "Starting map", .inum = { 0, 99, 1, 0 } },
+    { OPT_INTEGER, "Compatibility level", .inum = { -1, 17, 1, -1 } },
     { OPT_BOOLEAN, "Debug logging" },
 };
 
@@ -67,7 +68,8 @@ void UI_MenuMisc_Reload(void)
     misc_opts[1].codevar = &fs_profiles[ui_profile].record;
     misc_opts[2].codevar = &fs_profiles[ui_profile].skill;
     misc_opts[3].codevar = &fs_profiles[ui_profile].warp;
-    misc_opts[4].codevar = &fs_profiles[ui_profile].logfile;
+    misc_opts[4].codevar = &fs_profiles[ui_profile].complevel;
+    misc_opts[5].codevar = &fs_profiles[ui_profile].logfile;
 
     self->opts = misc_opts;
     self->numopts = sizeof(misc_opts) / sizeof(*misc_opts);
