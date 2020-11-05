@@ -90,6 +90,7 @@ int FS_Init(void)
         int present = CheckForProfile(i);
         fs_profiles[i].present = present;
         fs_profiles[i].monsters[0] = '0';
+        fs_profiles[i].skill[0] = '0';
         fs_profiles[i].complevel = -1;
         snprintf(fs_profiles[i].joinaddr, MAX_FNAME, "%s:5030", net_my_ip);
         numgames += present;
@@ -211,8 +212,8 @@ static void WriteResponseFile(int profile, const char *fname)
     if (g->nodeh)
         fprintf(f, "-nodeh\n");
 
-    if (g->skill)
-        fprintf(f, "-skill %d\n", g->skill);
+    if (g->skill[0] && g->skill[0] != '0')
+        fprintf(f, "-skill %s\n", g->skill);
 
     if (g->complevel >= 0)
         fprintf(f, "-complevel %d\n", g->complevel);

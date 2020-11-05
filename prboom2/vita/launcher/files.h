@@ -34,8 +34,8 @@ struct Profile
 
     int nodeh;
     int complevel;
-    int skill;
     int warp;
+    char skill[2];
     char monsters[2];
     int record;
     int logfile;
