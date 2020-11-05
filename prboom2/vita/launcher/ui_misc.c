@@ -23,11 +23,26 @@ static const char *mon_values[] =
     "0", "1", "2", "4", "6",
 };
 
+static const char *skill_labels[] =
+{
+    "Default",
+    "I'm too young to die",
+    "Hey, not too rough",
+    "Hurt me plenty",
+    "Ultra Violence",
+    "Nightmare!"
+};
+
+static const char *skill_values[] =
+{
+    "0", "1", "2", "3", "4", "5"
+};
+
 static struct Option misc_opts[] =
 {
     { OPT_CHOICE, "Monsters", .choice = { mon_labels, mon_values, 5, 0 } },
     { OPT_BOOLEAN, "Record demo" },
-    { OPT_INTEGER, "Skill", .inum = { 0, 5, 1, 0 } },
+    { OPT_CHOICE, "Skill", .choice = { skill_labels, skill_values, 6, 0 } },
     { OPT_INTEGER, "Starting map", .inum = { 0, 99, 1, 0 } },
     { OPT_INTEGER, "Compatibility level", .inum = { -1, 17, 1, -1 } },
     { OPT_BOOLEAN, "Debug logging" },
