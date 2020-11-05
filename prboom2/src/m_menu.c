@@ -985,7 +985,11 @@ void M_SaveSelect(int choice)
   saveSlot = choice;
   strcpy(saveOldString,savegamestrings[choice]);
   if (!strcmp(savegamestrings[choice],s_EMPTYSTRING)) // Ty 03/27/98 - externalized
+#ifdef __vita__ // fill the save name with a default string so people won't have to type
+    snprintf(savegamestrings[choice], SAVESTRINGSIZE, "SAVE %d", choice);
+#else
     savegamestrings[choice][0] = 0;
+#endif
   saveCharIndex = strlen(savegamestrings[choice]);
 }
 
