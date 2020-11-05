@@ -219,7 +219,7 @@ static void WriteResponseFile(int profile, const char *fname)
 
     if (g->warp)
     {
-        if (!g->episodic)
+        if (g->episodic)
         {
             int ep = g->warp / 10;
             int map = g->warp % 10;
