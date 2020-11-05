@@ -3004,6 +3004,12 @@ void gld_DrawScene(player_t *player)
   }
 #endif
 
+  // solid geometry
+  glDisable(GL_ALPHA_TEST);
+
+  // all the following items are opaque or masked
+  glDisable(GL_BLEND);
+
   //e6y: skybox
   skybox = 0;
   if (gl_drawskys != skytype_none)
@@ -3043,9 +3049,6 @@ void gld_DrawScene(player_t *player)
   //
 
   glBlendFunc(GL_ONE, GL_ZERO);
-
-  // solid geometry
-  glDisable(GL_ALPHA_TEST);
 
   // enable backside removing
   glEnable(GL_CULL_FACE);
@@ -3214,6 +3217,9 @@ void gld_DrawScene(player_t *player)
   //
   // transparent stuff
   //
+
+  // the following items might be translucent
+  glEnable(GL_BLEND);
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
