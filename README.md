@@ -8,9 +8,11 @@ The required fork of [vitaGL](https://github.com/fgsfdsfgs/vitaGL/tree/texture_m
 present in this repository. You don't need to install it manually.
 
 ### Build instructions
-1. Create a build folder: `mkdir vitabuild && cd vitabuild`
-2. On Windows under MSYS2 run: `cmake -G"MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" ..`.
-On Linux omit the `-G` option.
+1. Create a build folder:
+```mkdir vitabuild && cd vitabuild```
+2. On Windows under MSYS2 run:
+```cmake -G"MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" ..```
+   On Linux omit the `-G` option.
 3. Run `make`. This should produce a VPK in the `vitabuild/src` directory.
 
 ## Using the Vita port
@@ -57,7 +59,7 @@ If the game closes without producing a crash dump or an error message, a file na
 
 To join a game by IP, select `Game address`, enter the address, then hit `Connect to address`.
 The server is a separate program and for now has to be hosted on a PC.
-Grab [the latest PrBoom fork release]() and use `prboom-plus_server.exe` to run it.
+Grab [the latest PrBoom fork release](https://github.com/coelckers/prboom-plus/releases/latest) and use `prboom-plus_server.exe` to run it.
 
 Netgames will only work correctly if all players have selected the same game and set of custom files (stuff in the `Files` tab).
 PWAD order does matter.
