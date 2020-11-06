@@ -296,6 +296,18 @@ static void OptActivate(struct Option *opt)
     }
 }
 
+static void OptClear(struct Option *opt)
+{
+    if (opt->type == OPT_FILE)
+    {
+        opt->file.val[0] = 0;
+    }
+    else if (opt->type == OPT_STRING)
+    {
+        opt->string[0] = 0;
+    }
+}
+
 static void OptsUpdate(struct Menu *menu)
 {
     struct Option *opts = menu->opts;
@@ -323,6 +335,8 @@ static void OptsUpdate(struct Menu *menu)
         OptScroll(opts + menu->sel, -1);
     else if (IN_ButtonPressed(B_DRIGHT))
         OptScroll(opts + menu->sel, 1);
+    else if (IN_ButtonPressed(B_TRIANGLE))
+        OptClear(opts + menu->sel);
 }
 
 static void OptDraw(struct Option *opt, int x, int y, int sel)

@@ -30,6 +30,7 @@ present in this repository. You don't need to install it manually.
 * Cross: activate option
 * Start: save settings and launch the game you have selected in the `Profiles` tab (in single-player mode)
 * Circle: save settings and exit launcher / cancel selection when in file select dialog
+* Triangle: clear current entry
 
 ### Supported games / IWADs
 To play a game from this list, copy the corresponding files to `ux0:/data/prboom/iwads/`.
