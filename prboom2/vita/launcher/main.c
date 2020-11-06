@@ -15,6 +15,22 @@ SceUInt32 sceUserMainThreadStackSize = 1 * 1024 * 1024;
 
 static int init_level = 0;
 
+static void CheckDebugStart(void)
+{
+    IN_Update();
+    if (IN_ButtonHeld(B_SELECT))
+    {
+        for (int profile = 0; profile < MAX_PROFILES; ++profile)
+        {
+            if (fs_profiles[profile].present)
+            {
+                FS_SaveProfiles();
+                FS_ExecGame(profile);
+            }
+        }
+    }
+}
+
 void I_Cleanup(void)
 {
     if (init_level >= 5)
@@ -74,6 +90,8 @@ int main(void)
     init_level++;
     if (IN_Init()) I_Error("IN_Init(): failed");
     init_level++;
+    // emergency launch in case we need to generate the config
+    CheckDebugStart();
     if (CFG_Load()) I_Error("CFG_Load(): failed");
     init_level++;
     if (UI_Init()) I_Error("UI_Init(): failed");

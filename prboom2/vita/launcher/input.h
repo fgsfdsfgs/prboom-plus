@@ -30,6 +30,7 @@ int IN_Init(void);
 void IN_Update(void);
 void IN_Free(void);
 
+int IN_ButtonHeld(int btn);
 int IN_ButtonPressed(int btn);
 void IN_WaitForButton(int btn);
 int IN_GetFirstButton(void);

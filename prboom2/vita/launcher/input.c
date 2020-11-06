@@ -68,6 +68,18 @@ int IN_ButtonPressed(int btn)
     return (pad.buttons & btn) && !(pad_old.buttons & btn);
 }
 
+int IN_ButtonHeld(int btn)
+{
+    if (btn == B_TOUCH1 || btn == B_TOUCH2)
+    {
+        int i = btn - B_TOUCH1;
+        return touch[i];
+    }
+
+    btn = TranslateButton(btn);
+    return (pad.buttons & btn);
+}
+
 void IN_WaitForButton(int btn)
 {
     do
