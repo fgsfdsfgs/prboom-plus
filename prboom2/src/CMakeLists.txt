@@ -425,6 +425,10 @@ if(VITA)
         prboom-plus.vpk ${VITA_TITLEID} "${CMAKE_BINARY_DIR}/vita/launcher/vlauncher.self" NAME ${VITA_NAME}
         FILE "${CMAKE_BINARY_DIR}/src/prboom-plus.self" "prboom.bin"
         FILE "${CMAKE_SOURCE_DIR}/data/vita/launcher/fnt_buttons.png" "data/launcher/fnt_buttons.png"
+        FILE "${CMAKE_SOURCE_DIR}/data/vita/sce_sys/icon0.png" "sce_sys/icon0.png"
+        FILE "${CMAKE_SOURCE_DIR}/data/vita/sce_sys/livearea/contents/bg.png" "sce_sys/livearea/contents/bg.png"
+        FILE "${CMAKE_SOURCE_DIR}/data/vita/sce_sys/livearea/contents/startup.png" "sce_sys/livearea/contents/startup.png"
+        FILE "${CMAKE_SOURCE_DIR}/data/vita/sce_sys/livearea/contents/template.xml" "sce_sys/livearea/contents/template.xml"
     )
     add_dependencies(prboom-plus.vpk prboom-plus.self)
 endif()
