@@ -662,11 +662,10 @@ void I_FinishUpdate (void)
     SDL_LowerBlit(screen, &src_rect, buffer, &src_rect);
 
 #ifdef __vita__
-  I_StartRendering(); // in case we're not rendering yet
+  // don't need to memcpy anything because buffer already points
+  // to the internaltexture data
 
-  // Update the intermediate texture with the contents of the RGBA buffer.
-  // we can just copy here since any possible width is already 8-byte aligned
-  memcpy_neon(sw_texptr, buffer->pixels, sw_texsize);
+  I_StartRendering(); // in case we're not rendering yet
 
   // Make sure the pillarboxes are kept clear each frame.
   glClear(GL_COLOR_BUFFER_BIT);
@@ -1476,8 +1475,14 @@ void I_UpdateVideoMode(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, sw_texfmt, SCREENWIDTH, SCREENHEIGHT, 0, sw_texfmt, sw_textype, screen->pixels);
+
     // get data pointer so we can just memcpy later
     sw_texptr = vglGetTexDataPointer(GL_TEXTURE_2D);
+
+    // make buffer point to the actual texture data to avoid extra memcpying
+    if (buffer->pixels) SDL_free(buffer->pixels);
+    buffer->flags |= SDL_PREALLOC;
+    buffer->pixels = sw_texptr;
 #else
     sdl_window = SDL_CreateWindow(
       PACKAGE_NAME " " PACKAGE_VERSION,
