@@ -132,6 +132,8 @@ SDL_Rect dst_rect = { 0, 0, 0, 0 };
 static GLuint sw_texture;
 static GLenum sw_texfmt;
 static GLenum sw_textype;
+static GLuint sw_texsize;
+static void *sw_texptr;
 #define DEFAULT_SCREEN_W 960
 #define DEFAULT_SCREEN_H 544
 #else
@@ -663,8 +665,8 @@ void I_FinishUpdate (void)
   I_StartRendering(); // in case we're not rendering yet
 
   // Update the intermediate texture with the contents of the RGBA buffer.
-  glBindTexture(GL_TEXTURE_2D, sw_texture);
-  glTexSubImage2D(GL_TEXTURE_2D, 0, src_rect.x, src_rect.y, src_rect.w, src_rect.h, sw_texfmt, sw_textype, buffer->pixels);
+  // we can just copy here since any possible width is already 8-byte aligned
+  memcpy_neon(sw_texptr, buffer->pixels, sw_texsize);
 
   // Make sure the pillarboxes are kept clear each frame.
   glClear(GL_COLOR_BUFFER_BIT);
@@ -1326,6 +1328,7 @@ void I_UpdateVideoMode(void)
     {
       glDeleteTextures(1, &sw_texture);
       sw_texture = 0;
+      sw_texptr = NULL;
     }
 #else
     SDL_GL_DeleteContext(sdl_glcontext);
@@ -1453,14 +1456,17 @@ void I_UpdateVideoMode(void)
       case VID_MODE16:
         sw_textype = GL_UNSIGNED_SHORT_5_6_5;
         sw_texfmt = GL_RGB;
+        sw_texsize = SCREENWIDTH * SCREENHEIGHT * 2;
         break;
       case VID_MODE15:
         sw_textype = GL_UNSIGNED_SHORT_5_5_5_1;
         sw_texfmt = GL_RGBA;
+        sw_texsize = SCREENWIDTH * SCREENHEIGHT * 2;
         break;
       default:
         sw_textype = GL_UNSIGNED_BYTE;
         sw_texfmt = GL_BGRA;
+        sw_texsize = SCREENWIDTH * SCREENHEIGHT * 4;
         break;
     }
 
@@ -1470,6 +1476,8 @@ void I_UpdateVideoMode(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, sw_texfmt, SCREENWIDTH, SCREENHEIGHT, 0, sw_texfmt, sw_textype, screen->pixels);
+    // get data pointer so we can just memcpy later
+    sw_texptr = vglGetTexDataPointer(GL_TEXTURE_2D);
 #else
     sdl_window = SDL_CreateWindow(
       PACKAGE_NAME " " PACKAGE_VERSION,
