@@ -51,7 +51,7 @@ typedef enum                /* Logical output levels */
 #define __attribute__(x)
 #endif
 
-extern int lprintf(OutputLevels pri, const char *fmt, ...) __attribute__((format(printf,2,3)));
+extern int lprintf(/*OutputLevels*/ int pri, const char *fmt, ...) __attribute__((format(printf,2,3)));
 extern int cons_output_mask;
 extern int cons_error_mask;
 extern int log_to_file;

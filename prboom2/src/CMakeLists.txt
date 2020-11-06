@@ -263,7 +263,7 @@ set(PRBOOM_PLUS_SOURCES
 if(VITA)
     # HACK: because we build with -fno-short-enums, interactions with some libraries like libmad
     #       get broken, so we have to perform this fucking bullshit
-    set_source_files_properties(${DOOMMUSIC_SOURCES} PROPERTIES COMPILE_FLAGS -fshort-enums)
+    set_source_files_properties(MUSIC/madplayer.c PROPERTIES COMPILE_FLAGS -fshort-enums)
 endif()
 
 function(AddGameExecutable TARGET SOURCES)

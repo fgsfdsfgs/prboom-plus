@@ -72,7 +72,7 @@ static FILE *flog = NULL;
  */
 #define MAX_MESSAGE_SIZE 2048
 
-int lprintf(OutputLevels pri, const char *s, ...)
+int lprintf(/*OutputLevels*/ int pri, const char *s, ...)
 {
   int r=0;
   char msg[MAX_MESSAGE_SIZE];
