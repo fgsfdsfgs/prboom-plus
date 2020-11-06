@@ -260,6 +260,12 @@ set(PRBOOM_PLUS_SOURCES
     ${EXTRA_FILES}
 )
 
+if(VITA)
+    # HACK: because we build with -fno-short-enums, interactions with some libraries like libmad
+    #       get broken, so we have to perform this fucking bullshit
+    set_source_files_properties(${DOOMMUSIC_SOURCES} PROPERTIES COMPILE_FLAGS -fshort-enums)
+endif()
+
 function(AddGameExecutable TARGET SOURCES)
     if(WIN32)
         add_definitions("-DUSE_WIN32_PCSOUND_DRIVER -DUSE_WINDOWS_LAUNCHER")
