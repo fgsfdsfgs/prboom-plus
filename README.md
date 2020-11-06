@@ -43,7 +43,7 @@ To play a game from this list, copy the corresponding files to `ux0:/data/prboom
 | Final Doom: TNT Evilution              | `tnt.wad`      |
 | Final Doom: The Plutonia Experiment    | `plutonia.wad` |
 | Chex Quest                             | `chex.wad`, [`chex.deh`](https://www.doomworld.com/idgames/?file=utils/exe_edit/patches/chexdeh.zip) |
-| [FreeDoom](https://freedoom.github.io/): Phase 1                      | `freedoom.wad` |
+| [FreeDoom](https://freedoom.github.io/): Phase 1                      | `freedoom1.wad` |
 | FreeDoom: Phase 2                      | `freedoom2.wad`|
 | FreeDM                                 | `freedm.wad`   |
 | Hacx                                   | `hacx.wad`     |
