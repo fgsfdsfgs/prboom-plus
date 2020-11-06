@@ -502,6 +502,8 @@ static void OptLoadVar(struct Option *opt)
         case OPT_FILE:
             if (opt->codevar)
                 strncpy(opt->file.val, opt->codevar, MAX_STROPT);
+            else
+                CFG_ReadVar(ui_profile, opt->cfgvar, opt->file.val);
             break;
 
         case OPT_BUTTON:
