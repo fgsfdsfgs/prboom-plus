@@ -1812,6 +1812,14 @@ void V_ToggleFullscreen(void)
 
 void V_ChangeScreenResolution(void)
 {
+#if defined(GL_DOOM) && defined(__vita__)
+  if (V_GetMode() == VID_MODEGL)
+  {
+    // don't allow resolution changing in GL mode
+    return;
+  }
+#endif
+
   I_UpdateVideoMode();
 
 #ifdef GL_DOOM
