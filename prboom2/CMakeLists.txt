@@ -161,7 +161,7 @@ if(VITA)
     # vitaGL is required and is present as a submodule, so make a target for it
     set(VITAGL_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/vita/vitaGL/libvitaGL.a)
     add_custom_target(build_vitaGL ALL 
-                   COMMAND ${CMAKE_MAKE_PROGRAM} HAVE_SBRK=1
+                   COMMAND ${CMAKE_MAKE_PROGRAM} HAVE_SBRK=1 NO_DEBUG=1
                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/vita/vitaGL
                    COMMENT "Original vitaGL makefile target")
     add_library(vitaGL STATIC IMPORTED)
