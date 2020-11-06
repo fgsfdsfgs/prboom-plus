@@ -11,7 +11,9 @@ present in this repository. You don't need to install it manually.
 1. Create a build folder:
 ```mkdir vitabuild && cd vitabuild```
 2. On Windows under MSYS2 run:
-```cmake -G"MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" ..```
+
+   ```cmake -G"MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" ..```
+
    On Linux omit the `-G` option.
 3. Run `make`. This should produce a VPK in the `vitabuild/src` directory.
 
