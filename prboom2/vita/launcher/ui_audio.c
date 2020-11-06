@@ -10,8 +10,8 @@ void UI_MenuAudio_Draw(void);
 
 static const char *sample_rates[] = { "11025", "22050", "44100", "48000" };
 
-static const char *music_type_labels[] = { "OPL2", "SDL" };
-static const char *music_type_values[] = { "opl2", "sdl" };
+static const char *music_type_labels[] = { "OPL2", "FluidSynth", "SDL" };
+static const char *music_type_values[] = { "opl2", "fluidsynth", "sdl" };
 
 static const char *sound_type_labels[] = { "Digital", "PC Speaker" };
 static const char *sound_type_values[] = { "0", "1" };
@@ -35,7 +35,17 @@ static struct Option audio_opts[] =
         .choice =
         {
             music_type_labels, music_type_values,
-            2, 0,
+            3, 0,
+        },
+    },
+    {
+        OPT_FILE,
+        "FluidSynth soundfont",
+        "snd_soundfont", NULL,
+        .file =
+        {
+            "",
+            { "sf2", NULL }, 
         },
     },
     {
@@ -77,7 +87,7 @@ static struct Menu *self = &ui_menu_audio;
 
 void UI_MenuAudio_Init(void)
 {
-
+    audio_opts[2].file.dir = FS_GetBaseDir();
 }
 
 void UI_MenuAudio_Update(void)

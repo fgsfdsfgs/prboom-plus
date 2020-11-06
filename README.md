@@ -2,7 +2,8 @@
 ### Requirements
 * VitaSDK installed and in PATH;
 * libFLAC (run `vdpm flac` to install it if it's not present by default);
-* CMake.
+* CMake;
+* [fluidsynth-lite](https://github.com/fgsfdsfgs/fluidsynth-lite) (optional; build with `make -f Makefile.vita install`).
 
 The required fork of [vitaGL](https://github.com/fgsfdsfgs/vitaGL/tree/texture_matrix) is
 present in this repository. You don't need to install it manually.
@@ -77,6 +78,8 @@ This does not support music packs like Chocolate Doom, but you can just use a PW
 Controls can be rebound from in-game. Check `Options` -> `Setup` -> `Key Bindings`.
 
 You can add custom profiles to the launcher by editing `ux0:/data/prboom/profiles.cfg`. It also saves your PWAD list for each profile.
+
+You can use custom SF2 soundfonts for MIDI playback by choosing `FluidSynth` as your MIDI player and setting the `FluidSynth soundfont` setting in the launcher.
 
 PrBoom Plus is Boom compatible with some additional features. This is a fork of Graf Zahl's PrBoom fork, which also adds support for a few more modern features like UMAPINFO.
 This means you can run `SIGIL.wad` instead of `SIGIL_COMPAT.wad` and other similar PWADs. However this does not run Heretic, Hexen or Strife.

@@ -261,9 +261,14 @@ set(PRBOOM_PLUS_SOURCES
 )
 
 if(VITA)
+    set(GLBOOM_BINARY glboom-plus.elf)
+    set(PRBOOM_BINARY prboom-plus.elf)
     # HACK: because we build with -fno-short-enums, interactions with some libraries like libmad
     #       get broken, so we have to perform this fucking bullshit
     set_source_files_properties(MUSIC/madplayer.c PROPERTIES COMPILE_FLAGS -fshort-enums)
+else()
+    set(GLBOOM_BINARY glboom-plus)
+    set(PRBOOM_BINARY prboom-plus)
 endif()
 
 function(AddGameExecutable TARGET SOURCES)
@@ -343,9 +348,12 @@ function(AddGameExecutable TARGET SOURCES)
         target_include_directories(${TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/vita)
         # HACK: this adds libraries in a severely fucked up order and our pkg-config seems to do jack shit,
         #       so we just re-add them by hand
-        target_link_libraries(${TARGET} PRIVATE tess SDL2_net SDL2_image SDL2_mixer SDL2 vita2d vitaGL mathneon png jpeg mikmod mpg123 vorbisfile vorbis ogg FLAC z m c)
-        target_link_libraries(${TARGET} PRIVATE SceLibKernel_stub SceAppMgr_stub SceSysmodule_stub SceCtrl_stub SceTouch_stub SceNet_stub SceNetCtl_stub)
-        target_link_libraries(${TARGET} PRIVATE SceAppUtil_stub ScePower_stub SceCommonDialog_stub SceAudio_stub SceGxm_stub SceDisplay_stub SceHid_stub)
+        target_link_libraries(
+            ${TARGET} PRIVATE
+            tess SDL2_net SDL2_image SDL2_mixer SDL2 vita2d vitaGL mathneon png jpeg mikmod mpg123 vorbisfile vorbis ogg FLAC fluidsynth
+            z pthread m c SceLibKernel_stub SceAppMgr_stub SceSysmodule_stub SceCtrl_stub SceTouch_stub SceNet_stub SceNetCtl_stub
+            SceAppUtil_stub ScePower_stub SceCommonDialog_stub SceAudio_stub SceGxm_stub SceDisplay_stub SceHid_stub
+        )
     endif()
 
     if(MSVC)
@@ -363,7 +371,7 @@ endfunction()
 
 # for Vita only build GLBoom if possible
 if((NOT VITA) OR (NOT BUILD_GL))
-    AddGameExecutable(prboom-plus "${PRBOOM_PLUS_SOURCES}")
+    AddGameExecutable(${PRBOOM_BINARY} "${PRBOOM_PLUS_SOURCES}")
 endif()
 
 # GLBoom main executable
@@ -395,20 +403,20 @@ if(OPENGL_FOUND AND OPENGL_GLU_FOUND)
         gl_wipe.c
     )
 
-    AddGameExecutable(glboom-plus "${GLBOOM_PLUS_SOURCES}")
-    target_compile_definitions(glboom-plus PRIVATE
+    AddGameExecutable(${GLBOOM_BINARY} "${GLBOOM_PLUS_SOURCES}")
+    target_compile_definitions(${GLBOOM_BINARY} PRIVATE
         GL_DOOM
         USE_GLU_TESS
     )
 
     if(NOT VITA)
         # we already link to vitaGL anyway
-        target_link_libraries(glboom-plus PRIVATE
+        target_link_libraries(${GLBOOM_BINARY} PRIVATE
             ${OPENGL_gl_LIBRARY}
             ${OPENGL_glu_LIBRARY}
         )
         # can't do this shit on the Vita
-        target_compile_definitions(glboom-plus PRIVATE
+        target_compile_definitions(${GLBOOM_BINARY} PRIVATE
             USE_SHADERS
             USE_FBO_TECHNIQUE
             USE_GLU_IMAGESCALE
@@ -421,11 +429,11 @@ if(VITA)
     # HACK: vita_create_self prepends CMAKE_CURRENT_BINARY_DIR to the source if it's a target,
     #       which is set to src/ for some reason
     if(BUILD_GL)
-        vita_create_self(prboom-plus.self "../glboom-plus")
-        add_dependencies(prboom-plus.self glboom-plus)
+        vita_create_self(prboom-plus.self "../glboom-plus.elf")
+        add_dependencies(prboom-plus.self ${GLBOOM_BINARY})
     else()
-        vita_create_self(prboom-plus.self "../prboom-plus")
-        add_dependencies(prboom-plus.self prboom-plus)
+        vita_create_self(prboom-plus.self "../prboom-plus.elf")
+        add_dependencies(prboom-plus.self ${PRBOOM_BINARY})
     endif()
     vita_create_vpk(
         prboom-plus.vpk ${VITA_TITLEID} "${CMAKE_BINARY_DIR}/vita/launcher/vlauncher.self" NAME ${VITA_NAME}
@@ -546,9 +554,9 @@ if(APPLE)
     add_dependencies(prboom-plus-launcher prboom-plus)
 
     if(OPENGL_FOUND AND OPENGL_GLU_FOUND)
-        set(BUNDLE_GAME_EXECUTABLE glboom-plus)
+        set(BUNDLE_GAME_EXECUTABLE ${GLBOOM_BINARY})
     else()
-        set(BUNDLE_GAME_EXECUTABLE prboom-plus)
+        set(BUNDLE_GAME_EXECUTABLE ${PRBOOM_BINARY})
     endif()
 
     add_custom_command(TARGET prboom-plus-launcher POST_BUILD
