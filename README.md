@@ -76,8 +76,10 @@ You can add custom profiles to the launcher by editing `ux0:/data/prboom/profile
 PrBoom Plus is Boom compatible with some additional features. This is a fork of Graf Zahl's PrBoom fork, which also adds support for a few more modern features like UMAPINFO.
 This means you can run `SIGIL.wad` instead of `SIGIL_COMPAT.wad` and other similar PWADs. However this does not run Heretic, Hexen or Strife.
 
+See also the [original README](prboom2/README).
+
 ## Credits
-- [these people](AUTHORS) for PrBoom Plus itself;
+- [these people](prboom2/AUTHORS) for PrBoom Plus itself;
 - Vita SDK Team for the Vita SDK;
 - rsn8887 and cpasjuste for the SDL2 port;
 - Rinnegatamante for vitaGL;
