@@ -4,7 +4,7 @@
 #include <string.h>
 
 #define MAX_CHOICES 8
-#define MAX_STROPT 128
+#define MAX_STROPT 256
 
 enum Menus
 {

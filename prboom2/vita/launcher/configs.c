@@ -39,8 +39,8 @@ static struct Config cfg_main = { 0, CONFIG_FILENAME };
 
 static int ConfigLoad(struct Config *cfg)
 {
-    static char buf[512];
-    static char key[MAX_CVARNAME], value[MAX_CVARLEN];
+    char buf[512];
+    char key[MAX_CVARNAME], value[MAX_CVARLEN];
     snprintf(buf, sizeof(buf), "%s/%s", FS_GetBaseDir(), cfg->name);
 
     FILE *f = fopen(buf, "r");

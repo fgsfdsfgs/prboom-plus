@@ -63,5 +63,6 @@ static void DoJoinNet(int arg)
     fs_profiles[ui_profile].netmode = NETMODE_CLIENT;
     UI_SaveOptions();
     CFG_Save();
+    FS_SaveProfiles();
     FS_ExecGame(ui_profile);
 }

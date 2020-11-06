@@ -59,6 +59,7 @@ void UI_MenuMain_Update(void)
     {
         UI_SaveOptions();
         CFG_Save();
+        FS_SaveProfiles();
         FS_ExecGame(ui_profile);
     }
 }

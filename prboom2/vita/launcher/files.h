@@ -1,6 +1,6 @@
 #pragma once
 
-#define MAX_FNAME    128
+#define MAX_FNAME    256
 #define MAX_FILES    8
 #define MAX_PROFILES 32
 
@@ -19,8 +19,9 @@ enum NetMode
 
 struct Profile
 {
-    const char *name;
-    const char *iwad;
+    char name[MAX_FNAME];
+    char iwad[MAX_FNAME];
+
     int episodic;
 
     int present;
@@ -57,5 +58,8 @@ int FS_ProfileAvailable(int profile);
 
 int FS_ListDir(struct FileList *flist, const char *path, const char *ext);
 void FS_FreeFileList(struct FileList *flist);
+
+int FS_LoadProfiles(void);
+int FS_SaveProfiles(void);
 
 void FS_ExecGame(int profile);

@@ -18,7 +18,10 @@ static int init_level = 0;
 void I_Cleanup(void)
 {
     if (init_level >= 5)
-      CFG_Save();
+    {
+        CFG_Save();
+        FS_SaveProfiles();
+    }
     R_Free();
     NET_Free();
     IN_Free();

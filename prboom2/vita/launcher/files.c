@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <ctype.h>
 #include <vitasdk.h>
 
 #define mkdir(x, y) sceIoMkdir(x, y)
@@ -15,9 +16,8 @@ char fs_pwad_dir[MAX_FNAME];
 char fs_temp_dir[MAX_FNAME];
 char fs_iwad_dir[MAX_FNAME];
 
-static char fs_error[4096];
-
 // default profiles
+
 struct Profile fs_profiles[MAX_PROFILES] =
 {
     // doom1-based
@@ -33,6 +33,8 @@ struct Profile fs_profiles[MAX_PROFILES] =
     { "FreeDoom: Phase 2", "freedoom2.wad", 0 },
     { "Hacx", "hacx.wad", 0 },
 };
+
+static char fs_error[4096];
 
 static void SetError(const char *fmt, ...)
 {
@@ -75,6 +77,8 @@ const char *FS_GetBaseDir(void)
 
 int FS_Init(void)
 {
+    char fpath[MAX_FNAME];
+
     snprintf(fs_pwad_dir, sizeof(fs_pwad_dir), "%s/pwads", FS_GetBaseDir());
     snprintf(fs_iwad_dir, sizeof(fs_iwad_dir), "%s/iwads", FS_GetBaseDir());
     snprintf(fs_temp_dir, sizeof(fs_temp_dir), "%s/tmp", FS_GetBaseDir());
@@ -83,10 +87,12 @@ int FS_Init(void)
     mkdir(fs_pwad_dir, 0755);
     mkdir(fs_temp_dir, 0755);
 
+    if (FS_LoadProfiles() < 0) return -1;
+
     int numgames = 0;
     for (int i = 0; i < MAX_PROFILES; ++i)
     {
-        if (fs_profiles[i].iwad == NULL) break;
+        if (fs_profiles[i].iwad[0] == 0) break;
         int present = CheckForProfile(i);
         fs_profiles[i].present = present;
         fs_profiles[i].monsters[0] = '0';
@@ -109,7 +115,7 @@ int FS_Init(void)
 void FS_Free(void)
 {
 
-} 
+}
 
 char *FS_Error(void)
 {
@@ -160,6 +166,127 @@ void FS_FreeFileList(struct FileList *flist)
     free(flist->files);
     flist->files = NULL;
     flist->numfiles = 0;
+}
+
+int FS_LoadProfiles(void)
+{
+    char fname[MAX_FNAME];
+    struct Profile prof = { { 0 } };
+    char keybuf[512] = { 0 };
+    char value[512] = { 0 };
+    const char *key;
+
+    snprintf(fname, sizeof(fname), "%s/profiles.cfg", FS_GetBaseDir());
+
+    FILE *f = fopen(fname, "r");
+    if (!f)
+    {
+        // this is not an error, we'll create one on exit
+        return 0;
+    }
+
+    int num_profiles = 0;
+
+    memset(fs_profiles, 0, sizeof(fs_profiles));
+
+    while (!feof(f))
+    {
+        if (fscanf(f, "%511s %511[^\n]\n", keybuf, value) != 2)
+            continue;
+
+        if (keybuf[0] == '#')
+            continue;
+
+        // strip key and value
+
+        for (key = keybuf; *key && !isgraph(*key); ++key) ;
+        while (strlen(value) > 0 && !isgraph(value[strlen(value)-1]))
+            value[strlen(value)-1] = '\0';
+
+        if (!strcmp(key, "profile"))
+        {
+            strncpy(prof.name, value, sizeof(prof.name) - 1);
+        }
+        else if (!strcmp(key, "iwad"))
+        {
+            strncpy(prof.iwad, value, sizeof(prof.iwad) - 1);
+        }
+        else if (!strcmp(key, "episodic"))
+        {
+            prof.episodic = (value[0] == '1');
+        }
+        else if (!strcmp(key, "file"))
+        {
+            for (int i = 0; i < MAX_FILES; ++i)
+            {
+                if (prof.files[i][0] == 0)
+                {
+                    strncpy(prof.files[i], value, sizeof(prof.files[i]) - 1);
+                    break;
+                }
+            }
+        }
+        else if (!strcmp(key, "rsp"))
+        {
+            strncpy(prof.rsp, value, sizeof(prof.rsp) - 1);
+        }
+        else if (!strcmp(key, "nodeh"))
+        {
+            prof.nodeh = (value[0] == '1');
+        }
+        else if (!strcmp(key, "end") && !strcmp(value, "profile"))
+        {
+            if (prof.iwad[0] && prof.name[0])
+            {
+                memcpy(fs_profiles + num_profiles++, &prof, sizeof(prof));
+                memset(&prof, 0, sizeof(prof));
+            }
+            else
+            {
+                SetError("Invalid profile record (#%d) in file\n%s", num_profiles, fname);
+                fclose(f);
+                return -1;
+            }
+        }
+    }
+
+    fclose(f);
+
+    return num_profiles;
+}
+
+int FS_SaveProfiles(void)
+{
+    char fname[MAX_FNAME];
+
+    snprintf(fname, sizeof(fname), "%s/profiles.cfg", FS_GetBaseDir());
+
+    FILE *f = fopen(fname, "w");
+    if (!f)
+    {
+        SetError("Could not write file:\n%s", fname);
+        return -1;
+    }
+
+    for (int i = 0; i < MAX_PROFILES; ++i)
+    {
+        if (!fs_profiles[i].iwad[0]) break;
+        fprintf(f, "profile %s\n", fs_profiles[i].name);
+        fprintf(f, "  iwad %s\n", fs_profiles[i].iwad);
+        if (fs_profiles[i].episodic) fprintf(f, "  episodic 1\n");
+        if (fs_profiles[i].rsp[0]) fprintf(f, "  rsp %s\n", fs_profiles[i].rsp);
+        if (fs_profiles[i].nodeh) fprintf(f, "  nodeh 1\n");
+        for (int j = 0; j < MAX_FILES; ++j)
+        {
+            if (fs_profiles[i].files[j][0])
+                fprintf(f, "  file %s\n", fs_profiles[i].files[j]);
+        }
+        fprintf(f, "end profile\n\n");
+    }
+
+    fclose(f);
+
+    return 0;
 }
 
 static void WriteResponseFile(int profile, const char *fname)

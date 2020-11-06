@@ -414,7 +414,7 @@ static void OptLoadVar(struct Option *opt)
 
     buf[0] = 0;
 
-    int vtype;
+    int vtype = CVAR_UNKNOWN;
     if (opt->cfgvar && opt->cfgvar[0])
     {
         vtype = CFG_VarType(ui_profile, opt->cfgvar);
@@ -664,6 +664,7 @@ int UI_Update(void)
     {
         UI_SaveOptions();
         CFG_Save();
+        FS_SaveProfiles();
         FS_ExecGame(ui_profile);
     }
 
