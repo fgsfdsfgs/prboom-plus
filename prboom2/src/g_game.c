@@ -82,6 +82,7 @@
 #include "lprintf.h"
 #include "i_main.h"
 #include "i_system.h"
+#include "i_video.h"
 #include "i_joy.h"
 #include "r_demo.h"
 #include "r_fps.h"
