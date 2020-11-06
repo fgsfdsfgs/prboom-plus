@@ -80,6 +80,9 @@ Controls can be rebound from in-game. Check `Options` -> `Setup` -> `Key Binding
 You can add custom profiles to the launcher by editing `ux0:/data/prboom/profiles.cfg`. It also saves your PWAD list for each profile.
 
 You can use custom SF2 soundfonts for MIDI playback by choosing `FluidSynth` as your MIDI player and setting the `FluidSynth soundfont` setting in the launcher.
+FluidSynth seems to work best when sample rate = 22050, otherwise you might get some crackles.
+
+To disable autorun, either bind a button to it in the key bindings menu or edit `ux0:/data/prboom/prboom-plus.cfg` and change `autorun 1` to `autorun 0`. If you bind a button, autorun state is saved in the config, so you can unbind it later.
 
 PrBoom Plus is Boom compatible with some additional features. This is a fork of Graf Zahl's PrBoom fork, which also adds support for a few more modern features like UMAPINFO.
 This means you can run `SIGIL.wad` instead of `SIGIL_COMPAT.wad` and other similar PWADs. However this does not run Heretic, Hexen or Strife.
