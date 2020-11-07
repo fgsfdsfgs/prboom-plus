@@ -288,8 +288,6 @@ void D_Display (fixed_t frac)
   if (!I_StartDisplay())
     return;
 
-  I_StartRendering();
-
   if (setsizeneeded) {               // change the view size if needed
     R_ExecuteSetViewSize();
     oldgamestate = -1;            // force background redraw
@@ -301,6 +299,8 @@ void D_Display (fixed_t frac)
     wipe_StartScreen();
     R_ResetViewInterpolation();
   }
+
+  I_StartRendering();
 
   if (gamestate != GS_LEVEL) { // Not a level
     switch (oldgamestate) {

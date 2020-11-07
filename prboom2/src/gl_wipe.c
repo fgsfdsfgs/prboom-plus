@@ -47,6 +47,7 @@
 static GLuint wipe_scr_start_tex = 0;
 static GLuint wipe_scr_end_tex = 0;
 #ifdef __vita__
+static GLuint wipe_scr_end_fb = 0;
 static unsigned char *scr_buffer = NULL;
 #endif
 
@@ -90,8 +91,8 @@ int gld_wipe_doMelt(int ticks, int *y_lookup)
   total_h = gld_GetTexDimension(SCREENHEIGHT);
 
   fU1 = 0.0f;
-  fV1 = (float)SCREENHEIGHT / (float)total_h;
   fU2 = (float)SCREENWIDTH / (float)total_w;
+  fV1 = (float)SCREENHEIGHT / (float)total_h;
   fV2 = 0.0f;
   dU = 1.f / (float)total_w;
   
@@ -102,10 +103,18 @@ int gld_wipe_doMelt(int ticks, int *y_lookup)
 
   gld_glBegin(GL_TRIANGLE_STRIP);
   {
+#ifdef __vita__
+    // framebuffer texture is flipped
+    gld_glTexCoord2f(fU1, fV2); gld_glVertex2f(0.0f, 0.0f);
+    gld_glTexCoord2f(fU1, fV1); gld_glVertex2f(0.0f, (float)SCREENHEIGHT);
+    gld_glTexCoord2f(fU2, fV2); gld_glVertex2f((float)SCREENWIDTH, 0.0f);
+    gld_glTexCoord2f(fU2, fV1); gld_glVertex2f((float)SCREENWIDTH, (float)SCREENHEIGHT);
+#else
     gld_glTexCoord2f(fU1, fV1); gld_glVertex2f(0.0f, 0.0f);
     gld_glTexCoord2f(fU1, fV2); gld_glVertex2f(0.0f, (float)SCREENHEIGHT);
     gld_glTexCoord2f(fU2, fV1); gld_glVertex2f((float)SCREENWIDTH, 0.0f);
     gld_glTexCoord2f(fU2, fV2); gld_glVertex2f((float)SCREENWIDTH, (float)SCREENHEIGHT);
+#endif
   }
   gld_glEnd();
   
@@ -135,6 +144,14 @@ int gld_wipe_exitMelt(int ticks)
     glDeleteTextures(1, &wipe_scr_start_tex);
     wipe_scr_start_tex = 0;
   }
+#ifdef __vita__
+  if (wipe_scr_end_fb != 0)
+  {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &wipe_scr_end_fb);
+    wipe_scr_end_fb = 0;
+  }
+#endif
   if (wipe_scr_end_tex != 0)
   {
     glDeleteTextures(1, &wipe_scr_end_tex);
@@ -150,6 +167,16 @@ int gld_wipe_StartScreen(void)
 {
   wipe_scr_start_tex = CaptureScreenAsTexID();
 
+#ifdef __vita__
+  // switch render target to a framebuffer so we can use that as the end texture later
+  glGenTextures(1, &wipe_scr_end_tex);
+  glBindTexture(GL_TEXTURE_2D, wipe_scr_end_tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, scr_buffer);
+  glGenFramebuffers(1, &wipe_scr_end_fb);
+  glBindFramebuffer(GL_FRAMEBUFFER, wipe_scr_end_fb);
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, wipe_scr_end_tex, 0);
+#endif
+
   return 0;
 }
 
@@ -157,7 +184,12 @@ int gld_wipe_EndScreen(void)
 {
   I_StopRendering(1);
 
+#ifdef __vita__
+  // we're done rendering to a framebuffer, unbind it
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#else
   wipe_scr_end_tex = CaptureScreenAsTexID();
+#endif
 
   return 0;
 }
