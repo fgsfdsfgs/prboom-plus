@@ -524,6 +524,7 @@ void gld_DrawScreenSkybox(void)
       fU1 = fU2 + 1.0f / k;
     }
 
+    glDepthMask(GL_FALSE);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
 
@@ -545,6 +546,7 @@ void gld_DrawScreenSkybox(void)
 
     glEnable(GL_ALPHA_TEST);
     glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
   }
 }
 

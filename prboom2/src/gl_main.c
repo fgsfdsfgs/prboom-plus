@@ -3004,9 +3004,6 @@ void gld_DrawScene(player_t *player)
   }
 #endif
 
-  // solid geometry
-  glDisable(GL_ALPHA_TEST);
-
   // all the following items are opaque or masked
   glDisable(GL_BLEND);
 
@@ -3047,6 +3044,9 @@ void gld_DrawScene(player_t *player)
   //
   // opaque stuff
   //
+
+  // solid geometry
+  glDisable(GL_ALPHA_TEST);
 
   glBlendFunc(GL_ONE, GL_ZERO);
 
