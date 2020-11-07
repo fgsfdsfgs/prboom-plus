@@ -175,6 +175,10 @@ int gld_wipe_StartScreen(void)
   glGenFramebuffers(1, &wipe_scr_end_fb);
   glBindFramebuffer(GL_FRAMEBUFFER, wipe_scr_end_fb);
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, wipe_scr_end_tex, 0);
+  vglStartRendering();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  vglStopRendering();
+  glFinish();
 #endif
 
   return 0;
