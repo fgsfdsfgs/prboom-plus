@@ -689,7 +689,7 @@ void SetTextureMode(tex_mode_e type)
 
 #ifdef __vita__
 
-#define MAX_VERTICES 16384
+#define MAX_VERTICES 32768
 
 static unsigned short *vtx_idx;
 static float *vtx_pos, *vtx_posptr, *vtx_posstart;
