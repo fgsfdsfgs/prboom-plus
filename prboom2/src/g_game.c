@@ -2129,6 +2129,7 @@ void G_DoLoadGame(void)
   // draw the pattern into the back screen
   I_StartRendering ();
   R_FillBackScreen ();
+  I_StopRendering (1);
 
   /* killough 12/98: support -recordfrom and -loadgame -playdemo */
   if (!command_loadgame)

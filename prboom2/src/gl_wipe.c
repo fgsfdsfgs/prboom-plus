@@ -171,14 +171,10 @@ int gld_wipe_StartScreen(void)
   // switch render target to a framebuffer so we can use that as the end texture later
   glGenTextures(1, &wipe_scr_end_tex);
   glBindTexture(GL_TEXTURE_2D, wipe_scr_end_tex);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, scr_buffer);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
   glGenFramebuffers(1, &wipe_scr_end_fb);
   glBindFramebuffer(GL_FRAMEBUFFER, wipe_scr_end_fb);
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, wipe_scr_end_tex, 0);
-  vglStartRendering();
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  vglStopRendering();
-  glFinish();
 #endif
 
   return 0;
