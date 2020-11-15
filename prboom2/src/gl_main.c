@@ -531,6 +531,8 @@ void gld_MapDrawSubsectors(player_t *plr, int fx, int fy, fixed_t mx, fixed_t my
   glScissor(fx, SCREENHEIGHT - (fy + fh), fw, fh);
   glEnable(GL_SCISSOR_TEST);
 
+  gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
+
   if (automapmode & am_rotate)
   {
     float pivotx = (float)(fx + fw / 2);
@@ -823,6 +825,8 @@ void gld_DrawLine_f(float x0, float y0, float x1, float y1, int BaseColor)
   dx *= t;
   dy *= t;
 
+  gld_EnableTexture2D(GL_TEXTURE0_ARB, false);
+
   gld_glColor4f((float)playpal[3*BaseColor]/255.0f,
             (float)playpal[3*BaseColor+1]/255.0f,
             (float)playpal[3*BaseColor+2]/255.0f,
@@ -833,6 +837,8 @@ void gld_DrawLine_f(float x0, float y0, float x1, float y1, int BaseColor)
     gld_glVertex2f( x0 + dx, y0 + dy);
     gld_glVertex2f( x1 + dx, y1 + dy);
   gld_glEnd();
+
+  gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
 #elif defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
   unsigned char r, g, b, a;
   map_line_t *line;
