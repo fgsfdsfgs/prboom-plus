@@ -272,25 +272,25 @@ void gld_StaticLightAlpha(float light, float alpha)
   if (!player->fixedcolormap)
   {
     float ll = (shaders ? 1.0f : light);
-    gld_glColor4f(ll, ll, ll, alpha);
+    glColor4f(ll, ll, ll, alpha);
   }
   else
   {
     if (!(invul_method & INVUL_BW))
     {
-      gld_glColor4f(1.0f, 1.0f, 1.0f, alpha);
+      glColor4f(1.0f, 1.0f, 1.0f, alpha);
     }
     else
     {
 #ifdef USE_FBO_TECHNIQUE
       if (SceneInTexture)
       {
-        gld_glColor4f(0.5f, 0.5f, 0.5f, alpha);
+        glColor4f(0.5f, 0.5f, 0.5f, alpha);
       }
       else
 #endif
       {
-        gld_glColor4f(bw_red, bw_green, bw_blue, alpha);
+        glColor4f(bw_red, bw_green, bw_blue, alpha);
       }
     }
   }

@@ -316,16 +316,16 @@ void gld_SetupFloodStencil(GLWall *wall)
   glStencilOp(GL_KEEP, GL_KEEP, GL_INCR); // increment stencil of valid pixels
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); // don't write to the graphics buffer
   gld_EnableTexture2D(GL_TEXTURE0_ARB, false);
-  gld_glColor3f(1, 1, 1);
+  glColor3f(1, 1, 1);
   glEnable(GL_DEPTH_TEST);
   glDepthMask(true);
 
-  gld_glBegin(GL_TRIANGLE_FAN);
-  gld_glVertex3f(wall->glseg->x1, wall->ytop, wall->glseg->z1);
-  gld_glVertex3f(wall->glseg->x1, wall->ybottom, wall->glseg->z1);
-  gld_glVertex3f(wall->glseg->x2, wall->ybottom, wall->glseg->z2);
-  gld_glVertex3f(wall->glseg->x2, wall->ytop, wall->glseg->z2);
-  gld_glEnd();
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex3f(wall->glseg->x1, wall->ytop, wall->glseg->z1);
+  glVertex3f(wall->glseg->x1, wall->ybottom, wall->glseg->z1);
+  glVertex3f(wall->glseg->x2, wall->ybottom, wall->glseg->z2);
+  glVertex3f(wall->glseg->x2, wall->ytop, wall->glseg->z2);
+  glEnd();
 
   glStencilFunc(GL_EQUAL, recursion+1, ~0); // draw sky into stencil
   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);   // this stage doesn't modify the stencil
@@ -343,14 +343,14 @@ void gld_ClearFloodStencil(GLWall *wall)
   glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
   gld_EnableTexture2D(GL_TEXTURE0_ARB, false);
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); // don't write to the graphics buffer
-  gld_glColor3f(1, 1, 1);
+  glColor3f(1, 1, 1);
 
-  gld_glBegin(GL_TRIANGLE_FAN);
-  gld_glVertex3f(wall->glseg->x1, wall->ytop, wall->glseg->z1);
-  gld_glVertex3f(wall->glseg->x1, wall->ybottom, wall->glseg->z1);
-  gld_glVertex3f(wall->glseg->x2, wall->ybottom, wall->glseg->z2);
-  gld_glVertex3f(wall->glseg->x2, wall->ytop, wall->glseg->z2);
-  gld_glEnd();
+  glBegin(GL_TRIANGLE_FAN);
+  glVertex3f(wall->glseg->x1, wall->ytop, wall->glseg->z1);
+  glVertex3f(wall->glseg->x1, wall->ybottom, wall->glseg->z1);
+  glVertex3f(wall->glseg->x2, wall->ybottom, wall->glseg->z2);
+  glVertex3f(wall->glseg->x2, wall->ytop, wall->glseg->z2);
+  glEnd();
 
   // restore old stencil op.
   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);

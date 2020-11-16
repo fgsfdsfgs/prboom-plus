@@ -113,7 +113,6 @@ int gl_colorbuffer_bits=16;
 int gl_depthbuffer_bits=16;
 
 extern void M_QuitDOOM(int choice);
-extern void gld_ResetWrapper(void);
 int use_fullscreen;
 int desired_fullscreen;
 int render_vsync;
@@ -583,9 +582,6 @@ void I_StopRendering(int wait)
   {
     in_render_frame = 0;
     vglStopRendering();
-#ifdef GL_DOOM
-    gld_ResetWrapper();
-#endif
   }
 #endif
 #ifdef GL_DOOM
@@ -670,16 +666,18 @@ void I_FinishUpdate (void)
   // Make sure the pillarboxes are kept clear each frame.
   glClear(GL_COLOR_BUFFER_BIT);
 
+  glColor4f(1.f, 1.f, 1.f, 1.f);
+
   // Draw our buffer to screen, possibly upscaling it.
-  glBegin(GL_QUADS);
-    glTexCoord2i(0, 0);
-    glVertex3f(dst_rect.x, dst_rect.y, 0);
-    glTexCoord2i(1, 0);
-    glVertex3f(dst_rect.x + dst_rect.w, dst_rect.y, 0);
-    glTexCoord2i(1, 1);
-    glVertex3f(dst_rect.x + dst_rect.w, dst_rect.y + dst_rect.h, 0);
-    glTexCoord2i(0, 1);
-    glVertex3f(dst_rect.x, dst_rect.y + dst_rect.h, 0);
+  glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.f, 0.f);
+    glVertex3f(dst_rect.x, dst_rect.y, 0.f);
+    glTexCoord2f(1.f, 0.f);
+    glVertex3f(dst_rect.x + dst_rect.w, dst_rect.y, 0.f);
+    glTexCoord2f(1.f, 1.f);
+    glVertex3f(dst_rect.x + dst_rect.w, dst_rect.y + dst_rect.h, 0.f);
+    glTexCoord2f(0.f, 1.f);
+    glVertex3f(dst_rect.x, dst_rect.y + dst_rect.h, 0.f);
   glEnd();
 
   I_StopRendering(0);
@@ -1380,6 +1378,9 @@ void I_UpdateVideoMode(void)
     // is fucking slow
     vglUseVram(GL_TRUE);
 
+    // allocate enough vertices for more than one quad
+    vglSetImmediateBufferSize(32768);
+
     glClearColor(0, 0, 0, 0);
 
     // clear matrices possibly stuck there from previous usage of sw modes
@@ -1435,6 +1436,9 @@ void I_UpdateVideoMode(void)
       buffer = SDL_CreateRGBSurface(0, SCREENWIDTH, SCREENHEIGHT, 32, 0, 0, 0, 0);
       SDL_FillRect(buffer, NULL, 0);
     }
+
+    // we only need enough for 1 quad, but allocate a bit more just in case
+    vglSetImmediateBufferSize(256);
 
     // we're gonna be drawing fullscreen quads, so set normal orthographic projection
     glClearColor(0, 0, 0, 0);

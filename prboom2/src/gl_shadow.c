@@ -116,20 +116,20 @@ void gld_InitShadows(void)
 
 static void gld_DrawShadow(GLShadow *shadow)
 {
-  gld_glColor3f(shadow->light, shadow->light, shadow->light);
+  glColor3f(shadow->light, shadow->light, shadow->light);
 
-  gld_glBegin(GL_TRIANGLE_FAN);
+  glBegin(GL_TRIANGLE_FAN);
 
-  gld_glTexCoord2f(1.0f, 0.0f);
-  gld_glVertex3f(shadow->x + shadow->radius, shadow->z, shadow->y - shadow->radius);
-  gld_glTexCoord2f(0.0f, 0.0f);
-  gld_glVertex3f(shadow->x - shadow->radius, shadow->z, shadow->y - shadow->radius);
-  gld_glTexCoord2f(0.0f, 1.0f);
-  gld_glVertex3f(shadow->x - shadow->radius, shadow->z, shadow->y + shadow->radius);
-  gld_glTexCoord2f(1.0f, 1.0f);
-  gld_glVertex3f(shadow->x + shadow->radius, shadow->z, shadow->y + shadow->radius);
+  glTexCoord2f(1.0f, 0.0f);
+  glVertex3f(shadow->x + shadow->radius, shadow->z, shadow->y - shadow->radius);
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex3f(shadow->x - shadow->radius, shadow->z, shadow->y - shadow->radius);
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex3f(shadow->x - shadow->radius, shadow->z, shadow->y + shadow->radius);
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex3f(shadow->x + shadow->radius, shadow->z, shadow->y + shadow->radius);
 
-  gld_glEnd();
+  glEnd();
 }
 
 //===========================================================================

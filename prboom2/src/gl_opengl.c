@@ -689,113 +689,6 @@ void SetTextureMode(tex_mode_e type)
 
 #ifdef __vita__
 
-#define MAX_VERTICES 32768
-
-static unsigned short *vtx_idx;
-static float *vtx_pos, *vtx_posptr, *vtx_posstart;
-static float *vtx_tex, *vtx_texptr, *vtx_texstart;
-static float *vtx_col, *vtx_colptr, *vtx_colstart;
-static float *vtx_tmp, *vtx_tmpptr, *vtx_tmpstart;
-static float vtx_curcol[4] = { 1.f, 1.f, 1.f, 1.f };
-static int vtx_num = 0;
-static GLenum vtx_curprim = 0;
-
-void gld_ResetWrapper(void)
-{
-  vtx_posptr = vtx_posstart = vtx_pos;
-  vtx_texptr = vtx_texstart = vtx_tex;
-  vtx_colptr = vtx_colstart = vtx_col;
-  vtx_tmpptr = vtx_tmpstart = vtx_tmp;
-}
-
-void gld_glBegin(GLenum prim)
-{
-  if (vtx_pos == NULL)
-  {
-    unsigned int i;
-    vtx_pos = malloc(sizeof(float) * 3 * MAX_VERTICES);
-    vtx_tex = malloc(sizeof(float) * 2 * MAX_VERTICES);
-    vtx_col = malloc(sizeof(float) * 4 * MAX_VERTICES);
-    vtx_tmp = malloc(sizeof(float) * 4 * MAX_VERTICES);
-    vtx_idx = malloc(sizeof(short) * 1 * MAX_VERTICES);
-    if (!vtx_pos || !vtx_tex || !vtx_col || !vtx_idx || !vtx_tmp)
-      I_Error("could not allocate vertex buffers");
-    for (i = 0; i < MAX_VERTICES; ++i)
-      vtx_idx[i] = i; // indices are always sequential here
-    gld_ResetWrapper();
-  }
-
-  vtx_num = 0;
-  vtx_curprim = prim;
-}
-
-void gld_glVertex2f(float x, float y) { gld_glVertex3f(x, y, 0.f); }
-void gld_glVertex2i(int x, int y) { gld_glVertex3f(x, y, 0.f); }
-void gld_glVertex3fv(const float *v) { gld_glVertex3f(v[0], v[1], v[2]); }
-void gld_glVertex3f(float x, float y, float z)
-{
-  *(vtx_colptr++) = vtx_curcol[0];
-  *(vtx_colptr++) = vtx_curcol[1];
-  *(vtx_colptr++) = vtx_curcol[2];
-  *(vtx_colptr++) = vtx_curcol[3];
-  *(vtx_posptr++) = x;
-  *(vtx_posptr++) = y;
-  *(vtx_posptr++) = z;
-  vtx_num++;
-}
-
-void gld_glTexCoord2fv(const float *v) { gld_glTexCoord2f(v[0], v[1]); }
-void gld_glTexCoord2f(float u, float v)
-{
-  *(vtx_texptr++) = u;
-  *(vtx_texptr++) = v;
-}
-
-void gld_glColor3f(float r, float g, float b) { gld_glColor4f(r, g, b, 1.f); }
-void gld_glColor4fv(const float *v) { gld_glColor4f(v[0], v[1], v[2], v[3]); }
-void gld_glColor4ubv(const unsigned char *v) { gld_glColor4f(v[0] / 255.f, v[1] / 255.f, v[2] / 255.f, v[3] / 255.f); }
-void gld_glColor4f(float r, float g, float b, float a)
-{
-  vtx_curcol[0] = r;
-  vtx_curcol[1] = g;
-  vtx_curcol[2] = b;
-  vtx_curcol[3] = a;
-}
-
-void gld_glEnd(void)
-{
-  if (!vtx_num || !vtx_curprim)
-    return;
-
-  vglIndexPointerMapped(vtx_idx);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  vglVertexPointerMapped(vtx_posstart);
-  glEnableClientState(GL_COLOR_ARRAY);
-  vglColorPointerMapped(GL_FLOAT, vtx_colstart);
-  if (vtx_texptr != vtx_texstart)
-  {
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    vglTexCoordPointerMapped(vtx_texstart);
-  }
-  else
-  {
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  }
-
-  vglDrawObjects(vtx_curprim, vtx_num, GL_TRUE);
-
-  if (vtx_texptr != vtx_texstart)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
-
-  vtx_curprim = 0;
-  vtx_num = 0;
-  vtx_posstart = vtx_posptr;
-  vtx_colstart = vtx_colptr;
-  vtx_texstart = vtx_texptr;
-}
-
 // custom array drawing functions
 
 static struct VtxArray
@@ -853,71 +746,37 @@ void gld_glDisableClientState(GLenum array)
 
 void gld_glDrawArrays(GLenum mode, GLint first, GLsizei count)
 {
-  int i;
-
-  vglIndexPointerMapped(vtx_idx);
-
-  // bind colors if enabled, otherwise fill with current color and enable anyway
-  glEnableClientState(GL_COLOR_ARRAY);
-  if (vtx_arrays[1].enabled)
-  {
-    vglColorPointer(vtx_arrays[1].size, vtx_arrays[1].type, vtx_arrays[1].stride,
-      count, vtx_arrays[1].ptr + first * vtx_arrays[1].stride);
-  }
-  else
-  {
-    for (i = 0; i < count; ++i)
-    {
-      *(vtx_tmpptr++) = vtx_curcol[0];
-      *(vtx_tmpptr++) = vtx_curcol[1];
-      *(vtx_tmpptr++) = vtx_curcol[2];
-      *(vtx_tmpptr++) = vtx_curcol[3];
-    }
-    vglColorPointerMapped(GL_FLOAT, vtx_tmpstart);
-    vtx_tmpstart = vtx_tmpptr;
-  }
-
   if (vtx_arrays[2].enabled)
   {
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     vglTexCoordPointer(vtx_arrays[2].size, vtx_arrays[2].type, vtx_arrays[2].stride,
       count, vtx_arrays[2].ptr + first * vtx_arrays[2].stride);
   }
-  else
+
+  if (vtx_arrays[1].enabled)
   {
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    vglColorPointer(vtx_arrays[1].size, vtx_arrays[1].type, vtx_arrays[1].stride,
+      count, vtx_arrays[1].ptr + first * vtx_arrays[1].stride);
   }
 
   // bind vertices and draw
   if (vtx_arrays[0].enabled)
   {
     glEnableClientState(GL_VERTEX_ARRAY);
+    vglIndexPointerImmediate();
     vglVertexPointer(vtx_arrays[0].size, vtx_arrays[0].type, vtx_arrays[0].stride,
       count, vtx_arrays[0].ptr + first * vtx_arrays[0].stride);
     vglDrawObjects(mode, count, GL_TRUE);
     glDisableClientState(GL_VERTEX_ARRAY);
   }
 
-  if (vtx_arrays[2].enabled)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
 }
 
 #else
 
-void gld_ResetWrapper(void) { }
-void gld_glBegin(GLenum prim) { glBegin(prim); }
-void gld_glVertex2f(float x, float y) { glVertex2f(x, y); }
-void gld_glVertex2i(int x, int y) { glVertex2i(x, y); }
-void gld_glVertex3f(float x, float y, float z) { glVertex3f(x, y, z); }
-void gld_glVertex3fv(const float *v) { glVertex3fv(v); }
-void gld_glTexCoord2f(float u, float v) { glTexCoord2f(u, v); }
-void gld_glTexCoord2fv(const float *v) { glTexCoord2fv(v); }
-void gld_glColor3f(float r, float g, float b) { glColor3f(r, g, b); }
-void gld_glColor4f(float r, float g, float b, float a) { glColor4f(r, g, b, a); }
-void gld_glColor4fv(const float *v) { glColor4fv(v); }
-void gld_glColor4ubv(const unsigned char *v) { glColor4ubv(v); }
-void gld_glEnd(void) { glEnd(); }
 void gld_glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) { glVertexPointer(size, type, stride, pointer); }
 void gld_glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) { glColorPointer(size, type, stride, pointer); }
 void gld_glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) { glTexCoordPointer(size, type, stride, pointer); }
@@ -926,4 +785,3 @@ void gld_glDisableClientState(GLenum array) { glDisableClientState(array); }
 void gld_glDrawArrays(GLenum mode, GLint first, GLsizei count) { glDrawArrays(mode, first, count); }
 
 #endif
-

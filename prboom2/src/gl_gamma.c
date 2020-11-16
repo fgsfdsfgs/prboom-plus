@@ -229,13 +229,13 @@ void gld_BlendFakeGamma(void)
   glDisable(GL_ALPHA_TEST);
   glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
 
-  gld_glColor4f(1.f, 1.f, 1.f, gammaf);
-  gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glVertex3f(0.f, 0.f, 0.f);
-    gld_glVertex3f(SCREENWIDTH, 0.f, 0.f);
-    gld_glVertex3f(0.f, SCREENHEIGHT, 0.f);
-    gld_glVertex3f(SCREENWIDTH, SCREENHEIGHT, 0.f);
-  gld_glEnd();
+  glColor4f(1.f, 1.f, 1.f, gammaf);
+  glBegin(GL_TRIANGLE_STRIP);
+    glVertex3f(0.f, 0.f, 0.f);
+    glVertex3f(SCREENWIDTH, 0.f, 0.f);
+    glVertex3f(0.f, SCREENHEIGHT, 0.f);
+    glVertex3f(SCREENWIDTH, SCREENHEIGHT, 0.f);
+  glEnd();
 
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   glEnable(GL_ALPHA_TEST);

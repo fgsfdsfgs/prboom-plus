@@ -292,25 +292,12 @@ void gld_EnableClientCoordArray(GLenum texture, int enable);
 void gld_EnableMultisample(int enable);
 
 // wrappers
-void gld_glBegin(GLenum prim);
-void gld_glVertex2f(float x, float y);
-void gld_glVertex2i(int x, int y);
-void gld_glVertex3f(float x, float y, float z);
-void gld_glVertex3fv(const float *v);
-void gld_glTexCoord2f(float u, float v);
-void gld_glTexCoord2fv(const float *v);
-void gld_glColor3f(float r, float g, float b);
-void gld_glColor4f(float r, float g, float b, float a);
-void gld_glColor4fv(const float *v);
-void gld_glColor4ubv(const unsigned char *v);
-void gld_glEnd(void);
 void gld_glVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
 void gld_glColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
 void gld_glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
 void gld_glEnableClientState(GLenum array);
 void gld_glDisableClientState(GLenum array);
 void gld_glDrawArrays(GLenum mode, GLint first, GLsizei count);
-void gld_ResetWrapper(void);
 
 typedef enum
 {

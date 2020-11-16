@@ -131,12 +131,12 @@ void gld_DrawFakeSkyStrips(void)
   {
     GLWall* wall = gld_drawinfo.items[GLDIT_SWALL][i].item.wall;
 
-    gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glVertex3f(wall->glseg->x1,wall->ytop,wall->glseg->z1);
-    gld_glVertex3f(wall->glseg->x1,wall->ybottom,wall->glseg->z1);
-    gld_glVertex3f(wall->glseg->x2,wall->ytop,wall->glseg->z2);
-    gld_glVertex3f(wall->glseg->x2,wall->ybottom,wall->glseg->z2);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_STRIP);
+    glVertex3f(wall->glseg->x1,wall->ytop,wall->glseg->z1);
+    glVertex3f(wall->glseg->x1,wall->ybottom,wall->glseg->z1);
+    glVertex3f(wall->glseg->x2,wall->ytop,wall->glseg->z2);
+    glVertex3f(wall->glseg->x2,wall->ybottom,wall->glseg->z2);
+    glEnd();
   }
 
   gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
@@ -278,7 +278,7 @@ void gld_DrawStripsSky(void)
     glEnable(GL_TEXTURE_GEN_T);
     glEnable(GL_TEXTURE_GEN_Q);
     if (comp[comp_skymap] || !(invul_method & INVUL_BW))
-      gld_glColor4fv(gl_whitecolor);
+      glColor4fv(gl_whitecolor);
 
     SetTextureMode(TM_OPAQUE);
   }
@@ -301,7 +301,7 @@ void gld_DrawStripsSky(void)
 
     if (!gltexture)
     {
-      gld_glColor4f(1.0f,0.0f,0.0f,1.0f);
+      glColor4f(1.0f,0.0f,0.0f,1.0f);
     }
 
     if (gltexture)
@@ -320,16 +320,16 @@ void gld_DrawStripsSky(void)
       float r = (float)(wall->seg->sidedef - sides) / (float)(numsides - 1); 
       float g = (float)wall->seg->linedef->iLineID / (float)(numlines - 1); 
       float b = (float)i / (float)(gld_drawinfo.num_items[GLDIT_SWALL] - 1);
-      gld_glColor4f(r, g, b, 1.0f);
+      glColor4f(r, g, b, 1.0f);
     }
 #endif
 
-    gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glVertex3f(wall->glseg->x1,wall->ytop,wall->glseg->z1);
-    gld_glVertex3f(wall->glseg->x1,wall->ybottom,wall->glseg->z1);
-    gld_glVertex3f(wall->glseg->x2,wall->ytop,wall->glseg->z2);
-    gld_glVertex3f(wall->glseg->x2,wall->ybottom,wall->glseg->z2);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_STRIP);
+    glVertex3f(wall->glseg->x1,wall->ytop,wall->glseg->z1);
+    glVertex3f(wall->glseg->x1,wall->ybottom,wall->glseg->z1);
+    glVertex3f(wall->glseg->x2,wall->ytop,wall->glseg->z2);
+    glVertex3f(wall->glseg->x2,wall->ybottom,wall->glseg->z2);
+    glEnd();
 
     if (gltexture)
     {
@@ -375,22 +375,22 @@ void gld_DrawSkyCaps(void)
 
       if (SkyBox.type & SKY_CEILING)
       {
-        gld_glBegin(GL_TRIANGLE_STRIP);
-        gld_glVertex3f(-MAXCOORD,+MAXCOORD,+MAXCOORD);
-        gld_glVertex3f(+MAXCOORD,+MAXCOORD,+MAXCOORD);
-        gld_glVertex3f(-MAXCOORD,+MAXCOORD,-MAXCOORD);
-        gld_glVertex3f(+MAXCOORD,+MAXCOORD,-MAXCOORD);
-        gld_glEnd();
+        glBegin(GL_TRIANGLE_STRIP);
+        glVertex3f(-MAXCOORD,+MAXCOORD,+MAXCOORD);
+        glVertex3f(+MAXCOORD,+MAXCOORD,+MAXCOORD);
+        glVertex3f(-MAXCOORD,+MAXCOORD,-MAXCOORD);
+        glVertex3f(+MAXCOORD,+MAXCOORD,-MAXCOORD);
+        glEnd();
       }
 
       if (SkyBox.type & SKY_FLOOR)
       {
-        gld_glBegin(GL_TRIANGLE_STRIP);
-        gld_glVertex3f(-MAXCOORD,-MAXCOORD,+MAXCOORD);
-        gld_glVertex3f(+MAXCOORD,-MAXCOORD,+MAXCOORD);
-        gld_glVertex3f(-MAXCOORD,-MAXCOORD,-MAXCOORD);
-        gld_glVertex3f(+MAXCOORD,-MAXCOORD,-MAXCOORD);
-        gld_glEnd();
+        glBegin(GL_TRIANGLE_STRIP);
+        glVertex3f(-MAXCOORD,-MAXCOORD,+MAXCOORD);
+        glVertex3f(+MAXCOORD,-MAXCOORD,+MAXCOORD);
+        glVertex3f(-MAXCOORD,-MAXCOORD,-MAXCOORD);
+        glVertex3f(+MAXCOORD,-MAXCOORD,-MAXCOORD);
+        glEnd();
       }
 
       glPopMatrix();
@@ -479,12 +479,12 @@ void gld_DrawScreenSkybox(void)
     {
       GLWall* wall = gld_drawinfo.items[GLDIT_SWALL][i].item.wall;
 
-      gld_glBegin(GL_TRIANGLE_STRIP);
-      gld_glVertex3f(wall->glseg->x1,wall->ytop,wall->glseg->z1);
-      gld_glVertex3f(wall->glseg->x1,wall->ybottom,wall->glseg->z1);
-      gld_glVertex3f(wall->glseg->x2,wall->ytop,wall->glseg->z2);
-      gld_glVertex3f(wall->glseg->x2,wall->ybottom,wall->glseg->z2);
-      gld_glEnd();
+      glBegin(GL_TRIANGLE_STRIP);
+      glVertex3f(wall->glseg->x1,wall->ytop,wall->glseg->z1);
+      glVertex3f(wall->glseg->x1,wall->ybottom,wall->glseg->z1);
+      glVertex3f(wall->glseg->x2,wall->ytop,wall->glseg->z2);
+      glVertex3f(wall->glseg->x2,wall->ybottom,wall->glseg->z2);
+      glEnd();
     }
 
     gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
@@ -532,15 +532,15 @@ void gld_DrawScreenSkybox(void)
     glPushMatrix();
     glLoadIdentity();
 
-    gld_glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     gld_BindTexture(wall->gltexture, 0);
     w = 160.0f * SCREENWIDTH / WIDE_SCREENWIDTH;
-    gld_glBegin(GL_TRIANGLE_STRIP);
-      gld_glTexCoord2f(fU1, fV1); gld_glVertex3f(-w, +100.5f, -screen_skybox_zplane);
-      gld_glTexCoord2f(fU1, fV2); gld_glVertex3f(-w, -100.5f, -screen_skybox_zplane);
-      gld_glTexCoord2f(fU2, fV1); gld_glVertex3f(+w, +100.5f, -screen_skybox_zplane);
-      gld_glTexCoord2f(fU2, fV2); gld_glVertex3f(+w, -100.5f, -screen_skybox_zplane);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_STRIP);
+      glTexCoord2f(fU1, fV1); glVertex3f(-w, +100.5f, -screen_skybox_zplane);
+      glTexCoord2f(fU1, fV2); glVertex3f(-w, -100.5f, -screen_skybox_zplane);
+      glTexCoord2f(fU2, fV1); glVertex3f(+w, +100.5f, -screen_skybox_zplane);
+      glTexCoord2f(fU2, fV2); glVertex3f(+w, -100.5f, -screen_skybox_zplane);
+    glEnd();
 
     glPopMatrix();
 
@@ -886,18 +886,18 @@ static void RenderDome(SkyBoxParams_t *sky)
 #else
       {
         int k;
-        gld_glBegin(loop->mode);
+        glBegin(loop->mode);
         for (k = loop->vertexindex; k < (loop->vertexindex + loop->vertexcount); k++)
         {
           vbo_vertex_t *v = &vbo->data[k];
           if (loop->use_texture)
           {
-            gld_glTexCoord2fv((GLfloat*)&v->u);
+            glTexCoord2fv((GLfloat*)&v->u);
           }
-          gld_glColor4ubv((GLubyte*)&v->r);
-          gld_glVertex3fv((GLfloat*)&v->x);
+          glColor4ubv((GLubyte*)&v->r);
+          glVertex3fv((GLfloat*)&v->x);
         }
-        gld_glEnd();
+        glEnd();
       }
 #endif
     }
@@ -906,7 +906,7 @@ static void RenderDome(SkyBoxParams_t *sky)
   glScalef(1.0f, 1.0f, 1.0f);
 
   // current color is undefined after gld_glDrawArrays
-  gld_glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 #if defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
   if (gl_ext_arb_vertex_buffer_object)
@@ -1156,58 +1156,58 @@ int gld_DrawBoxSkyBox(void)
     // north
     gld_BindFace(sb, 0);
 
-    gld_glBegin(GL_TRIANGLE_FAN);
-    gld_glTexCoord2f(0.0f, 0.0f);
-    gld_glVertex3f(+MAXCOORD, MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(1.0f, 0.0f);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(1.0f, 1.0f);
-    gld_glVertex3f(-MAXCOORD, -MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(0.0f, 1.0f);
-    gld_glVertex3f(+MAXCOORD, -MAXCOORD, -MAXCOORD);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(+MAXCOORD, MAXCOORD, -MAXCOORD);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(-MAXCOORD, -MAXCOORD, -MAXCOORD);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(+MAXCOORD, -MAXCOORD, -MAXCOORD);
+    glEnd();
 
     // east
     gld_BindFace(sb, 1);
 
-    gld_glBegin(GL_TRIANGLE_FAN);
-    gld_glTexCoord2f(0.0f, 0.0f);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(1.0f, 0.0f);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(1.0f, 1.0f);
-    gld_glVertex3f(-MAXCOORD, -MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(0.0f, 1.0f);
-    gld_glVertex3f(-MAXCOORD, -MAXCOORD, -MAXCOORD);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(-MAXCOORD, -MAXCOORD, +MAXCOORD);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-MAXCOORD, -MAXCOORD, -MAXCOORD);
+    glEnd();
 
     // south
     gld_BindFace(sb, 2);
 
-    gld_glBegin(GL_TRIANGLE_FAN);
-    gld_glTexCoord2f(0.0f, 0.0f);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(1.0f, 0.0f);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(1.0f, 1.0f);
-    gld_glVertex3f(+MAXCOORD, -MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(0.0f, 1.0f);
-    gld_glVertex3f(-MAXCOORD, -MAXCOORD, +MAXCOORD);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(+MAXCOORD, -MAXCOORD, +MAXCOORD);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-MAXCOORD, -MAXCOORD, +MAXCOORD);
+    glEnd();
 
     // west
     gld_BindFace(sb, 3);
 
-    gld_glBegin(GL_TRIANGLE_FAN);
-    gld_glTexCoord2f(0.0f, 0.0f);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(1.0f, 0.0f);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(1.0f, 1.0f);
-    gld_glVertex3f(+MAXCOORD, -MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(0.0f, 1.0f);
-    gld_glVertex3f(+MAXCOORD, -MAXCOORD, +MAXCOORD);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(+MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(+MAXCOORD, -MAXCOORD, -MAXCOORD);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(+MAXCOORD, -MAXCOORD, +MAXCOORD);
+    glEnd();
   }
   else
   {
@@ -1216,94 +1216,94 @@ int gld_DrawBoxSkyBox(void)
     // all 4 sides
     gld_BindFace(sb, 0);
 
-    gld_glBegin(GL_TRIANGLE_FAN);
-    gld_glTexCoord2f(0.0f, 0.0f);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(.25f, 0);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(.25f, 1);
-    gld_glVertex3f(-MAXCOORD, -MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(0.0f, 1.0f);
-    gld_glVertex3f(+MAXCOORD, -MAXCOORD, -MAXCOORD);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(+MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(.25f, 0);
+    glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(.25f, 1);
+    glVertex3f(-MAXCOORD, -MAXCOORD, -MAXCOORD);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(+MAXCOORD, -MAXCOORD, -MAXCOORD);
+    glEnd();
 
     // east
-    gld_glBegin(GL_TRIANGLE_FAN);
-    gld_glTexCoord2f(.25f, 0);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(.5f, 0);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(.5f, 1);
-    gld_glVertex3f(-MAXCOORD, -MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(.25f, 1);
-    gld_glVertex3f(-MAXCOORD, -MAXCOORD, -MAXCOORD);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(.25f, 0);
+    glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(.5f, 0);
+    glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(.5f, 1);
+    glVertex3f(-MAXCOORD, -MAXCOORD, +MAXCOORD);
+    glTexCoord2f(.25f, 1);
+    glVertex3f(-MAXCOORD, -MAXCOORD, -MAXCOORD);
+    glEnd();
 
     // south
-    gld_glBegin(GL_TRIANGLE_FAN);
-    gld_glTexCoord2f(.5f, 0);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(.75f, 0);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(.75f, 1);
-    gld_glVertex3f(+MAXCOORD, -MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(.5f, 1);
-    gld_glVertex3f(-MAXCOORD, -MAXCOORD, +MAXCOORD);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(.5f, 0);
+    glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(.75f, 0);
+    glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(.75f, 1);
+    glVertex3f(+MAXCOORD, -MAXCOORD, +MAXCOORD);
+    glTexCoord2f(.5f, 1);
+    glVertex3f(-MAXCOORD, -MAXCOORD, +MAXCOORD);
+    glEnd();
 
     // west
-    gld_glBegin(GL_TRIANGLE_FAN);
-    gld_glTexCoord2f(.75f, 0);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(1.0f, 0.0f);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(1.0f, 1.0f);
-    gld_glVertex3f(+MAXCOORD, -MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(.75f, 1);
-    gld_glVertex3f(+MAXCOORD, -MAXCOORD, +MAXCOORD);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(.75f, 0);
+    glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(+MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(+MAXCOORD, -MAXCOORD, -MAXCOORD);
+    glTexCoord2f(.75f, 1);
+    glVertex3f(+MAXCOORD, -MAXCOORD, +MAXCOORD);
+    glEnd();
   }
 
   // top
   gld_BindFace(sb, faces);
-  gld_glBegin(GL_TRIANGLE_FAN);
+  glBegin(GL_TRIANGLE_FAN);
   if (!sb->fliptop)
   {
-    gld_glTexCoord2f(0.0f, 0.0f);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(1.0f, 0.0f);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(1.0f, 1.0f);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(0.0f, 1.0f);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(+MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
   }
   else
   {
-    gld_glTexCoord2f(0.0f, 0.0f);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(1.0f, 0.0f);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
-    gld_glTexCoord2f(1.0f, 1.0f);
-    gld_glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
-    gld_glTexCoord2f(0.0f, 1.0f);
-    gld_glVertex3f(+MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(+MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-MAXCOORD, +MAXCOORD, +MAXCOORD);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(-MAXCOORD, +MAXCOORD, -MAXCOORD);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(+MAXCOORD, +MAXCOORD, -MAXCOORD);
   }
-  gld_glEnd();
+  glEnd();
 
   // bottom
   gld_BindFace(sb, faces + 1);
 
-  gld_glBegin(GL_TRIANGLE_FAN);
-  gld_glTexCoord2f(0.0f, 0.0f);
-  gld_glVertex3f(+MAXCOORD, -MAXCOORD, -MAXCOORD);
-  gld_glTexCoord2f(1.0f, 0.0f);
-  gld_glVertex3f(-MAXCOORD, -MAXCOORD, -MAXCOORD);
-  gld_glTexCoord2f(1.0f, 1.0f);
-  gld_glVertex3f(-MAXCOORD, -MAXCOORD, +MAXCOORD);
-  gld_glTexCoord2f(0.0f, 1.0f);
-  gld_glVertex3f(+MAXCOORD, -MAXCOORD, +MAXCOORD);
-  gld_glEnd();
+  glBegin(GL_TRIANGLE_FAN);
+  glTexCoord2f(0.0f, 0.0f);
+  glVertex3f(+MAXCOORD, -MAXCOORD, -MAXCOORD);
+  glTexCoord2f(1.0f, 0.0f);
+  glVertex3f(-MAXCOORD, -MAXCOORD, -MAXCOORD);
+  glTexCoord2f(1.0f, 1.0f);
+  glVertex3f(-MAXCOORD, -MAXCOORD, +MAXCOORD);
+  glTexCoord2f(0.0f, 1.0f);
+  glVertex3f(+MAXCOORD, -MAXCOORD, +MAXCOORD);
+  glEnd();
 
   glPopMatrix();
 

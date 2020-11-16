@@ -69,7 +69,7 @@ am_icon_t am_icons[am_icon_count + 1] =
 
 typedef struct map_nice_thing_s
 {
-  vbo_xy_uv_rgba_t v[4];
+  vbo_vertex_t v[6];
 } PACKEDATTR map_nice_thing_t;
 
 static array_t map_things[am_icon_count];
@@ -141,6 +141,7 @@ void gld_AddNiceThing(int type, float x, float y, float radius, float angle,
   { \
     thing->v[index].x = _x; \
     thing->v[index].y = _y; \
+    thing->v[index].z = 0.f; \
     thing->v[index].u = _u; \
     thing->v[index].v = _v; \
     thing->v[index].r = r; \
@@ -151,8 +152,10 @@ void gld_AddNiceThing(int type, float x, float y, float radius, float angle,
 
   MAP_NICE_THING_INIT(0, x + sina_r + cosa_r, y - cosa_r + sina_r, 1.0f, 0.0f);
   MAP_NICE_THING_INIT(1, x + sina_r - cosa_r, y - cosa_r - sina_r, 0.0f, 0.0f);
-  MAP_NICE_THING_INIT(2, x - sina_r - cosa_r, y + cosa_r - sina_r, 0.0f, 1.0f);
-  MAP_NICE_THING_INIT(3, x - sina_r + cosa_r, y + cosa_r + sina_r, 1.0f, 1.0f);
+  MAP_NICE_THING_INIT(2, x - sina_r + cosa_r, y + cosa_r + sina_r, 1.0f, 1.0f);
+  MAP_NICE_THING_INIT(3, x + sina_r - cosa_r, y - cosa_r - sina_r, 0.0f, 0.0f);
+  MAP_NICE_THING_INIT(4, x - sina_r - cosa_r, y + cosa_r - sina_r, 0.0f, 1.0f);
+  MAP_NICE_THING_INIT(5, x - sina_r + cosa_r, y + cosa_r + sina_r, 1.0f, 1.0f);
 
 #undef MAP_NICE_THING_INIT
 }
@@ -189,31 +192,31 @@ void gld_DrawNiceThings(int fx, int fy, int fw, int fh)
       map_nice_thing_t *thing = &((map_nice_thing_t*)things->data)[0];
 
       // activate and specify pointers to arrays
-      gld_glVertexPointer(2, GL_FLOAT, sizeof(thing->v[0]), &thing->v[0].x);
+      gld_glVertexPointer(3, GL_FLOAT, sizeof(thing->v[0]), &thing->v[0].x);
       gld_glTexCoordPointer(2, GL_FLOAT, sizeof(thing->v[0]), &thing->v[0].u);
       gld_glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(thing->v[0]), &thing->v[0].r);
 
-      gld_glDrawArrays(GL_QUADS, 0, things->count * 4);
+      gld_glDrawArrays(GL_TRIANGLES, 0, things->count * 6);
     }
 #else
     for (i = 0; i < things->count; i++)
     {
       map_nice_thing_t *thing = &((map_nice_thing_t*)things->data)[i];
 
-      gld_glColor4ubv(&thing->v[0].r);
+      glColor4ubv(&thing->v[0].r);
 
-      gld_glBegin(GL_TRIANGLE_FAN);
+      glBegin(GL_TRIANGLE_FAN);
       {
-        gld_glTexCoord2f(thing->v[0].u, thing->v[0].v);
-        gld_glVertex2f(thing->v[0].x, thing->v[0].y);
-        gld_glTexCoord2f(thing->v[1].u, thing->v[1].v);
-        gld_glVertex2f(thing->v[1].x, thing->v[1].y);
-        gld_glTexCoord2f(thing->v[2].u, thing->v[2].v);
-        gld_glVertex2f(thing->v[2].x, thing->v[2].y);
-        gld_glTexCoord2f(thing->v[3].u, thing->v[3].v);
-        gld_glVertex2f(thing->v[3].x, thing->v[3].y);
+        glTexCoord2f(thing->v[0].u, thing->v[0].v);
+        glVertex2f(thing->v[0].x, thing->v[0].y);
+        glTexCoord2f(thing->v[1].u, thing->v[1].v);
+        glVertex2f(thing->v[1].x, thing->v[1].y);
+        glTexCoord2f(thing->v[2].u, thing->v[2].v);
+        glVertex2f(thing->v[2].x, thing->v[2].y);
+        glTexCoord2f(thing->v[3].u, thing->v[3].v);
+        glVertex2f(thing->v[3].x, thing->v[3].y);
       }
-      gld_glEnd();
+      glEnd();
     }
 #endif
   }

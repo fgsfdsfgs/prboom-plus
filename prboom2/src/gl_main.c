@@ -595,14 +595,14 @@ void gld_MapDrawSubsectors(player_t *plr, int fx, int fy, fixed_t mx, fixed_t my
           continue;
 
         // set the mode (GL_TRIANGLE_FAN)
-        gld_glBegin(currentloop->mode);
+        glBegin(currentloop->mode);
         // go through all vertexes of this loop
         for (vertexnum = currentloop->vertexindex; vertexnum < (currentloop->vertexindex + currentloop->vertexcount); vertexnum++)
         {
-          gld_glTexCoord2f(flats_vbo[vertexnum].u + floor_uoffs, flats_vbo[vertexnum].v + floor_voffs);
-          gld_glVertex3f(flats_vbo[vertexnum].x, flats_vbo[vertexnum].z, 0);
+          glTexCoord2f(flats_vbo[vertexnum].u + floor_uoffs, flats_vbo[vertexnum].v + floor_voffs);
+          glVertex3f(flats_vbo[vertexnum].x, flats_vbo[vertexnum].z, 0);
         }
-        gld_glEnd();
+        glEnd();
       }
     }
   }
@@ -614,21 +614,21 @@ void gld_MapDrawSubsectors(player_t *plr, int fx, int fy, fixed_t mx, fixed_t my
 
 void gld_DrawTriangleStrip(GLWall *wall, gl_strip_coords_t *c)
 {
-  gld_glBegin(GL_TRIANGLE_STRIP);
+  glBegin(GL_TRIANGLE_STRIP);
   
-  gld_glTexCoord2fv((const GLfloat*)&c->t[0]);
-  gld_glVertex3fv((const GLfloat*)&c->v[0]);
+  glTexCoord2fv((const GLfloat*)&c->t[0]);
+  glVertex3fv((const GLfloat*)&c->v[0]);
 
-  gld_glTexCoord2fv((const GLfloat*)&c->t[1]);
-  gld_glVertex3fv((const GLfloat*)&c->v[1]);
+  glTexCoord2fv((const GLfloat*)&c->t[1]);
+  glVertex3fv((const GLfloat*)&c->v[1]);
 
-  gld_glTexCoord2fv((const GLfloat*)&c->t[2]);
-  gld_glVertex3fv((const GLfloat*)&c->v[2]);
+  glTexCoord2fv((const GLfloat*)&c->t[2]);
+  glVertex3fv((const GLfloat*)&c->v[2]);
 
-  gld_glTexCoord2fv((const GLfloat*)&c->t[3]);
-  gld_glVertex3fv((const GLfloat*)&c->v[3]);
+  glTexCoord2fv((const GLfloat*)&c->t[3]);
+  glVertex3fv((const GLfloat*)&c->v[3]);
 
-  gld_glEnd();
+  glEnd();
 }
 
 void gld_DrawNumPatch_f(float x, float y, int lump, int cm, enum patch_translation_e flags)
@@ -699,26 +699,26 @@ void gld_DrawNumPatch_f(float x, float y, int lump, int cm, enum patch_translati
     {
       cm = CR_RED;
     }
-    gld_glColor3f(cm2RGB[cm][0], cm2RGB[cm][1], cm2RGB[cm][2]);//, cm2RGB[cm][3]);
+    glColor3f(cm2RGB[cm][0], cm2RGB[cm][1], cm2RGB[cm][2]);//, cm2RGB[cm][3]);
   }
   else
   {
     // e6y
     // This is a workaround for some on-board Intel video cards.
     // Do you know more elegant solution?
-    gld_glColor3f(1.0f, 1.0f, 1.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
   }
 
-  gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glTexCoord2f(fU1, fV1); gld_glVertex2f((xpos),(ypos));
-    gld_glTexCoord2f(fU1, fV2); gld_glVertex2f((xpos),(ypos+height));
-    gld_glTexCoord2f(fU2, fV1); gld_glVertex2f((xpos+width),(ypos));
-    gld_glTexCoord2f(fU2, fV2); gld_glVertex2f((xpos+width),(ypos+height));
-  gld_glEnd();
+  glBegin(GL_TRIANGLE_STRIP);
+    glTexCoord2f(fU1, fV1); glVertex2f((xpos),(ypos));
+    glTexCoord2f(fU1, fV2); glVertex2f((xpos),(ypos+height));
+    glTexCoord2f(fU2, fV1); glVertex2f((xpos+width),(ypos));
+    glTexCoord2f(fU2, fV2); glVertex2f((xpos+width),(ypos+height));
+  glEnd();
   
   if (bFakeColormap)
   {
-    gld_glColor3f(1.0f,1.0f,1.0f);
+    glColor3f(1.0f,1.0f,1.0f);
   }
 }
 
@@ -758,12 +758,12 @@ void gld_FillFlat(int lump, int x, int y, int width, int height, enum patch_tran
   fU2 = (float)width / (float)gltexture->realtexwidth;
   fV2 = (float)height / (float)gltexture->realtexheight;
 
-  gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glTexCoord2f(fU1, fV1); gld_glVertex2f((float)(x),(float)(y));
-    gld_glTexCoord2f(fU1, fV2); gld_glVertex2f((float)(x),(float)(y + height));
-    gld_glTexCoord2f(fU2, fV1); gld_glVertex2f((float)(x + width),(float)(y));
-    gld_glTexCoord2f(fU2, fV2); gld_glVertex2f((float)(x + width),(float)(y + height));
-  gld_glEnd();
+  glBegin(GL_TRIANGLE_STRIP);
+    glTexCoord2f(fU1, fV1); glVertex2f((float)(x),(float)(y));
+    glTexCoord2f(fU1, fV2); glVertex2f((float)(x),(float)(y + height));
+    glTexCoord2f(fU2, fV1); glVertex2f((float)(x + width),(float)(y));
+    glTexCoord2f(fU2, fV2); glVertex2f((float)(x + width),(float)(y + height));
+  glEnd();
 }
 
 void gld_FillPatch(int lump, int x, int y, int width, int height, enum patch_translation_e flags)
@@ -800,12 +800,12 @@ void gld_FillPatch(int lump, int x, int y, int width, int height, enum patch_tra
   fU2 = (float)width / (float)gltexture->realtexwidth;
   fV2 = (float)height / (float)gltexture->realtexheight;
 
-  gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glTexCoord2f(fU1, fV1); gld_glVertex2f((float)(x),(float)(y));
-    gld_glTexCoord2f(fU1, fV2); gld_glVertex2f((float)(x),(float)(y + height));
-    gld_glTexCoord2f(fU2, fV1); gld_glVertex2f((float)(x + width),(float)(y));
-    gld_glTexCoord2f(fU2, fV2); gld_glVertex2f((float)(x + width),(float)(y + height));
-  gld_glEnd();
+  glBegin(GL_TRIANGLE_STRIP);
+    glTexCoord2f(fU1, fV1); glVertex2f((float)(x),(float)(y));
+    glTexCoord2f(fU1, fV2); glVertex2f((float)(x),(float)(y + height));
+    glTexCoord2f(fU2, fV1); glVertex2f((float)(x + width),(float)(y));
+    glTexCoord2f(fU2, fV2); glVertex2f((float)(x + width),(float)(y + height));
+  glEnd();
 }
 
 void gld_DrawLine_f(float x0, float y0, float x1, float y1, int BaseColor)
@@ -827,16 +827,16 @@ void gld_DrawLine_f(float x0, float y0, float x1, float y1, int BaseColor)
 
   gld_EnableTexture2D(GL_TEXTURE0_ARB, false);
 
-  gld_glColor4f((float)playpal[3*BaseColor]/255.0f,
+  glColor4f((float)playpal[3*BaseColor]/255.0f,
             (float)playpal[3*BaseColor+1]/255.0f,
             (float)playpal[3*BaseColor+2]/255.0f,
             alpha);
-  gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glVertex2f( x0, y0 );
-    gld_glVertex2f( x1, y1 );
-    gld_glVertex2f( x0 + dx, y0 + dy);
-    gld_glVertex2f( x1 + dx, y1 + dy);
-  gld_glEnd();
+  glBegin(GL_TRIANGLE_STRIP);
+    glVertex2f( x0, y0 );
+    glVertex2f( x1, y1 );
+    glVertex2f( x0 + dx, y0 + dy);
+    glVertex2f( x1 + dx, y1 + dy);
+  glEnd();
 
   gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
 #elif defined(USE_VERTEX_ARRAYS) || defined(USE_VBO)
@@ -871,14 +871,14 @@ void gld_DrawLine_f(float x0, float y0, float x1, float y1, int BaseColor)
   if (alpha == 0)
     return;
 
-  gld_glColor4f((float)playpal[3*BaseColor]/255.0f,
+  glColor4f((float)playpal[3*BaseColor]/255.0f,
             (float)playpal[3*BaseColor+1]/255.0f,
             (float)playpal[3*BaseColor+2]/255.0f,
             alpha);
-  gld_glBegin(GL_LINES);
-    gld_glVertex2f( x0, y0 );
-    gld_glVertex2f( x1, y1 );
-  gld_glEnd();
+  glBegin(GL_LINES);
+    glVertex2f( x0, y0 );
+    glVertex2f( x1, y1 );
+  glEnd();
 #endif
 }
 
@@ -920,8 +920,8 @@ void gld_DrawWeapon(int weaponlump, vissprite_t *vis, int lightlevel)
   {
     glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
     glAlphaFunc(GL_GEQUAL,0.1f);
-    //gld_glColor4f(0.2f,0.2f,0.2f,(float)tran_filter_pct/100.0f);
-    gld_glColor4f(0.2f,0.2f,0.2f,0.33f);
+    //glColor4f(0.2f,0.2f,0.2f,(float)tran_filter_pct/100.0f);
+    glColor4f(0.2f,0.2f,0.2f,0.33f);
   }
   else
   {
@@ -930,18 +930,18 @@ void gld_DrawWeapon(int weaponlump, vissprite_t *vis, int lightlevel)
     else
       gld_StaticLight(light);
   }
-  gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glTexCoord2f(fU1, fV1); gld_glVertex2f((float)(x1),(float)(y1));
-    gld_glTexCoord2f(fU1, fV2); gld_glVertex2f((float)(x1),(float)(y2));
-    gld_glTexCoord2f(fU2, fV1); gld_glVertex2f((float)(x2),(float)(y1));
-    gld_glTexCoord2f(fU2, fV2); gld_glVertex2f((float)(x2),(float)(y2));
-  gld_glEnd();
+  glBegin(GL_TRIANGLE_STRIP);
+    glTexCoord2f(fU1, fV1); glVertex2f((float)(x1),(float)(y1));
+    glTexCoord2f(fU1, fV2); glVertex2f((float)(x1),(float)(y2));
+    glTexCoord2f(fU2, fV1); glVertex2f((float)(x2),(float)(y1));
+    glTexCoord2f(fU2, fV2); glVertex2f((float)(x2),(float)(y2));
+  glEnd();
   if(!vis->colormap)
   {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glAlphaFunc(GL_GEQUAL,0.5f);
   }
-  gld_glColor3f(1.0f,1.0f,1.0f);
+  glColor3f(1.0f,1.0f,1.0f);
 }
 
 void gld_FillBlock(int x, int y, int width, int height, int col)
@@ -949,16 +949,16 @@ void gld_FillBlock(int x, int y, int width, int height, int col)
   const unsigned char *playpal = V_GetPlaypal();
 
   gld_EnableTexture2D(GL_TEXTURE0_ARB, false);
-  gld_glColor3f((float)playpal[3*col]/255.0f,
+  glColor3f((float)playpal[3*col]/255.0f,
             (float)playpal[3*col+1]/255.0f,
             (float)playpal[3*col+2]/255.0f);
-  gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glVertex2i( x, y );
-    gld_glVertex2i( x, y+height );
-    gld_glVertex2i( x+width, y );
-    gld_glVertex2i( x+width, y+height );
-  gld_glEnd();
-  gld_glColor3f(1.0f,1.0f,1.0f);
+  glBegin(GL_TRIANGLE_STRIP);
+    glVertex2i( x, y );
+    glVertex2i( x, y+height );
+    glVertex2i( x+width, y );
+    glVertex2i( x+width, y+height );
+  glEnd();
+  glColor3f(1.0f,1.0f,1.0f);
   gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
 }
 
@@ -1300,14 +1300,14 @@ static void gld_ProcessExtraAlpha(void)
   if (extra_alpha>0.0f)
   {
     glDisable(GL_ALPHA_TEST);
-    gld_glColor4f(extra_red, extra_green, extra_blue, extra_alpha);
+    glColor4f(extra_red, extra_green, extra_blue, extra_alpha);
     gld_EnableTexture2D(GL_TEXTURE0_ARB, false);
-    gld_glBegin(GL_TRIANGLE_STRIP);
-      gld_glVertex2f( 0.0f, 0.0f);
-      gld_glVertex2f( 0.0f, (float)SCREENHEIGHT);
-      gld_glVertex2f( (float)SCREENWIDTH, 0.0f);
-      gld_glVertex2f( (float)SCREENWIDTH, (float)SCREENHEIGHT);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_STRIP);
+      glVertex2f( 0.0f, 0.0f);
+      glVertex2f( 0.0f, (float)SCREENHEIGHT);
+      glVertex2f( (float)SCREENWIDTH, 0.0f);
+      glVertex2f( (float)SCREENWIDTH, (float)SCREENHEIGHT);
+    glEnd();
     gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
     glEnable(GL_ALPHA_TEST);
   }
@@ -1317,14 +1317,14 @@ static void gld_ProcessExtraAlpha(void)
 static void gld_InvertScene(void)
 {
   glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
-  gld_glColor4f(1,1,1,1);
+  glColor4f(1,1,1,1);
   gld_EnableTexture2D(GL_TEXTURE0_ARB, false);
-  gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glVertex2f( 0.0f, 0.0f);
-    gld_glVertex2f( 0.0f, (float)SCREENHEIGHT);
-    gld_glVertex2f( (float)SCREENWIDTH, 0.0f);
-    gld_glVertex2f( (float)SCREENWIDTH, (float)SCREENHEIGHT);
-  gld_glEnd();
+  glBegin(GL_TRIANGLE_STRIP);
+    glVertex2f( 0.0f, 0.0f);
+    glVertex2f( 0.0f, (float)SCREENHEIGHT);
+    glVertex2f( (float)SCREENWIDTH, 0.0f);
+    glVertex2f( (float)SCREENWIDTH, (float)SCREENHEIGHT);
+  glEnd();
   gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -1376,11 +1376,11 @@ void gld_EndDrawScene(void)
       glTexEnvi(GL_TEXTURE_ENV,GL_SOURCE1_RGB,GL_TEXTURE);
       glTexEnvi(GL_TEXTURE_ENV,GL_OPERAND1_RGB,GL_SRC_COLOR);
 
-      gld_glColor3f(0.3f, 0.3f, 0.4f);
+      glColor3f(0.3f, 0.3f, 0.4f);
     }
     else
     {
-      gld_glColor3f(1.0f, 1.0f, 1.0f);
+      glColor3f(1.0f, 1.0f, 1.0f);
     }
 
     //e6y: motion bloor effect for strafe50
@@ -1398,14 +1398,14 @@ void gld_EndDrawScene(void)
       GLEXT_glBlendColorEXT(1.0f, 1.0f, 1.0f, motionblur_alpha);
     }
   
-    gld_glBegin(GL_TRIANGLE_STRIP);
+    glBegin(GL_TRIANGLE_STRIP);
     {
-      gld_glTexCoord2f(0.0f, 1.0f); gld_glVertex2f(0.0f, 0.0f);
-      gld_glTexCoord2f(0.0f, 0.0f); gld_glVertex2f(0.0f, (float)SCREENHEIGHT);
-      gld_glTexCoord2f(1.0f, 1.0f); gld_glVertex2f((float)SCREENWIDTH, 0.0f);
-      gld_glTexCoord2f(1.0f, 0.0f); gld_glVertex2f((float)SCREENWIDTH, (float)SCREENHEIGHT);
+      glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 0.0f);
+      glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, (float)SCREENHEIGHT);
+      glTexCoord2f(1.0f, 1.0f); glVertex2f((float)SCREENWIDTH, 0.0f);
+      glTexCoord2f(1.0f, 0.0f); glVertex2f((float)SCREENWIDTH, (float)SCREENHEIGHT);
     }
-    gld_glEnd();
+    glEnd();
 
     
     if (motion_blur.enabled)
@@ -1435,7 +1435,7 @@ void gld_EndDrawScene(void)
     }
   }
 
-  gld_glColor3f(1.0f,1.0f,1.0f);
+  glColor3f(1.0f,1.0f,1.0f);
   glDisable(GL_SCISSOR_TEST);
   glDisable(GL_ALPHA_TEST);
   if (gl_shared_texture_palette)
@@ -1527,7 +1527,7 @@ static void gld_DrawWall(GLWall *wall)
 
   if (!wall->gltexture)
   {
-    gld_glColor4f(1.0f,0.0f,0.0f,1.0f);
+    glColor4f(1.0f,0.0f,0.0f,1.0f);
   }
 
   if (has_detail)
@@ -1553,33 +1553,33 @@ static void gld_DrawWall(GLWall *wall)
     {
       gld_StaticLightAlpha(wall->light, wall->alpha);
 
-      gld_glBegin(GL_TRIANGLE_FAN);
+      glBegin(GL_TRIANGLE_FAN);
 
       // lower left corner
-      gld_glTexCoord2f(wall->ul,wall->vb);
-      gld_glVertex3f(wall->glseg->x1,wall->ybottom,wall->glseg->z1);
+      glTexCoord2f(wall->ul,wall->vb);
+      glVertex3f(wall->glseg->x1,wall->ybottom,wall->glseg->z1);
 
       // split left edge of wall
       if (!wall->glseg->fracleft)
         gld_SplitLeftEdge(wall, false);
 
       // upper left corner
-      gld_glTexCoord2f(wall->ul,wall->vt);
-      gld_glVertex3f(wall->glseg->x1,wall->ytop,wall->glseg->z1);
+      glTexCoord2f(wall->ul,wall->vt);
+      glVertex3f(wall->glseg->x1,wall->ytop,wall->glseg->z1);
 
       // upper right corner
-      gld_glTexCoord2f(wall->ur,wall->vt);
-      gld_glVertex3f(wall->glseg->x2,wall->ytop,wall->glseg->z2);
+      glTexCoord2f(wall->ur,wall->vt);
+      glVertex3f(wall->glseg->x2,wall->ytop,wall->glseg->z2);
 
       // split right edge of wall
       if (!wall->glseg->fracright)
         gld_SplitRightEdge(wall, false);
 
       // lower right corner
-      gld_glTexCoord2f(wall->ur,wall->vb);
-      gld_glVertex3f(wall->glseg->x2,wall->ybottom,wall->glseg->z2);
+      glTexCoord2f(wall->ur,wall->vb);
+      glVertex3f(wall->glseg->x2,wall->ybottom,wall->glseg->z2);
 
-      gld_glEnd();
+      glEnd();
     }
   }
 }
@@ -2113,7 +2113,7 @@ static void gld_DrawFlat(GLFlat *flat)
       if (!currentloop)
         continue;
       // set the mode (GL_TRIANGLES, GL_TRIANGLE_STRIP or GL_TRIANGLE_FAN)
-      gld_glBegin(currentloop->mode);
+      glBegin(currentloop->mode);
       // go through all vertexes of this loop
       for (vertexnum=currentloop->vertexindex; vertexnum<(currentloop->vertexindex+currentloop->vertexcount); vertexnum++)
       {
@@ -2125,14 +2125,14 @@ static void gld_DrawFlat(GLFlat *flat)
         }
         else
         {
-          gld_glTexCoord2fv((GLfloat*)&flats_vbo[vertexnum].u);
+          glTexCoord2fv((GLfloat*)&flats_vbo[vertexnum].u);
         }
         // set vertex coordinate
-        //gld_glVertex3fv((GLfloat*)&flats_vbo[vertexnum].x);
-        gld_glVertex3f(flats_vbo[vertexnum].x, flat->z, flats_vbo[vertexnum].z);
+        //glVertex3fv((GLfloat*)&flats_vbo[vertexnum].x);
+        glVertex3f(flats_vbo[vertexnum].x, flat->z, flats_vbo[vertexnum].z);
       }
       // end of loop
-      gld_glEnd();
+      glEnd();
     }
 #endif
   }
@@ -2291,9 +2291,9 @@ static void gld_DrawSprite(GLSprite *sprite)
       glGetIntegerv(GL_BLEND_SRC, &blend_src);
       glGetIntegerv(GL_BLEND_DST, &blend_dst);
       glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-      //gld_glColor4f(0.2f,0.2f,0.2f,(float)tran_filter_pct/100.0f);
+      //glColor4f(0.2f,0.2f,0.2f,(float)tran_filter_pct/100.0f);
       glAlphaFunc(GL_GEQUAL,0.1f);
-      gld_glColor4f(0.2f,0.2f,0.2f,0.33f);
+      glColor4f(0.2f,0.2f,0.2f,0.33f);
       restore = 1;
     }
     else
@@ -2332,12 +2332,12 @@ static void gld_DrawSprite(GLSprite *sprite)
     z3 = -(sprite->x1 * sin_inv_yaw + y2z2_y * cos_inv_yaw) + sprite->z;
     z4 = -(sprite->x2 * sin_inv_yaw + y2z2_y * cos_inv_yaw) + sprite->z;
 
-    gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glTexCoord2f(sprite->ul, sprite->vt); gld_glVertex3f(x1, y1, z1);
-    gld_glTexCoord2f(sprite->ur, sprite->vt); gld_glVertex3f(x2, y1, z2);
-    gld_glTexCoord2f(sprite->ul, sprite->vb); gld_glVertex3f(x3, y2, z3);
-    gld_glTexCoord2f(sprite->ur, sprite->vb); gld_glVertex3f(x4, y2, z4);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_STRIP);
+    glTexCoord2f(sprite->ul, sprite->vt); glVertex3f(x1, y1, z1);
+    glTexCoord2f(sprite->ur, sprite->vt); glVertex3f(x2, y1, z2);
+    glTexCoord2f(sprite->ul, sprite->vb); glVertex3f(x3, y2, z3);
+    glTexCoord2f(sprite->ur, sprite->vb); glVertex3f(x4, y2, z4);
+    glEnd();
   }
   else
   {
@@ -2352,12 +2352,12 @@ static void gld_DrawSprite(GLSprite *sprite)
     z2 = -(sprite->x1 * sin_inv_yaw) + sprite->z;
     z1 = -(sprite->x2 * sin_inv_yaw) + sprite->z;
 
-    gld_glBegin(GL_TRIANGLE_STRIP);
-    gld_glTexCoord2f(sprite->ul, sprite->vt); gld_glVertex3f(x1, y1, z2);
-    gld_glTexCoord2f(sprite->ur, sprite->vt); gld_glVertex3f(x2, y1, z1);
-    gld_glTexCoord2f(sprite->ul, sprite->vb); gld_glVertex3f(x1, y2, z2);
-    gld_glTexCoord2f(sprite->ur, sprite->vb); gld_glVertex3f(x2, y2, z1);
-    gld_glEnd();
+    glBegin(GL_TRIANGLE_STRIP);
+    glTexCoord2f(sprite->ul, sprite->vt); glVertex3f(x1, y1, z2);
+    glTexCoord2f(sprite->ur, sprite->vt); glVertex3f(x2, y1, z1);
+    glTexCoord2f(sprite->ul, sprite->vb); glVertex3f(x1, y2, z2);
+    glTexCoord2f(sprite->ur, sprite->vb); glVertex3f(x2, y2, z1);
+    glEnd();
   }
 
   if (restore)
@@ -2413,33 +2413,33 @@ static void gld_DrawHealthBars(void)
   {
     gld_EnableTexture2D(GL_TEXTURE0_ARB, false);
 
-    gld_glBegin(GL_LINES);
+    glBegin(GL_LINES);
     for (i = count - 1; i >= 0; i--)
     {
       GLHealthBar *hbar = gld_drawinfo.items[GLDIT_HBAR][i].item.hbar;
       if (hbar->cm != cm)
       {
         cm = hbar->cm;
-        gld_glColor4f(cm2RGB[cm][0], cm2RGB[cm][1], cm2RGB[cm][2], 1.0f);
+        glColor4f(cm2RGB[cm][0], cm2RGB[cm][1], cm2RGB[cm][2], 1.0f);
       }
 
-      gld_glVertex3f(hbar->x1, hbar->y, hbar->z1);
-      gld_glVertex3f(hbar->x2, hbar->y, hbar->z2);
+      glVertex3f(hbar->x1, hbar->y, hbar->z1);
+      glVertex3f(hbar->x2, hbar->y, hbar->z2);
     }
-    gld_glEnd();
+    glEnd();
 
     if (health_bar_full_length)
     {
-      gld_glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
-      gld_glBegin(GL_LINES);
+      glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
+      glBegin(GL_LINES);
       for (i = count - 1; i >= 0; i--)
       {
         GLHealthBar *hbar = gld_drawinfo.items[GLDIT_HBAR][i].item.hbar;
 
-        gld_glVertex3f(hbar->x1, hbar->y, hbar->z1);
-        gld_glVertex3f(hbar->x3, hbar->y, hbar->z3);
+        glVertex3f(hbar->x1, hbar->y, hbar->z1);
+        glVertex3f(hbar->x3, hbar->y, hbar->z3);
       }
-      gld_glEnd();
+      glEnd();
     }
 
     gld_EnableTexture2D(GL_TEXTURE0_ARB, true);
@@ -3204,12 +3204,12 @@ void gld_DrawScene(player_t *player)
     R_AddAllAliveMonstersSprites();
     glDisable(GL_DEPTH_TEST);
     gld_DrawItemsSortByTexture(GLDIT_ASPRITE);
-    gld_glColor4f(1.0f, color, color, 1.0f);
+    glColor4f(1.0f, color, color, 1.0f);
     for (i = gld_drawinfo.num_items[GLDIT_ASPRITE] - 1; i >= 0; i--)
     {
       gld_DrawSprite(gld_drawinfo.items[GLDIT_ASPRITE][i].item.sprite);
     }
-    gld_glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
   }
 
